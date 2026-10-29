@@ -123,6 +123,9 @@ pub struct Replica {
     history: History,
     /// The last revision whose fingerprint was reported.
     hashed: u64,
+    /// Where the last remote edit left its author's selection (client, offsets in the confirmed
+    /// document).
+    author_sel: Option<(String, Anchor)>,
 }
 
 impl Replica {
@@ -144,6 +147,7 @@ impl Replica {
             next_seq: 1,
             history: History::from_entries(rev, history),
             hashed: rev,
+            author_sel: None,
         };
         for op in tail {
             replica.check_next(&op)?;
@@ -254,9 +258,26 @@ impl Replica {
         }
         let before = self.confirmed.doc.clone();
         let spans = self.apply_confirmed(&op)?;
+        self.author_sel = anchor_of(&self.confirmed.doc, &self.confirmed.sel).map(|a| (op.client.clone(), a));
         let hint = spans.iter().find(|(story, _)| *story == op.sel.story).map(|(story, s)| (*story, s.start));
         let dropped_pending = if self.pending.is_empty() { self.follow(visible, &spans) } else { self.rebuild(visible, before, hint) };
         Ok(Applied::Remote { dropped_pending })
+    }
+
+    /// Where the last remote edit left its author's selection: `(client, offsets in the confirmed
+    /// document)`. Taken once.
+    pub fn take_author_selection(&mut self) -> Option<(String, Anchor)> {
+        self.author_sel.take()
+    }
+
+    /// A selection made at confirmed revision `base`, moved through every edit since, in the
+    /// confirmed document's offsets; `None` when `base` is newer than this replica or older than
+    /// its history.
+    pub fn rebase_anchor(&self, sel: &Anchor, base: u64) -> Option<Anchor> {
+        if base > self.rev {
+            return None;
+        }
+        self.history.rebase(sel, base).ok()
     }
 
     /// Skip revision `rev`, which no replica could read (a malformed edit): every replica skips

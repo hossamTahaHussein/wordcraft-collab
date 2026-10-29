@@ -83,6 +83,9 @@ pub struct Peer {
     pub color: u8,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sel: Option<Anchor>,
+    /// The confirmed revision `sel` is relative to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rev: Option<u64>,
 }
 
 /// Relay → replica.
@@ -155,9 +158,11 @@ pub enum Outbound {
     ResyncRequest {
         have: u64,
     },
-    /// Where this person's selection is (at most ten times a second; never logged).
+    /// Where this person's selection is, relative to the confirmed revision `rev` (sent at most
+    /// ten times a second, and only with no edits unconfirmed; never logged).
     Presence {
         sel: Anchor,
+        rev: u64,
     },
 }
 
@@ -250,7 +255,7 @@ mod tests {
     #[test]
     fn presence_messages_decode() {
         let j = decode_inbound(r#"{"t":"Join","client":"b","user":"B","color":1}"#).unwrap();
-        assert_eq!(j, Inbound::Join(Peer { client: "b".into(), user: "B".into(), color: 1, sel: None }));
+        assert_eq!(j, Inbound::Join(Peer { client: "b".into(), user: "B".into(), color: 1, sel: None, rev: None }));
         assert_eq!(decode_inbound(r#"{"t":"Leave","client":"b"}"#).unwrap(), Inbound::Leave { client: "b".into() });
         let p = decode_inbound(r#"{"t":"Presence","client":"a","user":"A","color":0,"sel":{"story":"body","anchor":3,"head":5}}"#).unwrap();
         let Inbound::Presence(peer) = p else { panic!("not presence") };
@@ -260,8 +265,8 @@ mod tests {
         let Inbound::Welcome { peers, .. } = w else { panic!("not welcome") };
         assert_eq!(peers.len(), 1);
         assert_eq!(
-            serde_json::to_value(Outbound::Presence { sel: Anchor { story: StoryRef::Body, anchor: 2, head: 2 } }).unwrap(),
-            json!({"t": "Presence", "sel": {"story": "body", "anchor": 2, "head": 2}})
+            serde_json::to_value(Outbound::Presence { sel: Anchor { story: StoryRef::Body, anchor: 2, head: 2 }, rev: 7 }).unwrap(),
+            json!({"t": "Presence", "sel": {"story": "body", "anchor": 2, "head": 2}, "rev": 7})
         );
     }
 
