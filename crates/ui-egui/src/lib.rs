@@ -451,10 +451,10 @@ fn migrate_units(v: &mut Value) {
     }
 }
 
-/// The application.
 /// Co-editing: someone else in the document, as the host gives them to [`WordApp::peers`].
 pub use canvas::peers::RemotePeer;
 
+/// The application.
 pub struct WordApp {
     pub session: Session,
     pub ui: UiState,

@@ -6,8 +6,7 @@ use std::collections::BTreeMap;
 
 use wordcraft_collab::mapping::{changes, map};
 use wordcraft_collab::proto::{Anchor, HistEntry, Inbound, Op, Outbound, Peer, decode_inbound};
-use wordcraft_collab::replica::{Applied, CollabError, Replica};
-use wordcraft_doc::Document;
+use wordcraft_collab::replica::{Applied, CollabError, Moved, Replica};
 use wordcraft_doc::offsets::{offset_of, pos_at};
 use wordcraft_engine::{Selection, Session};
 
@@ -36,11 +35,10 @@ impl PeerView {
 struct PeerState {
     name: String,
     color: u8,
-    /// Where they are, in the visible document's offsets.
-    anchor: Option<Anchor>,
-    /// Just placed in the current visible document: the next tick doesn't move it again.
-    fresh: bool,
-    /// Where they said they are, at a revision this replica hasn't reached yet.
+    /// Where they are, in the confirmed document's offsets at a revision (the replica's, unless
+    /// a snapshot replaced it since).
+    anchor: Option<(Anchor, u64)>,
+    /// Where they said they are, at a revision not placed yet.
     waiting: Option<(Anchor, u64)>,
     typed_at: Option<f64>,
 }
@@ -59,8 +57,9 @@ pub struct CollabLink {
     note: Option<String>,
     /// The others here, by client id.
     peers: BTreeMap<String, PeerState>,
-    /// The visible document as the peers' positions last followed it (its revision, a copy).
-    followed: Option<(u64, Document)>,
+    /// The visible document's revision when it last matched the confirmed one (nothing of this
+    /// person's unconfirmed).
+    clean: Option<u64>,
     /// This replica's selection as last sent, and when.
     sent: Option<(Anchor, f64)>,
     /// The selection moved but wasn't sent yet (too soon after the last one).
@@ -80,7 +79,7 @@ impl CollabLink {
             save_requested: false,
             note: None,
             peers: BTreeMap::new(),
-            followed: None,
+            clean: None,
             sent: None,
             presence_waiting: false,
             now: 0.0,
@@ -133,17 +132,25 @@ impl CollabLink {
                 return Vec::new();
             }
         };
+        let out = self.handle(message, visible);
+        self.follow(visible);
+        out
+    }
+
+    fn handle(&mut self, message: Inbound, visible: &mut Session) -> Vec<String> {
         match message {
             Inbound::Welcome { rev, snapshot, ops, you, seen, history, peers } => {
                 // The relay's list replaces ours (a reconnect may have missed joins and leaves).
                 self.peers.clear();
+                self.sent = None;
                 let welcome = self.welcome(rev, snapshot, ops, you, seen, history, visible);
+                self.follow(visible);
                 for peer in peers {
-                    self.note_peer(peer, visible);
+                    self.note_peer(peer);
                 }
                 welcome
             }
-            Inbound::Op(op) => self.op(*op, visible),
+            Inbound::Op(op) => self.apply_op(*op, visible),
             Inbound::SnapshotRequest => match self.replica.as_ref().map(Replica::snapshot) {
                 Some(Ok(s)) => vec![encode(&s)],
                 Some(Err(e)) => {
@@ -165,7 +172,7 @@ impl CollabLink {
                 Vec::new()
             }
             Inbound::Join(peer) | Inbound::Presence(peer) => {
-                self.note_peer(peer, visible);
+                self.note_peer(peer);
                 Vec::new()
             }
             Inbound::Leave { client } => {
@@ -179,8 +186,6 @@ impl CollabLink {
     /// for the first person, the opened document as revision 0.
     pub fn tick(&mut self, visible: &mut Session, now_ms: f64) -> Vec<String> {
         self.now = now_ms;
-        self.follow_changes(visible);
-        self.place_waiting(visible);
         if let Some(blank) = self.awaiting {
             if visible.document_id() == blank {
                 return Vec::new();
@@ -193,6 +198,7 @@ impl CollabLink {
                     self.document_ready = true;
                     let snapshot = r.snapshot();
                     self.replica = Some(r);
+                    self.follow(visible);
                     return snapshot.map(|s| vec![encode(&s)]).unwrap_or_default();
                 }
                 Err(e) => log::warn!("co-editing: couldn't start: {e}"),
@@ -200,6 +206,8 @@ impl CollabLink {
         }
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         replica.drain_local(visible);
+        self.follow(visible);
+        let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         let mut out = Vec::new();
         if let Some(op) = replica.next_to_send() {
             out.push(encode(&Outbound::Op(Box::new(op))));
@@ -215,16 +223,25 @@ impl CollabLink {
 
     /// The others here, their selections in the visible document.
     pub fn peers(&self, visible: &Session) -> Vec<PeerView> {
+        let replica = self.replica.as_ref();
+        // This person's unconfirmed edits, which move everyone on their screen (worked out only
+        // when someone has a position and there are such edits).
+        let mut mine = None;
+        let mut on_screen = |a: &Anchor| {
+            let replica = replica?;
+            let mine = mine
+                .get_or_insert_with(|| if self.clean == Some(visible.rev()) { Vec::new() } else { changes(replica.confirmed(), &visible.doc, None) });
+            let a = move_through(a, mine);
+            visible.doc.story(a.story)?;
+            Some(Selection { anchor: pos_at(&visible.doc, a.story, a.anchor), focus: pos_at(&visible.doc, a.story, a.head) })
+        };
         self.peers
             .iter()
             .map(|(client, p)| PeerView {
                 client: client.clone(),
                 name: p.name.clone(),
                 color: p.color,
-                sel: p
-                    .anchor
-                    .as_ref()
-                    .map(|a| Selection { anchor: pos_at(&visible.doc, a.story, a.anchor), focus: pos_at(&visible.doc, a.story, a.head) }),
+                sel: p.anchor.as_ref().and_then(|(a, _)| on_screen(a)),
                 typed_at: p.typed_at,
             })
             .collect()
@@ -236,81 +253,77 @@ impl CollabLink {
         self.presence_waiting
     }
 
-    fn note_peer(&mut self, peer: Peer, visible: &Session) {
-        let entry = self.peers.entry(peer.client.clone()).or_insert(PeerState {
-            name: String::new(),
-            color: 0,
-            anchor: None,
-            fresh: false,
-            waiting: None,
-            typed_at: None,
-        });
+    fn note_peer(&mut self, peer: Peer) {
+        let entry =
+            self.peers.entry(peer.client.clone()).or_insert(PeerState { name: String::new(), color: 0, anchor: None, waiting: None, typed_at: None });
         entry.name = peer.user;
         entry.color = peer.color;
-        if let Some(sel) = peer.sel {
-            entry.waiting = Some((sel, peer.rev.unwrap_or(0)));
+        // A position without its revision can't be placed.
+        if let (Some(sel), Some(rev)) = (peer.sel, peer.rev) {
+            entry.waiting = Some((sel, rev));
         }
-        self.place_waiting(visible);
+        self.place_waiting();
     }
 
-    /// Place the positions people sent, once this replica has the revision each is relative to:
-    /// moved through the edits since, then through this person's own unconfirmed edits.
-    fn place_waiting(&mut self, visible: &Session) {
+    /// Move everyone through the edits the replica confirmed since the last call, each through
+    /// that edit's own change; the edit's author goes where it left them. Then place the
+    /// positions people sent that this replica can now place.
+    fn follow(&mut self, visible: &Session) {
+        let Some(replica) = self.replica.as_mut() else { return };
+        let restarted = replica.take_restarted();
+        let moved = replica.take_moved();
+        self.clean = (replica.pending_len() == 0).then(|| visible.rev());
+        if restarted {
+            // The offsets were the old confirmed document's: place them again from their revision.
+            for p in self.peers.values_mut() {
+                if let Some((a, at)) = p.anchor.take()
+                    && p.waiting.as_ref().is_none_or(|(_, w)| *w < at)
+                {
+                    p.waiting = Some((a, at));
+                }
+            }
+        }
+        let me = self.you.clone().unwrap_or_default();
+        for m in moved {
+            if m.client == me {
+                // Others saw this person's caret move with the edit: say again where it is.
+                self.sent = None;
+            }
+            for (client, p) in self.peers.iter_mut() {
+                follow_one(client, p, &m, self.now);
+            }
+        }
+        self.place_waiting();
+    }
+
+    /// Place the positions people sent, once this replica has the revision each is relative to.
+    fn place_waiting(&mut self) {
         let Some(replica) = self.replica.as_ref() else { return };
-        let mine = changes(replica.confirmed(), &visible.doc, None);
         for p in self.peers.values_mut() {
             let Some((sel, rev)) = p.waiting.clone() else { continue };
             if rev > replica.rev() {
                 continue;
             }
             p.waiting = None;
-            if let Some(a) = replica.rebase_anchor(&sel, rev) {
-                p.anchor = Some(move_through(&a, &mine));
-                p.fresh = true;
-            }
+            p.anchor = replica.rebase_anchor(&sel, rev).map(|a| (a, replica.rev()));
         }
-    }
-
-    /// Move the peers' positions through whatever changed in the visible document since the last
-    /// tick: someone's edit, or this person's own typing.
-    fn follow_changes(&mut self, visible: &Session) {
-        let rev = visible.rev();
-        if let Some((seen, before)) = &self.followed {
-            if *seen == rev {
-                return;
-            }
-            let spans = changes(before, &visible.doc, None);
-            for p in self.peers.values_mut() {
-                // A position placed since the last tick is already in the current document.
-                if std::mem::take(&mut p.fresh) {
-                    continue;
-                }
-                if let Some(a) = p.anchor.as_mut() {
-                    *a = move_through(a, &spans);
-                }
-            }
-        }
-        for p in self.peers.values_mut() {
-            p.fresh = false;
-        }
-        self.followed = Some((rev, visible.doc.clone()));
     }
 
     /// This person's selection for the relay, when it moved and the last one is 100 ms old.
     fn presence_due(&mut self, visible: &Session, now_ms: f64) -> Option<String> {
+        self.presence_waiting = false;
         let sel = &visible.sel;
         if sel.anchor.story != sel.focus.story {
             return None;
         }
-        // With edits unconfirmed the visible offsets aren't the confirmed revision's: wait.
+        // With edits unconfirmed the visible offsets aren't the confirmed revision's: wait (their
+        // confirmation brings a message, and a tick).
         let replica = self.replica.as_ref()?;
         if replica.pending_len() > 0 {
-            self.presence_waiting = true;
             return None;
         }
         let rev = replica.rev();
         let here = Anchor { story: sel.anchor.story, anchor: offset_of(&visible.doc, &sel.anchor)?, head: offset_of(&visible.doc, &sel.focus)? };
-        self.presence_waiting = false;
         if self.sent.as_ref().is_some_and(|(last, _)| *last == here) {
             return None;
         }
@@ -372,23 +385,6 @@ impl CollabLink {
         }
     }
 
-    fn op(&mut self, op: Op, visible: &mut Session) -> Vec<String> {
-        let out = self.apply_op(op, visible);
-        // The author's caret is where their edit left it.
-        if let Some((client, a)) = self.replica.as_mut().and_then(|r| r.take_author_selection())
-            && let Some(replica) = self.replica.as_ref()
-        {
-            let mine = changes(replica.confirmed(), &visible.doc, None);
-            if let Some(p) = self.peers.get_mut(&client) {
-                p.anchor = Some(move_through(&a, &mine));
-                p.fresh = true;
-                p.waiting = None;
-                p.typed_at = Some(self.now);
-            }
-        }
-        out
-    }
-
     fn apply_op(&mut self, op: Op, visible: &mut Session) -> Vec<String> {
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         match replica.receive(op, visible) {
@@ -444,6 +440,26 @@ fn move_through(a: &Anchor, spans: &[(wordcraft_doc::StoryRef, wordcraft_collab:
         }
     }
     out
+}
+
+/// One peer through one confirmed edit `m`.
+fn follow_one(client: &str, p: &mut PeerState, m: &Moved, now: f64) {
+    if client == m.client {
+        // Unless they said where they are after this edit, they are where it left them.
+        if p.waiting.as_ref().is_none_or(|(_, w)| *w < m.rev) && p.anchor.as_ref().is_none_or(|(_, at)| *at < m.rev) {
+            p.waiting = None;
+            if let Some(a) = &m.author_sel {
+                p.anchor = Some((a.clone(), m.rev));
+            }
+            p.typed_at = Some(now);
+        }
+    }
+    if let Some((a, at)) = p.anchor.as_mut()
+        && *at + 1 == m.rev
+    {
+        *a = move_through(a, &m.spans);
+        *at = m.rev;
+    }
 }
 
 fn dropped_note(n: usize) -> String {
@@ -715,7 +731,8 @@ mod presence_tests {
     }
 
     fn presence(client: &str, user: &str, anchor: usize) -> String {
-        json!({"t": "Presence", "client": client, "user": user, "color": 3, "sel": {"story": "body", "anchor": anchor, "head": anchor}}).to_string()
+        json!({"t": "Presence", "client": client, "user": user, "color": 3, "rev": 0, "sel": {"story": "body", "anchor": anchor, "head": anchor}})
+            .to_string()
     }
 
     fn caret_off(link: &CollabLink, s: &Session, client: &str) -> usize {
@@ -754,7 +771,7 @@ mod presence_tests {
     #[test]
     fn peer_caret_moves_with_text_typed_before_it() {
         let (mut link, mut s) =
-            joined("Hello world", json!([{"client": "a", "user": "Ann", "color": 0, "sel": {"story": "body", "anchor": 6, "head": 6}}]));
+            joined("Hello world", json!([{"client": "a", "user": "Ann", "color": 0, "rev": 0, "sel": {"story": "body", "anchor": 6, "head": 6}}]));
         s.run("caret.docStart", &json!({})).unwrap();
         s.run("text.insert", &json!({"text": "Hi "})).unwrap();
         link.tick(&mut s, 10.0);
@@ -763,8 +780,10 @@ mod presence_tests {
 
     #[test]
     fn peer_caret_survives_deletion_around_it() {
-        let (mut link, mut s) =
-            joined("Hello big world", json!([{"client": "a", "user": "Ann", "color": 0, "sel": {"story": "body", "anchor": 8, "head": 8}}]));
+        let (mut link, mut s) = joined(
+            "Hello big world",
+            json!([{"client": "a", "user": "Ann", "color": 0, "rev": 0, "sel": {"story": "body", "anchor": 8, "head": 8}}]),
+        );
         s.run("select.text", &json!({"text": "big "})).unwrap();
         s.run("text.delete", &json!({})).unwrap();
         link.tick(&mut s, 10.0);
@@ -884,5 +903,159 @@ mod presence_order_tests {
         let p = presence(&link.tick(&mut s, 1200.0)).expect("sent once confirmed");
         let v: serde_json::Value = serde_json::from_str(&p).unwrap();
         assert_eq!(v["rev"], 1);
+    }
+}
+
+#[cfg(test)]
+mod presence_review_tests {
+    use serde_json::{Value, json};
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    fn snap(text: &str) -> String {
+        let mut s = Session::new(Document::new());
+        s.run("text.insert", &json!({"text": text})).unwrap();
+        String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap()
+    }
+
+    fn joined(text: &str, peers: Value) -> (CollabLink, Session) {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap(text), "ops": [], "you": "me", "peers": peers}).to_string(), &mut s);
+        link.tick(&mut s, 0.0);
+        (link, s)
+    }
+
+    fn at(client: &str, user: &str, off: usize) -> Value {
+        json!({"client": client, "user": user, "color": 0, "rev": 0, "sel": {"story": "body", "anchor": off, "head": off}})
+    }
+
+    fn op(client: &str, seq: u64, rev: u64, at: usize, text: &str) -> String {
+        json!({"t": "Op", "client": client, "seq": seq, "base": rev - 1, "kind": "cmd", "cmd": "text.insert", "params": {"text": text},
+            "sel": {"story": "body", "anchor": at, "head": at}, "ctx": {}, "rev": rev})
+        .to_string()
+    }
+
+    fn off(link: &CollabLink, s: &Session, client: &str) -> Option<usize> {
+        link.peers(s).into_iter().find(|p| p.client == client).and_then(|p| p.sel).map(|sel| sel.focus.off)
+    }
+
+    /// C1: a position placed by Presence still moves with the next edit, after idle ticks.
+    #[test]
+    fn a_placed_peer_moves_with_my_next_edit_after_idle_ticks() {
+        let (mut link, mut s) = joined("Hello world", json!([]));
+        link.on_message(
+            &json!({"t": "Presence", "client": "a", "user": "Ann", "color": 0, "rev": 0, "sel": {"story": "body", "anchor": 6, "head": 6}})
+                .to_string(),
+            &mut s,
+        );
+        for t in 1..5 {
+            link.tick(&mut s, t as f64 * 10.0);
+        }
+        s.run("caret.docStart", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "Hi "})).unwrap();
+        link.tick(&mut s, 100.0);
+        assert_eq!(off(&link, &s, "a"), Some(9));
+    }
+
+    /// C2: my typing and someone's edit in the same frame move an idle peer correctly.
+    #[test]
+    fn an_idle_peer_moves_correctly_when_two_edits_land_in_one_frame() {
+        let (mut link, mut s) = joined("Hello world", json!([at("b", "Bob", 6), {"client": "a", "user": "Ann", "color": 1}]));
+        // My keystroke (start of the text) and Ann's edit (end) arrive before the next tick.
+        s.run("caret.docStart", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "Hi "})).unwrap();
+        link.on_message(&op("a", 1, 1, 11, "!!!"), &mut s);
+        link.tick(&mut s, 10.0);
+        assert_eq!(off(&link, &s, "b"), Some(9), "Bob stays on 'w', shifted only by my 'Hi '");
+    }
+
+    /// C2: two remote edits in one frame: the first author is moved by the second edit.
+    #[test]
+    fn a_typing_peer_is_moved_by_a_later_edit_in_the_same_frame() {
+        let (mut link, mut s) =
+            joined("Hello world", json!([{"client": "a", "user": "Ann", "color": 0}, {"client": "b", "user": "Bob", "color": 1}]));
+        link.on_message(&op("a", 1, 1, 11, "!"), &mut s); // Ann ends at 12
+        link.on_message(&op("b", 1, 2, 0, "Big "), &mut s); // Bob inserts 4 before her
+        link.tick(&mut s, 10.0);
+        assert_eq!(off(&link, &s, "a"), Some(16));
+        assert_eq!(off(&link, &s, "b"), Some(4));
+    }
+
+    /// C3: one malformed person in a Welcome doesn't stop the newcomer from joining.
+    #[test]
+    fn a_malformed_peer_in_welcome_is_skipped() {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        let peers = json!([{"client": "x", "user": "X", "color": 300}, {"client": "y", "user": "Y", "color": 1, "sel": {"story": {"part": 1, "junk": "z"}, "anchor": 0, "head": 0}}, {"client": "a", "user": "Ann", "color": 2}]);
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap("Hi"), "ops": [], "you": "me", "peers": peers}).to_string(), &mut s);
+        assert_eq!(link.rev(), Some(0), "joined");
+        let names: Vec<String> = link.peers(&s).into_iter().map(|p| p.name).collect();
+        assert_eq!(names, ["Ann"]);
+    }
+
+    /// I1: a resync's replayed edits don't leave an author position to be applied on my next echo.
+    #[test]
+    fn my_echo_never_moves_someone_else() {
+        let (mut link, mut s) = joined("Hello world", json!([at("a", "Ann", 3)]));
+        // A resync whose tail has Ann's edit (her caret placed by it), then my own edit and echo.
+        let tail: Value = serde_json::from_str(&op("a", 1, 1, 11, "!")).unwrap();
+        link.on_message(&json!({"t": "Resync", "rev": 0, "snapshot": snap("Hello world"), "ops": [tail]}).to_string(), &mut s);
+        link.tick(&mut s, 10.0);
+        let before = off(&link, &s, "a");
+        s.run("caret.docStart", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "x"})).unwrap();
+        let out = link.tick(&mut s, 20.0);
+        let mut mine: Value = serde_json::from_str(out.iter().find(|m| m.contains(r#""t":"Op""#)).unwrap()).unwrap();
+        mine["rev"] = json!(2);
+        link.on_message(&mine.to_string(), &mut s);
+        link.tick(&mut s, 30.0);
+        assert_eq!(off(&link, &s, "a"), before.map(|o| o + 1), "shifted by my 'x', nothing else");
+    }
+
+    /// I2: after my edit is confirmed, my position is sent again even if it equals the last one sent.
+    #[test]
+    fn my_position_is_resent_after_my_edit_is_confirmed() {
+        let (mut link, mut s) = joined("Hello", json!([]));
+        let presence = |out: &[String]| out.iter().any(|m| m.contains(r#""t":"Presence""#));
+        s.run("caret.docEnd", &json!({})).unwrap();
+        assert!(presence(&link.tick(&mut s, 1000.0)));
+        s.run("text.insert", &json!({"text": "!"})).unwrap();
+        s.run("caret.left", &json!({})).unwrap();
+        let out = link.tick(&mut s, 1200.0);
+        let mut mine: Value = serde_json::from_str(out.iter().find(|m| m.contains(r#""t":"Op""#)).unwrap()).unwrap();
+        mine["rev"] = json!(1);
+        link.on_message(&mine.to_string(), &mut s);
+        assert!(presence(&link.tick(&mut s, 1400.0)), "others saw me move with my edit: say where I really am");
+    }
+
+    /// I4: unconfirmed edits don't keep asking for a tick every 100 ms.
+    #[test]
+    fn unconfirmed_edits_do_not_keep_presence_pending() {
+        let (mut link, mut s) = joined("Hello", json!([]));
+        s.run("caret.docEnd", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "!"})).unwrap();
+        link.tick(&mut s, 1000.0);
+        assert!(!link.presence_pending());
+    }
+
+    /// I6: someone in a story that doesn't exist has no caret (not one at the top of the body).
+    #[test]
+    fn a_peer_in_a_missing_story_has_no_position() {
+        let (link, s) =
+            joined("Hello", json!([{"client": "a", "user": "Ann", "color": 0, "rev": 0, "sel": {"story": {"part": 77}, "anchor": 1, "head": 1}}]));
+        assert_eq!(link.peers(&s)[0].sel, None);
+        let _ = StoryRef::Body;
+    }
+
+    /// I7: a resync keeps people where they were instead of piling them at the end.
+    #[test]
+    fn a_resync_keeps_people_in_place() {
+        let (mut link, mut s) = joined("Hello world", json!([at("a", "Ann", 6)]));
+        link.on_message(&json!({"t": "Resync", "rev": 0, "snapshot": snap("Hello world"), "ops": []}).to_string(), &mut s);
+        link.tick(&mut s, 10.0);
+        assert_eq!(off(&link, &s, "a"), Some(6));
     }
 }

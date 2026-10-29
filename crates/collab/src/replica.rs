@@ -123,9 +123,20 @@ pub struct Replica {
     history: History,
     /// The last revision whose fingerprint was reported.
     hashed: u64,
-    /// Where the last remote edit left its author's selection (client, offsets in the confirmed
-    /// document).
-    author_sel: Option<(String, Anchor)>,
+    /// The confirmed edits since the link last looked, for following people's positions.
+    moved: Vec<Moved>,
+    /// The confirmed document was replaced by a snapshot since the link last looked.
+    restarted: bool,
+}
+
+/// One confirmed edit as it moves positions: its revision, who made it, what it changed (in the
+/// confirmed document before it) and where it left its author's selection.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Moved {
+    pub rev: u64,
+    pub client: String,
+    pub spans: Vec<(StoryRef, Span)>,
+    pub author_sel: Option<Anchor>,
 }
 
 impl Replica {
@@ -147,7 +158,8 @@ impl Replica {
             next_seq: 1,
             history: History::from_entries(rev, history),
             hashed: rev,
-            author_sel: None,
+            moved: Vec::new(),
+            restarted: false,
         };
         for op in tail {
             replica.check_next(&op)?;
@@ -258,16 +270,20 @@ impl Replica {
         }
         let before = self.confirmed.doc.clone();
         let spans = self.apply_confirmed(&op)?;
-        self.author_sel = anchor_of(&self.confirmed.doc, &self.confirmed.sel).map(|a| (op.client.clone(), a));
         let hint = spans.iter().find(|(story, _)| *story == op.sel.story).map(|(story, s)| (*story, s.start));
         let dropped_pending = if self.pending.is_empty() { self.follow(visible, &spans) } else { self.rebuild(visible, before, hint) };
         Ok(Applied::Remote { dropped_pending })
     }
 
-    /// Where the last remote edit left its author's selection: `(client, offsets in the confirmed
-    /// document)`. Taken once.
-    pub fn take_author_selection(&mut self) -> Option<(String, Anchor)> {
-        self.author_sel.take()
+    /// The confirmed edits since the last call, oldest first.
+    pub fn take_moved(&mut self) -> Vec<Moved> {
+        std::mem::take(&mut self.moved)
+    }
+
+    /// True once after the confirmed document was replaced by a snapshot: positions kept in the
+    /// old one's offsets must be placed again (see [`Replica::rebase_anchor`]).
+    pub fn take_restarted(&mut self) -> bool {
+        std::mem::take(&mut self.restarted)
     }
 
     /// A selection made at confirmed revision `base`, moved through every edit since, in the
@@ -288,6 +304,7 @@ impl Replica {
         }
         self.rev = rev;
         self.history.push(rev, Vec::new());
+        self.moved.push(Moved { rev, client: String::new(), spans: Vec::new(), author_sel: None });
         Ok(())
     }
 
@@ -310,6 +327,8 @@ impl Replica {
             self.rev = rev;
             self.history = History::from_entries(rev, history);
             self.hashed = rev;
+            self.moved.clear();
+            self.restarted = true;
             let seen = seen.unwrap_or(0);
             self.rebuild_skipping(visible, before, None, |op| op.seq <= seen);
         }
@@ -340,6 +359,8 @@ impl Replica {
         let spans = changes(&before, &self.confirmed.doc, Some((sel.story, sel.anchor.min(sel.head))));
         self.rev += 1;
         self.history.push(self.rev, spans.clone());
+        let author_sel = anchor_of(&self.confirmed.doc, &self.confirmed.sel);
+        self.moved.push(Moved { rev: self.rev, client: op.client.clone(), spans: spans.clone(), author_sel });
         Ok(spans)
     }
 

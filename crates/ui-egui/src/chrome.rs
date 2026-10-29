@@ -356,7 +356,7 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                         let _ = app.run("ui.backstage", json!({"value": true, "page": "options", "pane": "general"}));
                     }
                     ui.add_space(8.0);
-                    // Co-editing: the other people here, newest leftmost; a click goes to them.
+                    // Co-editing: the other people here (in a stable order); a click goes to them.
                     let (shown, more) = crate::canvas::peers::avatars(&app.peers);
                     if more > 0 {
                         let label = format!("+{more}");

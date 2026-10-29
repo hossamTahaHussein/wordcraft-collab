@@ -106,8 +106,8 @@ pub enum Inbound {
         /// With a snapshot: the changes of the revisions before it.
         #[serde(default)]
         history: Vec<HistEntry>,
-        /// The people already here.
-        #[serde(default)]
+        /// The people already here (one that can't be read is left out, not the whole message).
+        #[serde(default, deserialize_with = "readable_peers")]
         peers: Vec<Peer>,
     },
     Op(Box<Op>),
@@ -164,6 +164,11 @@ pub enum Outbound {
         sel: Anchor,
         rev: u64,
     },
+}
+
+fn readable_peers<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Vec<Peer>, D::Error> {
+    let all = Vec::<Value>::deserialize(d)?;
+    Ok(all.into_iter().filter_map(|v| serde_json::from_value(v).ok()).collect())
 }
 
 #[derive(Debug, thiserror::Error)]
