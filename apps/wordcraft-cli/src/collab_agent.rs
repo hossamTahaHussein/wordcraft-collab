@@ -107,8 +107,6 @@ pub struct Collab {
     changes: Vec<Change>,
     /// Why the relay refused an edit of this call's.
     refused: Option<String>,
-    /// The agent's edits are tracked suggestions.
-    suggesting: bool,
     relay: String,
 }
 
@@ -159,6 +157,9 @@ impl Collab {
             session.author = name.to_string();
             replica.attach(&mut session);
             session.set_collab_role(CollabRole::parse(role.as_deref().unwrap_or("edit")));
+            if session.collab_role() != CollabRole::Suggest {
+                session.set_collab_tracking(suggesting);
+            }
             let peers = peers.into_iter().map(|p| (p.client, (p.user, p.color))).collect();
             return Ok(Collab {
                 wire,
@@ -170,7 +171,6 @@ impl Collab {
                 peers,
                 changes: Vec::new(),
                 refused: None,
-                suggesting,
                 relay: String::new(),
             });
         }
@@ -314,16 +314,10 @@ impl Collab {
         Ok(json!({"rev": self.replica.rev(), "changes": changes}))
     }
 
-    /// Run a method on the shared document; the agent's own edits are suggestions when it
-    /// suggests (unless the call itself switched tracking).
+    /// Run a method on the shared document (the agent's own Suggesting applies, as a person's
+    /// does).
     fn run_here(&mut self, method: &str, params: Value) -> Result<Value, String> {
-        let before = self.session.doc.settings.track_changes;
-        self.session.doc.settings.track_changes = self.suggesting || before;
-        let result = wordcraft_mcp::answer_on(&mut self.session, method, params);
-        if self.session.doc.settings.track_changes == (self.suggesting || before) {
-            self.session.doc.settings.track_changes = before;
-        }
-        result
+        wordcraft_mcp::answer_on(&mut self.session, method, params)
     }
 }
 

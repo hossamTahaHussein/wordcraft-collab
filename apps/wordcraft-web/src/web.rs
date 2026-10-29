@@ -243,6 +243,16 @@ impl eframe::App for WebShell {
             self.app.collab.can_undo = link.can_undo();
             self.app.collab.can_redo = link.can_redo();
             self.app.collab.offline = link.offline_locked();
+            self.app.collab.sync = self.app.collab.active.then(|| {
+                use wordcraft_ui_egui::collab_ui::SyncState;
+                if !link.online() {
+                    SyncState::Offline
+                } else if link.pending() > 0 {
+                    SyncState::Saving
+                } else {
+                    SyncState::Saved
+                }
+            });
             if let (Some(versions), Some(history)) = (link.take_versions(), self.app.collab.history.as_mut()) {
                 history.rows =
                     Some(versions.into_iter().map(|v| wordcraft_ui_egui::collab_ui::VersionRow { rev: v.rev, at: v.at, users: v.users }).collect());
@@ -251,7 +261,8 @@ impl eframe::App for WebShell {
                 && let Some(history) = self.app.collab.history.as_mut()
                 && history.preview.as_ref().is_some_and(|(r, _)| *r == rev)
             {
-                history.preview = Some((rev, Some(doc.map(|json| crate::collab_link::version_text(&json)).unwrap_or_default())));
+                let doc = doc.and_then(|json| crate::collab_link::version_doc(&json));
+                history.preview = Some((rev, Some(wordcraft_ui_egui::collab_ui::VersionPreview::new(doc))));
             }
             for request in self.app.take_collab_requests() {
                 use wordcraft_ui_egui::collab_ui::CollabRequest;

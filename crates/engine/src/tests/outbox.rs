@@ -248,3 +248,32 @@ fn a_viewer_changes_nothing_and_a_commenter_only_comments() {
     assert_eq!(CollabRole::parse("view"), CollabRole::View);
     assert_eq!(CollabRole::parse("nonsense"), CollabRole::Edit);
 }
+
+#[test]
+fn track_changes_while_co_editing_is_the_persons_own() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hi"})).unwrap();
+    s.take_outbox();
+    s.run("review.trackChanges", &json!({"value": true})).unwrap();
+    assert!(s.take_outbox().is_empty(), "nothing shared changes");
+    assert!(!s.doc.settings.track_changes, "the document's setting stays");
+    assert!(s.tracking());
+    s.run("text.insert", &json!({"text": "!"})).unwrap();
+    let r = s.take_outbox().pop().unwrap();
+    assert!(r.ctx.track, "the edit is a suggestion");
+    assert!(!s.doc.revisions.is_empty(), "and shows as one here at once");
+    assert!(!s.doc.settings.track_changes);
+}
+
+#[test]
+fn a_suggester_only_suggests() {
+    use crate::outbox::CollabRole;
+    let mut s = collab();
+    s.set_collab_role(CollabRole::Suggest);
+    assert_eq!(CollabRole::parse("suggest"), CollabRole::Suggest);
+    s.run("text.insert", &json!({"text": "Hi"})).unwrap();
+    assert!(s.take_outbox().pop().unwrap().ctx.track);
+    for id in ["review.trackChanges", "review.acceptAll", "review.reject"] {
+        assert!(matches!(s.run(id, &json!({"value": false})), Err(CmdError::Disabled(m)) if m.contains("only suggest")), "{id}");
+    }
+}

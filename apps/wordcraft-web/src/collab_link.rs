@@ -118,6 +118,11 @@ impl CollabLink {
         }
     }
 
+    /// Whether the page is connected to the relay.
+    pub fn online(&self) -> bool {
+        self.offline_since.is_none()
+    }
+
     /// The document is read only until this person's edits sync (offline too long, or too many
     /// waiting).
     pub fn offline_locked(&self) -> bool {
@@ -587,15 +592,9 @@ impl CollabLink {
     }
 }
 
-/// A kept version's text for its preview (native JSON in; empty when it can't be read).
-pub fn version_text(json: &str) -> String {
-    match wordcraft_engine::io::open_bytes("version.json", json.as_bytes()) {
-        Ok(doc) => {
-            let mut s = Session::new(doc);
-            s.run("document.text", &serde_json::json!({})).ok().and_then(|v| v["text"].as_str().map(str::to_string)).unwrap_or_default()
-        }
-        Err(_) => String::new(),
-    }
+/// A kept version's document for its preview (native JSON in; `None` when it can't be read).
+pub fn version_doc(json: &str) -> Option<wordcraft_doc::Document> {
+    wordcraft_engine::io::open_bytes("version.json", json.as_bytes()).ok()
 }
 
 /// `a` moved through `spans` (someone else's changes: a position at a change stays before it).
@@ -1385,8 +1384,8 @@ mod protocol_v2_tests {
         assert_eq!(link.take_versions().unwrap()[0].users, ["Ann"]);
         link.on_message(&json!({"t": "VersionDoc", "rev": 2, "doc": snap("Then")}).to_string(), &mut s);
         let (_, doc) = link.take_version_doc().unwrap();
-        assert_eq!(super::version_text(&doc.unwrap()).trim_end(), "Then");
-        assert_eq!(super::version_text("not json"), "");
+        assert_eq!(super::version_doc(&doc.unwrap()).unwrap().plain_text(StoryRef::Body), "Then");
+        assert!(super::version_doc("not json").is_none());
         assert!(link.restore(2));
         let out = super::edits_only(link.tick(&mut s, 0.0));
         let op = parse(&out[0]);

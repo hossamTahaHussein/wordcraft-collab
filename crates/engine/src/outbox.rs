@@ -32,6 +32,9 @@ pub const COLLAB_DISABLED: &[&str] = &[
 /// snapshot history.
 pub const COLLAB_UNDO: &[&str] = &["edit.undo", "edit.redo"];
 
+/// What a suggester may not do: decide on suggestions, or put back a whole version.
+pub const SUGGESTER_REFUSED: &[&str] = &["review.accept", "review.acceptAll", "review.reject", "review.rejectAll"];
+
 /// What a commenter may change while co-editing (the relay's `comment-commands.json`).
 pub const COMMENT_COMMANDS: &[&str] = &["review.newComment", "review.reply", "review.editComment", "review.deleteComment", "review.resolveComment"];
 
@@ -42,6 +45,9 @@ pub enum CollabRole {
     Edit,
     /// Comments only.
     Comment,
+    /// Everything, but as tracked suggestions others accept or reject (and no accepting or
+    /// rejecting themselves).
+    Suggest,
     /// Read only.
     View,
 }
@@ -51,6 +57,7 @@ impl CollabRole {
     pub fn parse(s: &str) -> CollabRole {
         match s {
             "comment" => CollabRole::Comment,
+            "suggest" => CollabRole::Suggest,
             "view" => CollabRole::View,
             _ => CollabRole::Edit,
         }
@@ -80,6 +87,9 @@ pub struct Recorded {
 pub(crate) struct CollabState {
     on: bool,
     role: CollabRole,
+    /// The person's own Track Changes while co-editing (Suggesting); `None` follows the
+    /// document's setting. Each person suggests or edits on their own.
+    track: Option<bool>,
     recording: bool,
     /// A recorded command is running: the commands it runs aren't recorded again.
     busy: bool,
@@ -88,7 +98,7 @@ pub(crate) struct CollabState {
 
 impl Default for CollabState {
     fn default() -> Self {
-        CollabState { on: false, role: CollabRole::Edit, recording: true, busy: false, outbox: Vec::new() }
+        CollabState { on: false, role: CollabRole::Edit, track: None, recording: true, busy: false, outbox: Vec::new() }
     }
 }
 
@@ -119,6 +129,23 @@ impl Session {
     /// before the edit shows.
     pub fn set_collab_role(&mut self, role: CollabRole) {
         self.collab.role = role;
+        if role == CollabRole::Suggest {
+            self.collab.track = Some(true);
+        }
+    }
+
+    /// Whether this person's edits are tracked: their own Suggesting while co-editing, otherwise
+    /// the document's Track Changes.
+    pub fn tracking(&self) -> bool {
+        match self.collab.track {
+            Some(t) if self.collab.on => t,
+            _ => self.doc.settings.track_changes,
+        }
+    }
+
+    /// Set this person's own Suggesting while co-editing (an agent's, a host's choice).
+    pub fn set_collab_tracking(&mut self, on: bool) {
+        self.collab.track = Some(on);
     }
 
     pub fn collab_role(&self) -> CollabRole {
@@ -168,9 +195,22 @@ impl Session {
         if COLLAB_DISABLED.contains(&id) || crate::run_ctx::NONDETERMINISTIC.iter().any(|(nd, _)| *nd == id) {
             return Err(CmdError::Disabled(format!("{id}: Not available while co-editing")));
         }
+        // Track Changes while co-editing is the person's own Suggesting: it changes nothing shared.
+        if id == "review.trackChanges" && person {
+            if self.collab.role == CollabRole::Suggest {
+                return Err(CmdError::Disabled(format!("{id}: You can only suggest changes in this document")));
+            }
+            let on = params.get("value").and_then(Value::as_bool).unwrap_or(!self.tracking());
+            self.collab.track = Some(on);
+            self.touch();
+            return Ok(serde_json::json!({"value": on}));
+        }
         let mutates = self.registry.get(id).is_some_and(|spec| spec.mutates);
         if !mutates || !person {
             return run(self);
+        }
+        if self.collab.role == CollabRole::Suggest && SUGGESTER_REFUSED.contains(&id) {
+            return Err(CmdError::Disabled(format!("{id}: You can only suggest changes in this document")));
         }
         if self.collab.role == CollabRole::Comment && !COMMENT_COMMANDS.contains(&id) {
             return Err(CmdError::Disabled(format!("{id}: You can only comment on this document")));
@@ -192,7 +232,12 @@ impl Session {
         }
         let rev_before = self.rev();
         self.collab.busy = true;
+        // The person's own Suggesting applies to this edit, as `ctx.track` does on every replica.
+        let doc_track = std::mem::replace(&mut self.doc.settings.track_changes, ctx.track);
         let result = crate::with_clock(ctx.time, || run(self));
+        if self.doc.settings.track_changes == ctx.track {
+            self.doc.settings.track_changes = doc_track;
+        }
         self.collab.busy = false;
         if result.is_ok() && self.rev() != rev_before {
             self.collab.outbox.push(Recorded { id: id.to_string(), params: params.clone(), sel_before, anchor, ctx });

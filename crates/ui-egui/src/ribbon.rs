@@ -138,7 +138,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     role
                 } else if app.session.viewing {
                     tl!("Viewing")
-                } else if app.session.doc.settings.track_changes {
+                } else if app.session.tracking() {
                     tl!("Reviewing")
                 } else {
                     tl!("Editing")
@@ -194,7 +194,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             let _ = app.run("ui.backstage", json!({"value": true, "page": "export"}));
                         }
                         ui.add_space(6.0);
-                        let track = app.session.doc.settings.track_changes;
+                        let track = app.session.tracking();
                         let mode = if plan.buttons == 0 {
                             crate::widgets::icon_text_menu_button(ui, "pencil", editing_label, regular(12.0))
                         } else {
@@ -205,7 +205,8 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                         let locked = app.session.viewing_locked;
                         egui::Popup::menu(&mode).show(|ui| {
                             crate::widgets::menu_items(ui, |ui| {
-                                if locked {
+                                // Read only from the page, or a role that decides the mode: only they lift it.
+                                if locked || crate::collab_ui::role_label(app).is_some() {
                                     ui.disable();
                                 }
                                 // Editing and Reviewing end Viewing first: tracking is a change Viewing refuses.

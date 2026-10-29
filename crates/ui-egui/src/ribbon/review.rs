@@ -52,7 +52,7 @@ pub(super) fn review(app: &mut WordApp, ui: &mut Ui) {
         big(ui, app, "showComments", "Show\nComments", "view.commentsPane", json!({"value": !shown}), false);
     });
     group(ui, "Tracking", Some("review.trackingOptions"), app, |ui, app| {
-        let on = app.session.doc.settings.track_changes;
+        let on = app.session.tracking();
         let r = big(ui, app, "trackChanges", if on { "Track\nChanges ✓" } else { "Track\nChanges" }, "review.trackChanges", json!({}), false);
         let _ = r;
         stack(ui, |ui| {

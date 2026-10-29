@@ -68,7 +68,7 @@ impl Session {
             author: self.author.clone(),
             initials: self.initials.clone(),
             time: crate::cmd::now_unix(),
-            track: self.doc.settings.track_changes,
+            track: self.tracking(),
             editing: EditingPrefs {
                 autocorrect: self.prefs.autocorrect.clone(),
                 typing_replaces_selection: self.prefs.typing_replaces_selection,

@@ -385,6 +385,15 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                     if !shown.is_empty() {
                         ui.add_space(8.0);
                     }
+                    // Co-editing: whether this person's edits have reached everyone.
+                    if let Some(sync) = app.collab.sync {
+                        let label = crate::collab_ui::sync_label(sync);
+                        let w = ui.ctx().fonts_mut(|f| f.layout_no_wrap(label.to_string(), regular(11.5), t.text_dim).size().x);
+                        let (r, resp) = ui.allocate_exact_size(vec2(w + 4.0, 22.0), Sense::hover());
+                        ui.painter().text(r.center(), Align2::CENTER_CENTER, label, regular(11.5), t.text_dim);
+                        resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Label, true, label));
+                        ui.add_space(8.0);
+                    }
                     if app.ui.show_discord {
                         let (r, resp) = ui.allocate_exact_size(vec2(100.0, 22.0), Sense::click());
                         ui.painter().rect_filled(r, 11.0, if resp.hovered() { t.accent_text } else { t.accent });
@@ -661,7 +670,7 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                         crate::ribbon::language_menu(ui, app);
                     })
                 });
-                if app.session.doc.settings.track_changes {
+                if app.session.tracking() {
                     st(ui, tl!("Track Changes: On"));
                 }
                 if app.session.prefs.overtype && st(ui, tl!("Overtype")).on_hover_text(tl!("Click to switch back to inserting")).clicked() {
