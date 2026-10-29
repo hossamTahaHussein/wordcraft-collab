@@ -42,6 +42,9 @@ thread_local! {
     /// Groups drawn taller than [`CONTENT_H`] (title and height): their content runs into the
     /// group label below, as View › Show did with four check boxes in one column.
     pub(crate) static TALL_GROUPS: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+    /// Each group's dialog launcher as drawn: the group's title, the launcher's rect and the
+    /// title row's.
+    pub(crate) static LAUNCHERS: std::cell::RefCell<Vec<(String, egui::Rect, egui::Rect)>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 #[cfg(test)]

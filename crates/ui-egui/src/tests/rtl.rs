@@ -92,3 +92,35 @@ fn the_title_and_status_bars_mirror() {
     assert!(text_rect(&shapes, "AutoSave").unwrap().center().x < 640.0, "English unchanged");
     assert!(text_rect(&shapes, "100%").unwrap().center().x > 640.0);
 }
+
+#[test]
+fn the_ribbon_tabs_and_groups_start_at_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let file = text_rect(&shapes, crate::tl!("File")).expect("File tab");
+    let home = text_rect(&shapes, crate::tl!("Home")).expect("Home tab");
+    assert!(file.min.x > home.max.x, "File is the rightmost tab: {file:?} {home:?}");
+    let clipboard = text_rect(&shapes, crate::tl!("Clipboard")).expect("Clipboard group");
+    let font = text_rect(&shapes, crate::tl!("Font")).expect("Font group");
+    assert!(clipboard.min.x > font.max.x, "Clipboard is the first group, at the right");
+    let share = text_rect(&shapes, crate::tl!("Share")).expect("Share button");
+    assert!(share.center().x < 640.0, "Share at the tab strip's left end");
+}
+
+#[test]
+fn a_narrow_mirrored_ribbon_keeps_its_first_groups_on_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    let shapes = frame(&mut app, &ctx, 640.0);
+    let clipboard = text_rect(&shapes, crate::tl!("Clipboard")).expect("Clipboard group");
+    assert!(clipboard.max.x > 520.0, "first group against the right edge: {clipboard:?}");
+}
+
+#[test]
+fn group_dialog_launchers_sit_in_the_bottom_left_corner() {
+    crate::widgets::LAUNCHERS.with(|l| l.borrow_mut().clear());
+    let (mut app, ctx) = app_in("ar");
+    frame(&mut app, &ctx, 1280.0);
+    let (launcher, row) =
+        crate::widgets::LAUNCHERS.with(|l| l.borrow().iter().rev().find(|(id, _, _)| id == "Font").map(|(_, a, b)| (*a, *b))).expect("Font launcher");
+    assert!(launcher.center().x < row.center().x, "at the group's left: {launcher:?} in {row:?}");
+}

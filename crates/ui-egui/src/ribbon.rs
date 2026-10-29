@@ -129,7 +129,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
         .exact_size(30.0)
         .frame(egui::Frame::NONE.fill(t.tab_strip).inner_margin(egui::Margin { left: 8, right: 10, top: 0, bottom: 0 }))
         .show(ui, |ui| {
-            ui.horizontal_centered(|ui| {
+            ui.with_layout(craft_ui::direction::row(ui), |ui| {
                 ui.spacing_mut().item_spacing = vec2(2.0, 0.0);
                 // Share, Editing mode and Comments keep their room; the tabs get what is left of it
                 // (#897, #2026), and the buttons give up their labels before a tab is drawn over them.
@@ -160,7 +160,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     })
                     .collect();
                 let plan = plan_strip(&specs, button_levels, ui.available_width(), MORE_TABS_W + 2.0);
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
                     // No document open (#1129): nothing to share, edit or comment on — but only
                     // these buttons. Disabling the whole line took the tab strip with it: the
                     // tabs took clicks that did nothing, so the empty window had no way back to
@@ -213,7 +213,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                         }
                     });
                     ui.add_space(8.0);
-                    ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                    ui.with_layout(craft_ui::direction::row(ui), |ui| {
                         // The tabs that don't fit go into a » menu at the end of the strip (#897, #2026).
                         for (i, ((tab, custom), _)) in tabs.iter().zip(&plan.fits).enumerate().filter(|(_, (_, fits))| **fits) {
                             let (tab, custom) = (tab.as_str(), *custom);
@@ -335,8 +335,15 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             if let Some(x) = pending {
                 area = area.horizontal_scroll_offset(x);
             }
+            // Right to left the groups start at the right; the row is as wide as the ribbon so
+            // they do, and grows past it only when they don't fit.
+            let row = if craft_ui::direction::is_rtl(ui) {
+                egui::Layout::right_to_left(egui::Align::Min)
+            } else {
+                egui::Layout::left_to_right(egui::Align::Min)
+            };
             let scroll = area.show(ui, |ui| {
-                ui.horizontal_top(|ui| {
+                ui.with_layout(row, |ui| {
                     ui.spacing_mut().item_spacing = vec2(2.0, 2.0);
                     match entry {
                         // Every tab hidden: nothing to show.
