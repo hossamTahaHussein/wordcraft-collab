@@ -37,6 +37,13 @@ pub use tooltip::{key_text, shortcut_text};
 const _: () = assert!(BIG_LABEL_Y + LABEL_PITCH + LABEL_LINE_H <= CONTENT_H);
 const _: () = assert!(BIG_ICON_Y + 16.0 <= BIG_LABEL_Y);
 
+/// [`Ui::vertical`] against the reading start: a stack of controls in a mirrored row (a ribbon
+/// group's columns) sits against the row's cursor, not at the far side of the space left.
+pub(crate) fn column<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> egui::InnerResponse<R> {
+    let layout = craft_ui::direction::column(ui);
+    ui.scope_builder(egui::UiBuilder::new().layout(layout), add)
+}
+
 #[cfg(test)]
 thread_local! {
     /// Groups drawn taller than [`CONTENT_H`] (title and height): their content runs into the
