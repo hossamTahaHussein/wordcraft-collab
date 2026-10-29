@@ -21,7 +21,7 @@
 //! - `wordcraft:failed` (to the parent): `{ error }` when the app couldn't start.
 //! - `wordcraft:collab` (both ways, with `?collab=1`): `{ msg }`, one co-editing relay message
 //!   as a JSON string (`wordcraft_collab::proto`); the parent carries them to and from the relay.
-//! - `wordcraft:collab.status` (to the parent): `{ pending, rev }` when either changes.
+//! - `wordcraft:collab.status` (to the parent): `{ pending, rev, people }` when any changes.
 //!
 //! Only the parent window on the page's own origin is heard or answered. In host mode the parent
 //! guards leaving the page, and `?author=` names the user for comments and tracked changes.
@@ -131,9 +131,15 @@ impl Bridge {
         self.send(&[("type", "wordcraft:collab".into()), ("msg", msg.into())]);
     }
 
-    pub fn post_collab_status(&self, pending: usize, rev: Option<u64>) {
+    /// `people`: everyone in the document, this person included.
+    pub fn post_collab_status(&self, pending: usize, rev: Option<u64>, people: usize) {
         let rev = rev.map_or(JsValue::NULL, |r| JsValue::from_f64(r as f64));
-        self.send(&[("type", "wordcraft:collab.status".into()), ("pending", JsValue::from_f64(pending as f64)), ("rev", rev)]);
+        self.send(&[
+            ("type", "wordcraft:collab.status".into()),
+            ("pending", JsValue::from_f64(pending as f64)),
+            ("rev", rev),
+            ("people", JsValue::from_f64(people as f64)),
+        ]);
     }
 
     /// Hear `wordcraft:open` from the parent and queue the file like a dropped one, and queue

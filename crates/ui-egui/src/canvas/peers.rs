@@ -24,7 +24,8 @@ pub struct RemotePeer {
     pub name: String,
     /// Index into `theme::Tokens::peer_colors`.
     pub color: u8,
-    pub sel: Selection,
+    /// Where they are; `None` until they say (they still have an avatar).
+    pub sel: Option<Selection>,
     /// They edited in the last few seconds: their name shows.
     pub typing: bool,
 }
@@ -52,14 +53,17 @@ pub(crate) fn peer_marks(app: &mut WordApp, rects: &[Rect], scale: f32, hover: O
     app.peers
         .iter()
         .map(|peer| {
-            let caret = layout.caret_on(&peer.sel.focus, hint).and_then(|c| {
+            let Some(psel) = &peer.sel else {
+                return PeerMark { color: peer.color, caret: None, sel: Vec::new(), flag: None, margin: None };
+            };
+            let caret = layout.caret_on(&psel.focus, hint).and_then(|c| {
                 let r = to_screen(c.page, c.x, c.top, 0.0, c.height)?;
                 Some((c.page, Rect::from_min_size(pos2(r.min.x - CARET_WIDTH / 2.0, r.min.y), vec2(CARET_WIDTH, r.height()))))
             });
-            let sel = if peer.sel.is_collapsed() {
+            let sel = if psel.is_collapsed() {
                 Vec::new()
             } else {
-                let (a, b) = peer.sel.ordered();
+                let (a, b) = psel.ordered();
                 layout.selection_rects(&app.session.doc, &a, &b, hint).into_iter().filter_map(|(pi, r)| to_screen(pi, r.x, r.y, r.w, r.h)).collect()
             };
             let hovered = caret.is_some_and(|(_, c)| hover.is_some_and(|p| c.expand(HOVER_REACH).contains(p)));
@@ -153,7 +157,7 @@ mod tests {
     }
 
     fn peer(name: &str, a: usize, b: usize, typing: bool) -> RemotePeer {
-        RemotePeer { name: name.into(), color: 2, sel: Selection { anchor: Pos::body(0, a), focus: Pos::body(0, b) }, typing }
+        RemotePeer { name: name.into(), color: 2, sel: Some(Selection { anchor: Pos::body(0, a), focus: Pos::body(0, b) }), typing }
     }
 
     #[test]
@@ -195,7 +199,7 @@ mod tests {
         let header = app.session.sel.focus.story;
         assert_ne!(header, StoryRef::Body);
         let _ = app.session.run("insert.closeHeader", &json!({}));
-        app.peers = vec![RemotePeer { name: "Ann".into(), color: 1, sel: Selection::caret(Pos::new(header, Path(vec![0]), 2)), typing: false }];
+        app.peers = vec![RemotePeer { name: "Ann".into(), color: 1, sel: Some(Selection::caret(Pos::new(header, Path(vec![0]), 2))), typing: false }];
         let r = rects(&mut app);
         let marks = peer_marks(&mut app, &r, SCALE, None);
         let caret = marks[0].caret.expect("a caret in the header");
@@ -219,7 +223,7 @@ mod tests {
     #[test]
     fn a_peer_off_the_document_draws_nothing() {
         let mut app = app("Hi");
-        app.peers = vec![RemotePeer { name: "Ann".into(), color: 0, sel: Selection::caret(Pos::body(40, 0)), typing: true }];
+        app.peers = vec![RemotePeer { name: "Ann".into(), color: 0, sel: Some(Selection::caret(Pos::body(40, 0))), typing: true }];
         let r = rects(&mut app);
         let marks = peer_marks(&mut app, &r, SCALE, None);
         assert!(marks.iter().all(|m| m.caret.is_none() && m.sel.is_empty() && m.flag.is_none()));
@@ -247,7 +251,9 @@ mod chrome_tests {
     use crate::WordApp;
 
     fn peers(n: usize) -> Vec<RemotePeer> {
-        (0..n).map(|i| RemotePeer { name: format!("Person {i}"), color: i as u8, sel: Selection::caret(Pos::body(0, i)), typing: false }).collect()
+        (0..n)
+            .map(|i| RemotePeer { name: format!("Person {i}"), color: i as u8, sel: Some(Selection::caret(Pos::body(0, i))), typing: false })
+            .collect()
     }
 
     #[test]
@@ -258,9 +264,9 @@ mod chrome_tests {
         assert_eq!(shown[0], ("P0".to_string(), 0));
         let (shown, more) = avatars(&peers(8));
         assert_eq!((shown.len(), more), (5, 3));
-        let ann = vec![RemotePeer { name: "Ann Lee".into(), color: 4, sel: Selection::caret(Pos::body(0, 0)), typing: false }];
+        let ann = vec![RemotePeer { name: "Ann Lee".into(), color: 4, sel: Some(Selection::caret(Pos::body(0, 0))), typing: false }];
         assert_eq!(avatars(&ann).0[0], ("AL".to_string(), 4));
-        let arabic = vec![RemotePeer { name: "حسام طه".into(), color: 1, sel: Selection::caret(Pos::body(0, 0)), typing: false }];
+        let arabic = vec![RemotePeer { name: "حسام طه".into(), color: 1, sel: Some(Selection::caret(Pos::body(0, 0))), typing: false }];
         assert_eq!(avatars(&arabic).0[0].0, "حط");
     }
 
@@ -275,11 +281,29 @@ mod chrome_tests {
     fn jump_to_peer_moves_the_view_to_its_caret() {
         let mut app = WordApp::new(Session::new(Document::from_text("Hello world")), crate::Services::default());
         app.peers = peers(1);
-        app.peers[0].sel = Selection::caret(Pos::body(0, 7));
+        app.peers[0].sel = Some(Selection::caret(Pos::body(0, 7)));
         app.canvas.scroll_to_caret = false;
         app.run("ui.jumpToPeer", json!({"index": 0})).unwrap();
         assert_eq!(app.session.sel.focus, Pos::body(0, 7));
         assert!(app.canvas.scroll_to_caret);
         assert!(app.run("ui.jumpToPeer", json!({"index": 5})).is_err(), "no such person");
+    }
+}
+
+#[cfg(test)]
+mod unplaced_tests {
+    use wordcraft_doc::Document;
+    use wordcraft_engine::Session;
+
+    use super::*;
+    use crate::WordApp;
+
+    #[test]
+    fn someone_who_has_not_said_where_they_are_has_an_avatar_but_no_caret() {
+        let mut app = WordApp::new(Session::new(Document::from_text("Hi")), crate::Services::default());
+        app.peers = vec![RemotePeer { name: "Ann".into(), color: 0, sel: None, typing: true }];
+        let marks = peer_marks(&mut app, &[], 1.0, None);
+        assert!(marks[0].caret.is_none() && marks[0].flag.is_none());
+        assert_eq!(avatars(&app.peers).0.len(), 1);
     }
 }

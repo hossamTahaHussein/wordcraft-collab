@@ -452,6 +452,9 @@ fn migrate_units(v: &mut Value) {
 }
 
 /// The application.
+/// Co-editing: someone else in the document, as the host gives them to [`WordApp::peers`].
+pub use canvas::peers::RemotePeer;
+
 pub struct WordApp {
     pub session: Session,
     pub ui: UiState,
@@ -460,7 +463,7 @@ pub struct WordApp {
     print_feedback_seen: Option<printing::Feedback>,
     pub canvas: canvas::CanvasState,
     /// Co-editing: the other people in the document, where they are (the host fills this).
-    pub peers: Vec<canvas::peers::RemotePeer>,
+    pub peers: Vec<RemotePeer>,
     /// Content control frames, check boxes and lists on the page.
     pub controls: content_controls::ControlUi,
     pub dialog: Option<dialogs::Dialog>,

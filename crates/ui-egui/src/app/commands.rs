@@ -738,10 +738,10 @@ impl WordApp {
             "ui.jumpToPeer" => {
                 // Co-editing: go to where someone else is working (their avatar in the title bar).
                 let i = p.get("index").and_then(Value::as_u64).and_then(|i| usize::try_from(i).ok());
-                let Some(peer) = i.and_then(|i| self.peers.get(i)) else {
-                    return Some(Err("no such person in this document".into()));
+                let Some(at) = i.and_then(|i| self.peers.get(i)).and_then(|p| p.sel.as_ref()).map(|sel| sel.focus.clone()) else {
+                    return Some(Err("no such person in this document, or they haven't said where they are yet".into()));
                 };
-                self.session.sel = wordcraft_engine::Selection::caret(peer.sel.focus.clone());
+                self.session.sel = wordcraft_engine::Selection::caret(at);
                 self.session.clamp_selection();
                 self.canvas.scroll_to_caret = true;
                 json!({})

@@ -102,7 +102,7 @@ pub fn start() {
                     // `?collab=1`: co-editing through the parent page (`collab_link`).
                     let collab = (app_bridge.is_some() && query_param("collab").as_deref() == Some("1"))
                         .then(|| crate::collab_link::CollabLink::new(query_param("docName")));
-                    Ok(Box::new(WebShell { app, inbox, messages, prefs, collab, bridge: app_bridge.clone(), collab_status: (0, None) }))
+                    Ok(Box::new(WebShell { app, inbox, messages, prefs, collab, bridge: app_bridge.clone(), collab_status: (0, None, 1) }))
                 }),
             )
             .await;
@@ -140,7 +140,7 @@ struct WebShell {
     collab: Option<crate::collab_link::CollabLink>,
     bridge: Option<crate::host::Bridge>,
     /// The co-editing status last posted to the parent (pending edits, revision).
-    collab_status: (usize, Option<u64>),
+    collab_status: (usize, Option<u64>, usize),
 }
 
 fn local_storage() -> Option<web_sys::Storage> {
@@ -176,9 +176,19 @@ impl eframe::App for WebShell {
         }
         self.app.logic(ctx);
         if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
-            for out in link.tick(&mut self.app.session, js_sys::Date::now()) {
+            let now = js_sys::Date::now();
+            for out in link.tick(&mut self.app.session, now) {
                 bridge.post_collab(&out);
             }
+            let peers = link.peers(&self.app.session);
+            // A name flag shows for a few seconds after someone types: look again to hide it.
+            if peers.iter().any(|p| p.typing(now)) {
+                ctx.request_repaint_after(std::time::Duration::from_millis(500));
+            }
+            self.app.peers = peers
+                .into_iter()
+                .map(|p| wordcraft_ui_egui::RemotePeer { typing: p.typing(now), name: p.name, color: p.color, sel: p.sel })
+                .collect();
             // A moved selection waits out the presence limit: come back for it without input.
             if link.presence_pending() {
                 ctx.request_repaint_after(std::time::Duration::from_millis(100));
@@ -190,10 +200,10 @@ impl eframe::App for WebShell {
                     Err(e) => log::warn!("co-editing: autosave failed: {e}"),
                 }
             }
-            let status = (link.pending(), link.rev());
+            let status = (link.pending(), link.rev(), self.app.peers.len() + 1);
             if status != self.collab_status {
                 self.collab_status = status;
-                bridge.post_collab_status(status.0, status.1);
+                bridge.post_collab_status(status.0, status.1, status.2);
             }
         }
         // Store changed preferences straight away: a reload or closed tab runs no exit code (#2132).
