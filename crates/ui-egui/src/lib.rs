@@ -459,6 +459,8 @@ pub struct WordApp {
     pub printing: printing::State,
     print_feedback_seen: Option<printing::Feedback>,
     pub canvas: canvas::CanvasState,
+    /// Co-editing: the other people in the document, where they are (the host fills this).
+    pub peers: Vec<canvas::peers::RemotePeer>,
     /// Content control frames, check boxes and lists on the page.
     pub controls: content_controls::ControlUi,
     pub dialog: Option<dialogs::Dialog>,

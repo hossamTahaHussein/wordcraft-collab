@@ -142,6 +142,7 @@ impl WordApp {
             parked: Default::default(),
             windows: windows::Windows::new(shown_document),
             print_document: None,
+            peers: Vec::new(),
             canvas,
             controls,
             dialog,

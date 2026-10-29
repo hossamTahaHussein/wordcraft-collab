@@ -23,6 +23,7 @@ mod links;
 mod margins;
 mod navigation;
 mod pages;
+pub(crate) mod peers;
 mod reading;
 mod rulers;
 mod story;
@@ -1391,6 +1392,12 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     painter.rect_filled(hr, 0.0, t.find_highlight);
                 }
             }
+        }
+        // Co-editing: the other people's carets, selections and name flags.
+        if !app.peers.is_empty() {
+            let hover = ui.input(|i| i.pointer.hover_pos());
+            let marks = peers::peer_marks(app, &rects, geo.scale, hover);
+            peers::paint_peers(&painter, &marks, &t.peer_colors);
         }
         // Selection (a selected object shows its frame instead): whole table cells shade the
         // cells (an empty one too), a column selection each row's piece, text running into or

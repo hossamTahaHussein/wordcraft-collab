@@ -207,6 +207,7 @@ impl WordApp {
             parked: _,
             // Per window.
             ui,
+            peers: _,
             canvas,
             controls,
             dialog,
