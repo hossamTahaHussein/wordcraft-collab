@@ -19,11 +19,15 @@
 //!     Export Page as PNG: `false`. They are copies; the document's file stays the same.
 //! - `wordcraft:dirty` (to the parent): `{ dirty }` whenever unsaved changes appear or go away.
 //! - `wordcraft:failed` (to the parent): `{ error }` when the app couldn't start.
+//! - `wordcraft:collab` (both ways, with `?collab=1`): `{ msg }`, one co-editing relay message
+//!   as a JSON string (`wordcraft_collab::proto`); the parent carries them to and from the relay.
+//! - `wordcraft:collab.status` (to the parent): `{ pending, rev }` when either changes.
 //!
 //! Only the parent window on the page's own origin is heard or answered. In host mode the parent
 //! guards leaving the page, and `?author=` names the user for comments and tracked changes.
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
+use std::collections::VecDeque;
 use std::rc::Rc;
 
 use wasm_bindgen::JsCast as _;
@@ -39,6 +43,8 @@ pub struct Bridge {
     window: web_sys::Window,
     parent: web_sys::Window,
     origin: String,
+    /// Co-editing messages from the parent, waiting for the next frame.
+    collab: Rc<RefCell<VecDeque<String>>>,
 }
 
 impl Bridge {
@@ -60,7 +66,7 @@ impl Bridge {
         if parent.location().origin().ok()? != origin {
             return None;
         }
-        Some(Self { window, parent, origin })
+        Some(Self { window, parent, origin, collab: Rc::default() })
     }
 
     /// Hand saved and exported files to the parent instead of downloading them, report unsaved
@@ -115,17 +121,42 @@ impl Bridge {
             .map_err(|e| e.as_string().unwrap_or_else(|| format!("{e:?}")))
     }
 
-    /// Hear `wordcraft:open` from the parent and queue the file like a dropped one.
+    /// The co-editing messages the parent sent since the last call.
+    pub fn take_collab(&self) -> Vec<String> {
+        self.collab.borrow_mut().drain(..).collect()
+    }
+
+    /// Send a co-editing message to the parent for the relay.
+    pub fn post_collab(&self, msg: &str) {
+        self.send(&[("type", "wordcraft:collab".into()), ("msg", msg.into())]);
+    }
+
+    pub fn post_collab_status(&self, pending: usize, rev: Option<u64>) {
+        let rev = rev.map_or(JsValue::NULL, |r| JsValue::from_f64(r as f64));
+        self.send(&[("type", "wordcraft:collab.status".into()), ("pending", JsValue::from_f64(pending as f64)), ("rev", rev)]);
+    }
+
+    /// Hear `wordcraft:open` from the parent and queue the file like a dropped one, and queue
+    /// `wordcraft:collab` messages for the next frame.
     fn listen(&self, inbox: Inbox, ctx: egui::Context) {
         let parent = self.parent.clone();
         let origin = self.origin.clone();
+        let collab = self.collab.clone();
         let on_message = Closure::<dyn FnMut(web_sys::MessageEvent)>::new(move |event: web_sys::MessageEvent| {
             if event.origin() != origin || !event.source().is_some_and(|s| js_sys::Object::is(&s, &parent)) {
                 return;
             }
             let data = event.data();
-            if string(&data, "type").as_deref() != Some("wordcraft:open") {
-                return;
+            match string(&data, "type").as_deref() {
+                Some("wordcraft:open") => {}
+                Some("wordcraft:collab") => {
+                    if let Some(msg) = string(&data, "msg") {
+                        collab.borrow_mut().push_back(msg);
+                        ctx.request_repaint();
+                    }
+                    return;
+                }
+                _ => return,
             }
             let name = string(&data, "name").filter(|n| !n.trim().is_empty()).unwrap_or_else(|| "Document.docx".to_string());
             let Some(bytes) = bytes(&data) else { return };

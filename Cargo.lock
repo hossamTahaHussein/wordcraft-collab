@@ -6964,6 +6964,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "wordcraft-collab",
  "wordcraft-doc",
  "wordcraft-engine",
  "wordcraft-fonts",

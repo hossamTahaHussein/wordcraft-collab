@@ -99,7 +99,10 @@ pub fn start() {
                         crate::host::Bridge::set_author(&mut app, &author);
                         prefs.keep_own_author(&app.session.author, &own);
                     }
-                    Ok(Box::new(WebShell { app, inbox, messages, prefs }))
+                    // `?collab=1`: co-editing through the parent page (`collab_link`).
+                    let collab = (app_bridge.is_some() && query_param("collab").as_deref() == Some("1"))
+                        .then(|| crate::collab_link::CollabLink::new(query_param("docName")));
+                    Ok(Box::new(WebShell { app, inbox, messages, prefs, collab, bridge: app_bridge.clone(), collab_status: (0, None) }))
                 }),
             )
             .await;
@@ -134,6 +137,10 @@ struct WebShell {
     inbox: Inbox,
     messages: Rc<RefCell<Vec<String>>>,
     prefs: crate::prefs::PrefsSync,
+    collab: Option<crate::collab_link::CollabLink>,
+    bridge: Option<crate::host::Bridge>,
+    /// The co-editing status last posted to the parent (pending edits, revision).
+    collab_status: (usize, Option<u64>),
 }
 
 fn local_storage() -> Option<web_sys::Storage> {
@@ -154,7 +161,34 @@ impl eframe::App for WebShell {
         for msg in msgs {
             self.app.status(msg);
         }
+        if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
+            for msg in bridge.take_collab() {
+                for out in link.on_message(&msg, &mut self.app.session) {
+                    bridge.post_collab(&out);
+                }
+            }
+            if link.take_document_ready() {
+                self.app.ui.backstage = false;
+            }
+        }
         self.app.logic(ctx);
+        if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
+            for out in link.tick(&mut self.app.session) {
+                bridge.post_collab(&out);
+            }
+            // Autosave: the relay chose this editor to save the shared document.
+            if link.take_save_request() {
+                match self.app.execute("file.save", serde_json::json!({})) {
+                    Ok(_) => bridge.post_collab(&link.saved()),
+                    Err(e) => log::warn!("co-editing: autosave failed: {e}"),
+                }
+            }
+            let status = (link.pending(), link.rev());
+            if status != self.collab_status {
+                self.collab_status = status;
+                bridge.post_collab_status(status.0, status.1);
+            }
+        }
         // Store changed preferences straight away: a reload or closed tab runs no exit code (#2132).
         if let Some(json) = self.prefs.changed(&self.app) {
             match local_storage() {
