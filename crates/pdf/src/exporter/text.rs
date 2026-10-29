@@ -12,6 +12,38 @@ pub(super) struct GlyphPaint {
     pub italic: bool,
 }
 
+/// Within each character's glyphs (one text range: a letter drawn as a dotless body and its dots,
+/// a base and its marks), the glyph with the widest advance carries the text and the marks (no
+/// advance) none.
+/// Readers place an extracted character between the first and last glyph that carry it: with the
+/// dots inside, an Arabic letter (Noto draws ب ت ن ي… as a body and dots) started or ended
+/// mid-letter, and poppler (pdftotext, Evince, Okular) saw gaps there and split words with spaces.
+fn text_on_base_glyphs(face: &FaceRef, placed: &mut [(u32, f32, f32, std::ops::Range<usize>)]) {
+    let mut i = 0;
+    while i < placed.len() {
+        let range = placed[i].3.clone();
+        let mut j = i + 1;
+        while placed.get(j).is_some_and(|p| p.3 == range) {
+            j += 1;
+        }
+        if j - i > 1
+            && let Some(cluster) = placed.get_mut(i..j)
+        {
+            // Only marks (no advance) give their text up: several full glyphs for one character
+            // (ß shown as SS) keep it, and the reader's ActualText names them together.
+            let base = (0..cluster.len()).max_by(|a, b| face.advance(cluster[*a].0).total_cmp(&face.advance(cluster[*b].0))).unwrap_or(0);
+            if face.advance(cluster[base].0) > 0.0 {
+                for (k, g) in cluster.iter_mut().enumerate() {
+                    if k != base && face.advance(g.0) <= 0.0 {
+                        g.3 = range.end..range.end;
+                    }
+                }
+            }
+        }
+        i = j;
+    }
+}
+
 impl Exporter<'_> {
     /// Unicode text for each glyph: (text, per-glyph byte range). Glyphs and the run's text are
     /// aligned through the font's reverse character map (ligatures take several characters,
@@ -115,8 +147,13 @@ impl Exporter<'_> {
             let parts = split_clusters(&txt, glyphs, &ranges, &self.cmap(face));
             (visual_order(&txt, glyphs, &ranges, &parts), parts)
         };
-        let placed: Vec<(u32, f32, f32, std::ops::Range<usize>)> =
+        let mut placed: Vec<(u32, f32, f32, std::ops::Range<usize>)> =
             order.iter().filter_map(|&i| Some((glyphs.get(i).copied()?, ranges.get(i).cloned()?))).map(|((g, x, y), r)| (g, x, y, r)).collect();
+        text_on_base_glyphs(face, &mut placed);
+        // The glyphs that carry no text (a letter's dots, marks) are drawn as shapes, so readers
+        // see only the glyphs that carry characters.
+        let marks: Vec<(u32, f32, f32)> = placed.iter().filter(|p| p.3.is_empty()).map(|p| (p.0, p.1, p.2)).collect();
+        placed.retain(|p| !p.3.is_empty());
         let Some(&(_, x0, y0, _)) = placed.first() else { return };
         let kg: Vec<KrillaGlyph> = placed
             .iter()
@@ -144,6 +181,12 @@ impl Exporter<'_> {
         match font {
             Some(font) => {
                 s.draw_glyphs(Point::from_xy(x0, y0), &kg, font, &txt, size, false);
+                // One shape per mark, each where layout put it.
+                for mark in &marks {
+                    if let Some(path) = glyph_outlines(face, size, std::slice::from_ref(mark)) {
+                        s.draw_path(&path);
+                    }
+                }
             }
             None => {
                 if let Some(path) = glyph_outlines(face, size, glyphs) {

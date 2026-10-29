@@ -1827,7 +1827,14 @@ fn glyph_boxes(bytes: &[u8]) -> Vec<[i64; 4]> {
     impl Device<'_> for Boxes {
         fn set_soft_mask(&mut self, _: Option<SoftMask<'_>>) {}
         fn set_blend_mode(&mut self, _: BlendMode) {}
-        fn draw_path(&mut self, _: &kurbo::BezPath, _: kurbo::Affine, _: &Paint<'_>, _: &PathDrawMode) {}
+        // A mark that carries no text (an Arabic letter's dots) is drawn as its outline.
+        fn draw_path(&mut self, p: &kurbo::BezPath, t: kurbo::Affine, _: &Paint<'_>, mode: &PathDrawMode) {
+            if matches!(mode, PathDrawMode::Fill(_)) && !p.elements().is_empty() {
+                let b = (t * p.clone()).bounding_box();
+                let r = |v: f64| (v * 10.0).round() as i64;
+                self.0.push([r(b.x0), r(b.y0), r(b.x1), r(b.y1)]);
+            }
+        }
         fn push_clip_path(&mut self, _: &ClipPath) {}
         fn push_transparency_group(&mut self, _: f32, _: Option<SoftMask<'_>>, _: BlendMode) {}
         fn draw_glyph(&mut self, g: &Glyph<'_>, t: kurbo::Affine, gt: kurbo::Affine, _: &Paint<'_>, mode: &GlyphDrawMode) {
@@ -2461,4 +2468,26 @@ fn baseline_is_the_most_shared_y() {
     assert_eq!(baseline(&[(1, 0.0, 7.5), (2, 3.0, 4.0), (3, 6.0, 7.5)]), Some(7.5));
     assert_eq!(baseline(&[(1, 0.0, 9.0), (2, 3.0, 4.0)]), Some(4.0));
     assert_eq!(baseline(&[(1, 0.0, -0.0), (2, 3.0, 0.0)]), Some(0.0));
+}
+
+/// Arabic letters drawn as a body and dots (Noto Sans Arabic draws ب ت ث ن ي ة ف… so) come out
+/// of the text layer as letters: nothing unreadable, each character once, and the letters that
+/// share a body are named by ActualText (which Acrobat, Chrome and poppler read; a reader
+/// of ToUnicode alone, like this test's, may name a shared body by its first letter). The dots
+/// are drawn as shapes, so no reader meets a glyph without text.
+#[test]
+fn arabic_text_extracts_as_whole_letters() {
+    let text = "هذا نص عربي في المكتبة";
+    let mut p = Paragraph::with_text(text, CharProps { rtl: Some(true), ..Default::default() });
+    p.props.bidi = Some(true);
+    let mut d = Document::new();
+    d.body = vec![para_block(p)];
+    let got = extract_text(&export(&d, &PdfOptions::default()).unwrap()).concat();
+    assert!(!got.contains('\u{FFFD}') && !got.chars().any(|c| c.is_control() && !c.is_whitespace()), "{got:?}");
+    let letters = |s: &str| s.chars().filter(|c| !c.is_whitespace()).count();
+    assert_eq!(letters(&got), letters(text), "each letter once: {got:?}");
+    // ن and ب share a body here (نص, عربي): each is named by its own ActualText.
+    let raw = String::from_utf8_lossy(&export(&d, &PdfOptions { compress: false, ..Default::default() }).unwrap()).into_owned();
+    let actual = |letter: char| raw.contains(&format!("/ActualText<FEFF{:04X}>", u32::from(letter)));
+    assert!(actual('ن') || actual('ب'), "the second of ن and ب to use the shared body is named by ActualText");
 }
