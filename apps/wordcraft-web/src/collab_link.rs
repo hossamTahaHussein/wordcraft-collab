@@ -154,7 +154,15 @@ impl CollabLink {
     /// Answer an `Export`: the file's bytes, or why there are none.
     pub fn exported(id: String, file: Result<Vec<u8>, String>) -> String {
         use base64::Engine as _;
+        // Base64 takes 4 bytes for 3; the message must stay under the relay's limit.
+        let fits = |len: usize| len.div_ceil(3) * 4 + 1024 <= wordcraft_collab::proto::MAX_SNAPSHOT_BYTES;
         encode(&match file {
+            Ok(bytes) if !fits(bytes.len()) => Outbound::Exported {
+                id,
+                ok: false,
+                data: None,
+                error: Some(format!("The file is too large to send ({} MB)", bytes.len() / (1024 * 1024))),
+            },
             Ok(bytes) => Outbound::Exported { id, ok: true, data: Some(base64::engine::general_purpose::STANDARD.encode(bytes)), error: None },
             Err(e) => Outbound::Exported { id, ok: false, data: None, error: Some(e) },
         })
@@ -305,8 +313,9 @@ impl CollabLink {
                 Vec::new()
             }
             // Only the confirmed document at exactly that revision is a version of it.
-            Inbound::VersionRequest { rev } => match self.replica.as_ref().filter(|r| r.rev() == rev).map(Replica::snapshot) {
-                Some(Ok(Outbound::Snapshot { doc, .. })) => vec![encode(&Outbound::Version { rev, doc })],
+            // The document as confirmed now: others may have edited since the save it is for.
+            Inbound::VersionRequest { rev } => match self.replica.as_ref().filter(|r| r.rev() >= rev).map(Replica::snapshot) {
+                Some(Ok(Outbound::Snapshot { rev, doc, .. })) => vec![encode(&Outbound::Version { rev, doc })],
                 _ => Vec::new(),
             },
             Inbound::VersionList { versions } => {
@@ -1368,14 +1377,29 @@ mod protocol_v2_tests {
         assert_eq!(link.pending(), 0);
     }
 
+    /// An export too big for one relay message is refused, not sent (the relay would drop the
+    /// connection over it).
     #[test]
-    fn a_version_is_given_only_at_its_revision() {
+    fn a_too_large_export_is_refused() {
+        let v = parse(&CollabLink::exported("e1".into(), Ok(vec![0; 38 * 1024 * 1024])));
+        assert_eq!((v["ok"].as_bool(), v["data"].is_null()), (Some(false), true));
+        assert!(v["error"].as_str().unwrap().contains("too large"));
+        let v = parse(&CollabLink::exported("e2".into(), Ok(vec![1, 2, 3])));
+        assert_eq!((v["ok"].as_bool(), v["data"].as_str()), (Some(true), Some("AQID")));
+    }
+
+    /// A version is the document as this replica has it now, at or after the revision asked
+    /// for (others may have edited since the save), never one it hasn't reached.
+    #[test]
+    fn a_version_is_given_at_or_after_its_revision() {
         let (mut link, mut s) = joined("Kept", None);
-        assert!(link.on_message(r#"{"t":"VersionRequest","rev":2}"#, &mut s).is_empty());
-        let out = link.on_message(r#"{"t":"VersionRequest","rev":3}"#, &mut s);
-        let v = parse(&out[0]);
-        assert_eq!((v["t"].as_str(), v["rev"].as_u64()), (Some("Version"), Some(3)));
-        assert!(v["doc"].as_str().unwrap().contains("Kept"));
+        assert!(link.on_message(r#"{"t":"VersionRequest","rev":4}"#, &mut s).is_empty(), "not reached yet");
+        for asked in [2, 3] {
+            let out = link.on_message(&json!({"t": "VersionRequest", "rev": asked}).to_string(), &mut s);
+            let v = parse(&out[0]);
+            assert_eq!((v["t"].as_str(), v["rev"].as_u64()), (Some("Version"), Some(3)), "asked {asked}");
+            assert!(v["doc"].as_str().unwrap().contains("Kept"));
+        }
     }
 
     #[test]

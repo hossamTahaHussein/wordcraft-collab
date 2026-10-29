@@ -52,6 +52,9 @@ pub struct RunCtx {
     pub time: u64,
     /// Track this person's changes (their Suggesting mode).
     pub track: bool,
+    /// Made by the relay's HTTP API through this person's editor: not theirs to undo.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub api: bool,
     pub editing: EditingPrefs,
     /// The language new text is written in ([`Session::editing_lang`]): case rules follow it.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,6 +72,7 @@ impl Session {
             initials: self.initials.clone(),
             time: crate::cmd::now_unix(),
             track: self.tracking(),
+            api: self.api_run,
             editing: EditingPrefs {
                 autocorrect: self.prefs.autocorrect.clone(),
                 typing_replaces_selection: self.prefs.typing_replaces_selection,

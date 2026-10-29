@@ -209,6 +209,8 @@ pub struct Session {
     /// Viewing was set by the page that embeds the editor (`view.viewing {"lock": true}`): the
     /// person can't leave it; only the page lifts it.
     pub viewing_locked: bool,
+    /// The command running now is the relay's HTTP API's, not this person's (`RunCtx::api`).
+    pub api_run: bool,
     /// Editing inside an equation: which one and the caret in it.
     pub math: Option<MathEdit>,
     /// Equations are typed in LaTeX rather than the linear format.

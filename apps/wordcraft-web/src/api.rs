@@ -63,15 +63,19 @@ pub fn document_file(app: &WordApp, format: &str) -> Result<(String, Vec<u8>), S
     Ok((name, bytes))
 }
 
-/// Run command `cmd` for the relay's HTTP API as an edit by `author` (the person's own name is
-/// back afterwards): while co-editing it syncs to everyone as `author`'s edit.
+/// Run command `cmd` for the relay's HTTP API as an edit by `author` (the person's own name and
+/// initials are back afterwards): while co-editing it syncs to everyone as `author`'s edit, and
+/// it isn't this person's to undo.
 pub fn run_as(app: &mut WordApp, cmd: &str, params: Value, author: &str) -> Result<Value, String> {
     if !params.is_object() {
         return Err(format!("{cmd}: params must be an object"));
     }
-    let own = std::mem::replace(&mut app.session.author, author.to_string());
+    let initials: String = author.split_whitespace().filter_map(|w| w.chars().next()).collect();
+    let own = (std::mem::replace(&mut app.session.author, author.to_string()), std::mem::replace(&mut app.session.initials, initials));
+    app.session.api_run = true;
     let result = app.execute(cmd, params);
-    app.session.author = own;
+    app.session.api_run = false;
+    (app.session.author, app.session.initials) = own;
     result
 }
 
@@ -204,6 +208,11 @@ mod tests {
         assert_eq!(a.session.author, "Me");
         assert_eq!(a.session.doc.revisions.last().map(|r| r.author.as_str()), Some("Robot"), "the edit is Robot's");
         assert!(run_as(&mut a, "nope.nothing", json!({}), "Robot").is_err());
+        // A comment the API adds carries its author's initials; the person's own come back.
+        a.session.initials = "ME".into();
+        run_as(&mut a, "review.newComment", json!({"text": "Checked"}), "Review Bot").unwrap();
+        assert_eq!(a.session.doc.comments.values().last().map(|c| c.initials.as_str()), Some("RB"));
+        assert_eq!((a.session.initials.as_str(), a.session.api_run), ("ME", false));
     }
 
     #[test]

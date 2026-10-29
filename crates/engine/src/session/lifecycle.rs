@@ -158,6 +158,7 @@ impl Session {
             editing_lang_bidi: None,
             viewing: false,
             viewing_locked: false,
+            api_run: false,
             read_aloud: Default::default(),
             password,
             #[cfg(not(target_arch = "wasm32"))]

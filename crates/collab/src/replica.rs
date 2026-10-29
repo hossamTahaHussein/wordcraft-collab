@@ -239,7 +239,11 @@ impl Replica {
                 "edit.undo" => (OpKind::Undo, "collab.undo".to_string(), serde_json::json!({"target": 0})),
                 "edit.redo" => (OpKind::Redo, "collab.redo".to_string(), serde_json::json!({"target": 0})),
                 _ => {
-                    self.undone.clear();
+                    // A new edit of the person's own ends what they can redo (the HTTP API's
+                    // through their editor isn't theirs).
+                    if !r.ctx.api {
+                        self.undone.clear();
+                    }
                     (OpKind::Cmd, r.id, r.params)
                 }
             };

@@ -225,3 +225,30 @@ fn resync_of_the_undoer() {
     a.replica.resume(0, Some((base.clone(), Vec::new())), tail, None, &mut a.visible).unwrap();
     assert_eq!(a.confirmed_text(), "x", "after resync a must still have the undo applied");
 }
+
+/// An edit the relay's HTTP API made through this replica isn't the person's own: their undo
+/// skips it, and it doesn't clear what they can redo.
+#[test]
+fn api_edits_are_not_the_persons_own() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    end(&mut a);
+    a.type_text("y");
+    relay.settle(&mut [&mut a]);
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a]);
+    assert_eq!(a.confirmed_text(), "x");
+    a.visible.api_run = true;
+    a.act("text.insert", json!({"text": "Z"}));
+    a.visible.api_run = false;
+    relay.settle(&mut [&mut a]);
+    assert_eq!(a.confirmed_text(), "xZ");
+    a.act("edit.redo", json!({}));
+    relay.settle(&mut [&mut a]);
+    assert!(a.confirmed_text().contains('y'), "redo still brings Ann's edit back: {}", a.confirmed_text());
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a]);
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a]);
+    assert!(a.confirmed_text().contains('Z'), "undo never takes back the API's edit: {}", a.confirmed_text());
+}

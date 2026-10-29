@@ -81,7 +81,7 @@ impl UndoLog {
         self.entries
             .iter()
             .rev()
-            .find(|e| e.op.client == client && matches!(e.op.kind, OpKind::Cmd | OpKind::Restore) && !self.excluded.contains(&e.rev))
+            .find(|e| e.op.client == client && !e.op.ctx.api && matches!(e.op.kind, OpKind::Cmd | OpKind::Restore) && !self.excluded.contains(&e.rev))
             .map(|e| e.rev)
     }
 
@@ -93,7 +93,9 @@ impl UndoLog {
             .entries
             .iter()
             .rev()
-            .filter(|e| e.op.client == client && matches!(e.op.kind, OpKind::Cmd | OpKind::Restore) && !self.excluded.contains(&e.rev))
+            .filter(|e| {
+                e.op.client == client && !e.op.ctx.api && matches!(e.op.kind, OpKind::Cmd | OpKind::Restore) && !self.excluded.contains(&e.rev)
+            })
             .collect();
         let Some(first) = own.first() else { return Vec::new() };
         let mut group = vec![first.rev];
