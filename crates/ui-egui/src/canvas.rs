@@ -502,7 +502,13 @@ fn prepare_view(app: &mut WordApp, ui: &Ui, full: Rect, layout: &DocLayout) -> C
         && app.session.view.mode == wordcraft_layout::ViewMode::Print
         && !read_mode
         && crate::chrome::Screen::of(&app.session.view) == crate::chrome::Screen::Normal;
-    let (hruler, vruler, area) = if show_ruler {
+    let (hruler, vruler, area) = if show_ruler && craft_ui::direction::is_rtl(ui) {
+        // A right-to-left interface has the vertical ruler at the right, as Word's (the scroll bar
+        // moves left by itself). The pages themselves don't mirror.
+        let h = Rect::from_min_max(full.min, pos2(full.max.x - RULER, full.min.y + RULER));
+        let v = Rect::from_min_max(pos2(full.max.x - RULER, full.min.y + RULER), full.max);
+        (Some(h), Some(v), Rect::from_min_max(pos2(full.min.x, full.min.y + RULER), pos2(full.max.x - RULER, full.max.y)))
+    } else if show_ruler {
         let h = Rect::from_min_max(pos2(full.min.x + RULER, full.min.y), pos2(full.max.x, full.min.y + RULER));
         let v = Rect::from_min_max(pos2(full.min.x, full.min.y + RULER), pos2(full.min.x + RULER, full.max.y));
         (Some(h), Some(v), Rect::from_min_max(pos2(full.min.x + RULER, full.min.y + RULER), full.max))

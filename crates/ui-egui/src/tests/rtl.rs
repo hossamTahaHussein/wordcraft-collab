@@ -148,3 +148,37 @@ fn the_file_page_menu_is_on_the_right() {
     // As in English 52 pt from the menu's left edge (the icon before it), 52 pt from its right.
     assert!((open.max.x - (1280.0 - 52.0)).abs() < 2.0, "the label reads from the menu's right edge: {open:?}");
 }
+
+#[test]
+fn the_vertical_ruler_is_on_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let page = app.canvas.page_rects[0];
+    // Ruler numbers right of the page belong to a vertical ruler at the window's right.
+    let right_of_page = shapes.iter().any(|c| match &c.shape {
+        Shape::Text(t) => {
+            t.galley.text().parse::<u32>().is_ok() && t.visual_bounding_rect().min.x > page.max.x && t.visual_bounding_rect().min.y > page.min.y
+        }
+        _ => false,
+    });
+    assert!(right_of_page, "vertical ruler numbers at the right of the page");
+    let left_of_page = shapes.iter().any(|c| match &c.shape {
+        Shape::Text(t) => t.galley.text().parse::<u32>().is_ok() && t.visual_bounding_rect().max.x < page.min.x,
+        _ => false,
+    });
+    assert!(!left_of_page, "none at the left");
+}
+
+#[test]
+fn the_document_is_not_mirrored() {
+    let (mut app, ctx) = app_in("ar");
+    frame(&mut app, &ctx, 1280.0);
+    let caret_ar = crate::canvas::caret_screen(&mut app).expect("caret").0.x;
+    let (mut app2, ctx2) = app_in("en");
+    frame(&mut app2, &ctx2, 1280.0);
+    let caret_en = crate::canvas::caret_screen(&mut app2).expect("caret").0.x;
+    // The page moves with the ruler, but the English paragraph still starts at its left margin.
+    let page_ar = app.canvas.page_rects[0];
+    let page_en = app2.canvas.page_rects[0];
+    assert!(((caret_ar - page_ar.min.x) - (caret_en - page_en.min.x)).abs() < 1.0, "{caret_ar} in {page_ar:?}, {caret_en} in {page_en:?}");
+}
