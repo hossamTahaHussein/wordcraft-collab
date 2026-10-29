@@ -130,9 +130,9 @@ pub struct Replica {
     restarted: bool,
     /// Checkpoints and confirmed edits for selective undo.
     undo: UndoLog,
-    /// This person's edits they undid, newest last: what Redo brings back (emptied by a new
-    /// edit of theirs).
-    undone: Vec<u64>,
+    /// This person's undone steps (each the edits one undo took back), newest last: what Redo
+    /// brings back (emptied by a new edit of theirs).
+    undone: Vec<Vec<u64>>,
     /// Messages for the person ("Nothing of yours to undo").
     notes: Vec<String>,
 }
@@ -282,7 +282,7 @@ impl Replica {
         let Some(i) = self.pending.iter().position(|p| p.seq == seq) else { return };
         if self.pending[i].kind == OpKind::Undo
             && let Some(t) = self.pending[i].params.get("target").and_then(Value::as_u64)
-            && self.undone.last() == Some(&t)
+            && self.undone.last().and_then(|g| g.first()) == Some(&t)
         {
             self.undone.pop();
         }
@@ -316,10 +316,14 @@ impl Replica {
     fn name_target(&mut self) -> bool {
         let Some(op) = self.pending.front() else { return false };
         let undo = op.kind == OpKind::Undo;
-        let target = if undo { self.undo.newest_own(&self.client).inspect(|t| self.undone.push(*t)) } else { self.undone.pop() };
-        match (target, self.pending.front_mut()) {
-            (Some(t), Some(op)) => {
-                op.params = serde_json::json!({"target": t});
+        let group = if undo {
+            Some(self.undo.own_group(&self.client)).filter(|g| !g.is_empty()).inspect(|g| self.undone.push(g.clone()))
+        } else {
+            self.undone.pop()
+        };
+        match (group, self.pending.front_mut()) {
+            (Some(g), Some(op)) => {
+                op.params = if g.len() > 1 { serde_json::json!({"target": g[0], "more": &g[1..]}) } else { serde_json::json!({"target": g[0]}) };
                 true
             }
             _ => {
@@ -451,8 +455,11 @@ impl Replica {
             // An edit out of this replica's reach changes nothing here; the fingerprint check
             // resyncs a replica that ends up different.
             OpKind::Undo | OpKind::Redo => {
-                let target = op.params.get("target").and_then(Value::as_u64).unwrap_or(0);
-                if let Some(doc) = self.undo.apply(target, op.kind == OpKind::Undo) {
+                let mut targets: Vec<u64> = op.params.get("target").and_then(Value::as_u64).into_iter().collect();
+                if let Some(more) = op.params.get("more").and_then(Value::as_array) {
+                    targets.extend(more.iter().filter_map(Value::as_u64));
+                }
+                if let Some(doc) = self.undo.apply(&targets, op.kind == OpKind::Undo) {
                     self.confirmed.doc = doc;
                     self.confirmed.clamp_selection();
                 }

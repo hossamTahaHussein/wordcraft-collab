@@ -159,9 +159,30 @@ fn an_undo_sent_again_after_a_reconnect_keeps_its_edit() {
     relay.settle(&mut [&mut a]);
     a.act("edit.undo", json!({}));
     let first = a.replica.next_to_send().unwrap();
-    assert_eq!(first.params, json!({"target": 2}));
+    assert_eq!(first.params, json!({"target": 2, "more": [1]}), "typed together: one step");
     // The connection drops before the relay got it; the Welcome resumes and it goes again.
     let again = a.replica.resume(relay.rev(), None, Vec::new(), None, &mut a.visible).unwrap();
-    assert_eq!(again[0].params, json!({"target": 2}));
+    assert_eq!(again[0].params, json!({"target": 2, "more": [1]}));
     assert!(a.replica.can_redo());
+}
+
+#[test]
+fn a_run_of_typing_is_one_undo() {
+    let mut relay = Relay::new(doc_with("Start"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    end(&mut a);
+    for t in [" ", "two", " ", "words", "."] {
+        end(&mut a);
+        a.type_text(t);
+        relay.settle(&mut [&mut a, &mut b]);
+    }
+    assert_eq!(b.text(), "Start two words.");
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(a.text(), "Start");
+    assert_eq!(b.text(), "Start");
+    a.act("edit.redo", json!({}));
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(b.text(), "Start two words.");
 }
