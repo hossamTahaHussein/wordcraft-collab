@@ -72,7 +72,7 @@ impl CollabLink {
             }
         };
         match message {
-            Inbound::Welcome { rev, snapshot, ops, you, seen, history } => self.welcome(rev, snapshot, ops, you, seen, history, visible),
+            Inbound::Welcome { rev, snapshot, ops, you, seen, history, .. } => self.welcome(rev, snapshot, ops, you, seen, history, visible),
             Inbound::Op(op) => self.op(*op, visible),
             Inbound::SnapshotRequest => match self.replica.as_ref().map(Replica::snapshot) {
                 Some(Ok(s)) => vec![encode(&s)],
@@ -94,6 +94,7 @@ impl CollabLink {
                 self.save_requested = self.replica.is_some();
                 Vec::new()
             }
+            Inbound::Join(_) | Inbound::Leave { .. } | Inbound::Presence(_) => Vec::new(),
         }
     }
 

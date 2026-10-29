@@ -73,6 +73,18 @@ pub struct HistSpan {
     pub new_end: usize,
 }
 
+/// Someone else in the document: who, their colour (an index into the palette) and, once they
+/// sent one, where their selection is.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Peer {
+    pub client: String,
+    pub user: String,
+    pub color: u8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sel: Option<Anchor>,
+}
+
 /// Relay → replica.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "t")]
@@ -91,6 +103,9 @@ pub enum Inbound {
         /// With a snapshot: the changes of the revisions before it.
         #[serde(default)]
         history: Vec<HistEntry>,
+        /// The people already here.
+        #[serde(default)]
+        peers: Vec<Peer>,
     },
     Op(Box<Op>),
     /// Upload a snapshot of the confirmed document.
@@ -107,6 +122,14 @@ pub enum Inbound {
     },
     /// Save the document now (autosave).
     Save,
+    /// Someone joined.
+    Join(Peer),
+    /// Someone left.
+    Leave {
+        client: String,
+    },
+    /// Someone's selection moved.
+    Presence(Peer),
 }
 
 /// Replica → relay.
@@ -131,6 +154,10 @@ pub enum Outbound {
     /// This replica missed edits after `have`.
     ResyncRequest {
         have: u64,
+    },
+    /// Where this person's selection is (at most ten times a second; never logged).
+    Presence {
+        sel: Anchor,
     },
 }
 
@@ -202,7 +229,7 @@ mod tests {
     #[test]
     fn welcome_and_resync_decode() {
         let w = decode_inbound(r#"{"t":"Welcome","rev":3,"snapshot":null,"ops":[],"you":"c1"}"#).unwrap();
-        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None, history: vec![] });
+        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None, history: vec![], peers: vec![] });
         assert_eq!(decode_inbound(r#"{"t":"Save"}"#).unwrap(), Inbound::Save);
         assert_eq!(decode_inbound(r#"{"t":"SnapshotRequest"}"#).unwrap(), Inbound::SnapshotRequest);
         let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[]}"#).unwrap();
@@ -218,6 +245,24 @@ mod tests {
         assert_eq!(t(&Outbound::Snapshot { rev: 1, doc: "{}".into(), history: vec![] }), "Snapshot");
         assert_eq!(t(&Outbound::Saved { rev: 1 }), "Saved");
         assert_eq!(serde_json::to_value(Outbound::ResyncRequest { have: 7 }).unwrap(), json!({"t": "ResyncRequest", "have": 7}));
+    }
+
+    #[test]
+    fn presence_messages_decode() {
+        let j = decode_inbound(r#"{"t":"Join","client":"b","user":"B","color":1}"#).unwrap();
+        assert_eq!(j, Inbound::Join(Peer { client: "b".into(), user: "B".into(), color: 1, sel: None }));
+        assert_eq!(decode_inbound(r#"{"t":"Leave","client":"b"}"#).unwrap(), Inbound::Leave { client: "b".into() });
+        let p = decode_inbound(r#"{"t":"Presence","client":"a","user":"A","color":0,"sel":{"story":"body","anchor":3,"head":5}}"#).unwrap();
+        let Inbound::Presence(peer) = p else { panic!("not presence") };
+        assert_eq!(peer.sel, Some(Anchor { story: StoryRef::Body, anchor: 3, head: 5 }));
+        let w =
+            decode_inbound(r#"{"t":"Welcome","rev":0,"snapshot":null,"ops":[],"you":"c","peers":[{"client":"a","user":"A","color":0}]}"#).unwrap();
+        let Inbound::Welcome { peers, .. } = w else { panic!("not welcome") };
+        assert_eq!(peers.len(), 1);
+        assert_eq!(
+            serde_json::to_value(Outbound::Presence { sel: Anchor { story: StoryRef::Body, anchor: 2, head: 2 } }).unwrap(),
+            json!({"t": "Presence", "sel": {"story": "body", "anchor": 2, "head": 2}})
+        );
     }
 
     #[test]
