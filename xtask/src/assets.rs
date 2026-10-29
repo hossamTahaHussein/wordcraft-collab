@@ -2,7 +2,7 @@
 //!
 //! Scans all git-tracked (and untracked, not ignored) files with an asset extension, plus
 //! everything under `assets/`, `docs/images/` and `examples/`, and fails if a path is not listed
-//! as `` `path` `` in ATTRIBUTION.md. See the asset policy in AGENTS.md.
+//! as `` `path` `` in ATTRIBUTION.md. See the asset policy in CONTRIBUTING.md.
 
 use std::path::Path;
 use std::process::Command;

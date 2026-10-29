@@ -153,7 +153,7 @@ Russian AutoCorrect, agreement checks.
 Italian (`it`, #594) follows `it`, `it-IT` and `it-CH` system locales. Its catalog has every key of
 the others plus 51 strings that are wrapped in `tl!` but were in no catalog yet (File › Info
 properties, the File › Home greeting, list levels, Equation tab gallery and tooltips). Ribbon tabs,
-groups and command names use the names Italian Word users know (feature names, as `AGENTS.md`
+groups and command names use the names Italian Word users know (feature names, as `CONTRIBUTING.md`
 allows); all other text is written from the meaning of the English. Italian proofing: see the table above.
 
 A native speaker reviewed the catalog on 2026-10-14 (wording fixes, consistent terms).

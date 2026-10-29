@@ -4,7 +4,7 @@
 
 How WordCraft is built today (origin/main `40c5d51`). The longer design notes in
 `plan/architecture.md` are gitignored and local to the original author's machine; this file is the
-committed, current summary. Rules for working in the code are in [`AGENTS.md`](../AGENTS.md).
+committed, current summary. Rules for working in the code are in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
 
 ## Layers
 
