@@ -145,7 +145,7 @@ $rtf = '{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fswiss\fcharset0 Tahoma;}}\vi
 [System.IO.File]::WriteAllText($LicenseRtf, $rtf, [System.Text.Encoding]::ASCII)
 
 # One MSI from one dual-scope source (see wordcraft.wxs and install-policy.wxi): per user by default into
-# %LOCALAPPDATA%\Programs\ArtCraft\WordCraft (#39), per machine into Program Files\ArtCraft on request.
+# %LOCALAPPDATA%\Programs\WordCraftCollab\WordCraft (#39), per machine into Program Files\WordCraftCollab on request.
 # The plain name is the one every sibling app, the launcher and the shared windows-arm64 workflow expect.
 $Msi = Join-Path $Dist "wordcraft-$Version-windows-$Arch.msi"
 Invoke-Native "wix build" {

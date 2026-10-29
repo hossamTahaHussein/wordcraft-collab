@@ -1333,11 +1333,6 @@ fn paint_view_and_tables(pen: &Pen, name: &str) -> bool {
             pen.line_c(&[(14.0, 11.0), (14.0, 17.0)], a);
             pen.line_c(&[(11.0, 14.0), (17.0, 14.0)], a);
         }
-        "discord" => {
-            pen.fill(&[(3.0, 6.0), (7.0, 3.5), (13.0, 3.5), (17.0, 6.0), (17.5, 14.0), (13.5, 16.5), (6.5, 16.5), (2.5, 14.0)], a);
-            pen.fcircle(7.5, 10.5, 1.5, Color32::WHITE);
-            pen.fcircle(12.5, 10.5, 1.5, Color32::WHITE);
-        }
         _ => return false,
     }
     true

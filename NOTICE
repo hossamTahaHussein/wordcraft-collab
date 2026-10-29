@@ -1,11 +1,13 @@
-WordCraft
+WordCraft Collab
+Based on WordCraft (https://github.com/storytold/wordcraft).
 Copyright (c) 2026 ArtCraft Team and the WordCraft contributors.
+Real-time co-editing additions Copyright (c) 2026 Hossam Taha.
 Licensed under the MIT License or the Apache License, Version 2.0, at your option
 (LICENSE-MIT, LICENSE-APACHE).
 
-The ArtCraft name, wordmark and logos in docs/brand/ are trademarks of the ArtCraft Team. They are
-not open source and are not covered by the license above; their terms are in
-docs/brand/LICENSE-brand.txt.
+This is a modified version of WordCraft. It is not made, sponsored or endorsed by the ArtCraft
+Team. The ArtCraft name, wordmark and logos are trademarks of the ArtCraft Team; as their brand
+terms require for modified versions, they have been removed from this repository.
 
 Third-party material
 
