@@ -199,6 +199,20 @@ impl eframe::App for WebShell {
                 bridge.post_result(id, crate::api::call(&mut self.app, &method, &params));
             }
         }
+        // The relay's HTTP API: exports and commands it asked this editor for.
+        if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
+            for request in link.take_host_requests() {
+                let answer = match request {
+                    crate::collab_link::HostRequest::Export { id, format } => {
+                        crate::collab_link::CollabLink::exported(id, crate::api::document_file(&self.app, &format).map(|(_, bytes)| bytes))
+                    }
+                    crate::collab_link::HostRequest::Run { id, cmd, params, author } => {
+                        crate::collab_link::CollabLink::ran(id, crate::api::run_as(&mut self.app, &cmd, params, &author))
+                    }
+                };
+                bridge.post_collab(&answer);
+            }
+        }
         if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
             let now = js_sys::Date::now();
             for out in link.tick(&mut self.app.session, now) {

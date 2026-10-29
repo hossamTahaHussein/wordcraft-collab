@@ -32,6 +32,31 @@ pub const COLLAB_DISABLED: &[&str] = &[
 /// snapshot history.
 pub const COLLAB_UNDO: &[&str] = &["edit.undo", "edit.redo"];
 
+/// What a commenter may change while co-editing (the relay's `comment-commands.json`).
+pub const COMMENT_COMMANDS: &[&str] = &["review.newComment", "review.editComment", "review.deleteComment", "review.resolveComment"];
+
+/// What the person may do in a co-edited document (their join token's role).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CollabRole {
+    #[default]
+    Edit,
+    /// Comments only.
+    Comment,
+    /// Read only.
+    View,
+}
+
+impl CollabRole {
+    /// The relay's name for a role (`edit`, `comment`, `view`); anything else is `edit`.
+    pub fn parse(s: &str) -> CollabRole {
+        match s {
+            "comment" => CollabRole::Comment,
+            "view" => CollabRole::View,
+            _ => CollabRole::Edit,
+        }
+    }
+}
+
 /// Commands that paste this session's clipboard: their record carries it ([`RunCtx::clipboard`]).
 const CLIPBOARD_READERS: &[&str] = &["edit.paste", "edit.pasteSpecial", "edit.pasteText", "edit.pasteMerge"];
 
@@ -54,6 +79,7 @@ pub struct Recorded {
 #[derive(Debug)]
 pub(crate) struct CollabState {
     on: bool,
+    role: CollabRole,
     recording: bool,
     /// A recorded command is running: the commands it runs aren't recorded again.
     busy: bool,
@@ -62,7 +88,7 @@ pub(crate) struct CollabState {
 
 impl Default for CollabState {
     fn default() -> Self {
-        CollabState { on: false, recording: true, busy: false, outbox: Vec::new() }
+        CollabState { on: false, role: CollabRole::Edit, recording: true, busy: false, outbox: Vec::new() }
     }
 }
 
@@ -87,6 +113,16 @@ impl Session {
 
     pub fn collab(&self) -> bool {
         self.collab.on
+    }
+
+    /// What the person may do while co-editing; the relay refuses the rest anyway, this says so
+    /// before the edit shows.
+    pub fn set_collab_role(&mut self, role: CollabRole) {
+        self.collab.role = role;
+    }
+
+    pub fn collab_role(&self) -> CollabRole {
+        self.collab.role
     }
 
     /// Pause recording (while the co-editing layer replays commands it already has).
@@ -115,7 +151,11 @@ impl Session {
                 "{id}: Opening or closing a document isn't available while co-editing: it would replace the shared document for everyone"
             )));
         }
-        if COLLAB_UNDO.contains(&id) && self.collab.recording && !self.collab.busy {
+        let person = self.collab.recording && !self.collab.busy;
+        if person && self.collab.role == CollabRole::View && (COLLAB_UNDO.contains(&id) || self.registry.get(id).is_some_and(|spec| spec.mutates)) {
+            return Err(CmdError::Disabled(format!("{id}: You can only view this document")));
+        }
+        if COLLAB_UNDO.contains(&id) && person {
             if self.viewing {
                 return Err(CmdError::Disabled(format!("{id}: {}", crate::cmd::protect::VIEWING)));
             }
@@ -129,8 +169,11 @@ impl Session {
             return Err(CmdError::Disabled(format!("{id}: Not available while co-editing")));
         }
         let mutates = self.registry.get(id).is_some_and(|spec| spec.mutates);
-        if !mutates || !self.collab.recording || self.collab.busy {
+        if !mutates || !person {
             return run(self);
+        }
+        if self.collab.role == CollabRole::Comment && !COMMENT_COMMANDS.contains(&id) {
+            return Err(CmdError::Disabled(format!("{id}: You can only comment on this document")));
         }
         let refuse = |why: &str| Err(CmdError::Disabled(format!("{id}: {why} isn't available while co-editing")));
         if !self.also_selected.is_empty() || self.column.is_some() {

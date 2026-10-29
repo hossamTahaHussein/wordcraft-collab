@@ -34,7 +34,7 @@ use serde_json::Value;
 
 pub use io::Password;
 pub use keymap::KeyMap;
-pub use outbox::{COLLAB_DISABLED, Recorded};
+pub use outbox::{COLLAB_DISABLED, CollabRole, Recorded};
 pub use ribbon::RibbonLayout;
 pub use run_ctx::{EditingPrefs, RunCtx, with_clock};
 pub use session::{

@@ -222,3 +222,29 @@ fn a_paste_too_large_to_send_is_refused() {
     s.run("caret.docEnd", &json!({})).unwrap();
     assert!(matches!(s.run("edit.paste", &json!({})), Err(CmdError::Disabled(_))));
 }
+
+#[test]
+fn a_viewer_changes_nothing_and_a_commenter_only_comments() {
+    use crate::outbox::CollabRole;
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hello"})).unwrap();
+    s.take_outbox();
+    s.set_collab_role(CollabRole::View);
+    for id in ["text.insert", "edit.undo", "review.newComment"] {
+        match s.run(id, &json!({"text": "x"})) {
+            Err(CmdError::Disabled(m)) => assert!(m.contains("only view"), "{id}: {m}"),
+            other => panic!("{id}: {other:?}"),
+        }
+    }
+    assert!(s.run("caret.docStart", &json!({})).is_ok(), "moving around is fine");
+    s.set_collab_role(CollabRole::Comment);
+    assert!(matches!(s.run("text.insert", &json!({"text": "x"})), Err(CmdError::Disabled(m)) if m.contains("only comment")));
+    s.run("select.text", &json!({"text": "Hello"})).unwrap();
+    s.run("review.newComment", &json!({"text": "Nice"})).unwrap();
+    assert_eq!(s.take_outbox().len(), 1);
+    // Replays of other people's edits are never refused.
+    s.set_recording(false);
+    assert!(s.run("text.insert", &json!({"text": "x"})).is_ok());
+    assert_eq!(CollabRole::parse("view"), CollabRole::View);
+    assert_eq!(CollabRole::parse("nonsense"), CollabRole::Edit);
+}

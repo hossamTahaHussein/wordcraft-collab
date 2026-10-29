@@ -4,11 +4,12 @@
 
 use std::collections::BTreeMap;
 
+use serde_json::Value;
 use wordcraft_collab::mapping::{changes, map};
-use wordcraft_collab::proto::{Anchor, HistEntry, Inbound, Op, Outbound, Peer, decode_inbound};
+use wordcraft_collab::proto::{Anchor, HistEntry, Inbound, Op, Outbound, Peer, VersionInfo, decode_inbound};
 use wordcraft_collab::replica::{Applied, CollabError, Moved, Replica};
 use wordcraft_doc::offsets::{offset_of, pos_at};
-use wordcraft_engine::{Selection, Session};
+use wordcraft_engine::{CollabRole, Selection, Session};
 
 /// How often a replica may say where its selection is.
 const PRESENCE_EVERY_MS: f64 = 100.0;
@@ -43,6 +44,14 @@ struct PeerState {
     typed_at: Option<f64>,
 }
 
+/// What the relay's HTTP API asked of this editor (the host answers with
+/// [`CollabLink::exported`] and [`CollabLink::ran`]).
+#[derive(Clone, Debug, PartialEq)]
+pub enum HostRequest {
+    Export { id: String, format: String },
+    Run { id: String, cmd: String, params: Value, author: String },
+}
+
 pub struct CollabLink {
     replica: Option<Replica>,
     /// This replica's client id (from `Welcome`).
@@ -68,6 +77,12 @@ pub struct CollabLink {
     now: f64,
     /// The names of the people whose edits were applied since [`CollabLink::take_edited_by`].
     edited_by: Vec<String>,
+    /// What the person may do (the join token's role).
+    role: CollabRole,
+    host_requests: Vec<HostRequest>,
+    /// The version list and a version's document, as the relay last sent them.
+    versions: Option<Vec<VersionInfo>>,
+    version_doc: Option<(u64, Option<String>)>,
 }
 
 impl CollabLink {
@@ -86,7 +101,71 @@ impl CollabLink {
             presence_waiting: false,
             now: 0.0,
             edited_by: Vec::new(),
+            role: CollabRole::Edit,
+            host_requests: Vec::new(),
+            versions: None,
+            version_doc: None,
         }
+    }
+
+    pub fn role(&self) -> CollabRole {
+        self.role
+    }
+
+    /// The relay's HTTP API requests since the last call.
+    pub fn take_host_requests(&mut self) -> Vec<HostRequest> {
+        std::mem::take(&mut self.host_requests)
+    }
+
+    /// Answer an `Export`: the file's bytes, or why there are none.
+    pub fn exported(id: String, file: Result<Vec<u8>, String>) -> String {
+        use base64::Engine as _;
+        encode(&match file {
+            Ok(bytes) => Outbound::Exported { id, ok: true, data: Some(base64::engine::general_purpose::STANDARD.encode(bytes)), error: None },
+            Err(e) => Outbound::Exported { id, ok: false, data: None, error: Some(e) },
+        })
+    }
+
+    /// Answer a `Run`.
+    pub fn ran(id: String, result: Result<Value, String>) -> String {
+        encode(&match result {
+            Ok(v) => Outbound::RunResult { id, ok: true, result: Some(v), error: None },
+            Err(e) => Outbound::RunResult { id, ok: false, result: None, error: Some(e) },
+        })
+    }
+
+    /// Ask for the version list (it arrives in [`CollabLink::take_versions`]).
+    pub fn list_versions(&self) -> String {
+        encode(&Outbound::Versions)
+    }
+
+    /// Ask for one version's document (it arrives in [`CollabLink::take_version_doc`]).
+    pub fn get_version(&self, rev: u64) -> String {
+        encode(&Outbound::GetVersion { rev })
+    }
+
+    pub fn take_versions(&mut self) -> Option<Vec<VersionInfo>> {
+        self.versions.take()
+    }
+
+    pub fn take_version_doc(&mut self) -> Option<(u64, Option<String>)> {
+        self.version_doc.take()
+    }
+
+    /// Restore the version at `rev` for everyone (editors only; it goes out with the next tick).
+    pub fn restore(&mut self, rev: u64) -> bool {
+        if self.role != CollabRole::Edit {
+            return false;
+        }
+        self.replica.as_mut().map(|r| r.restore(rev)).is_some()
+    }
+
+    pub fn can_undo(&self) -> bool {
+        self.replica.as_ref().is_some_and(Replica::can_undo)
+    }
+
+    pub fn can_redo(&self) -> bool {
+        self.replica.as_ref().is_some_and(Replica::can_redo)
     }
 
     pub fn rev(&self) -> Option<u64> {
@@ -142,7 +221,9 @@ impl CollabLink {
 
     fn handle(&mut self, message: Inbound, visible: &mut Session) -> Vec<String> {
         match message {
-            Inbound::Welcome { rev, snapshot, ops, you, seen, history, peers } => {
+            Inbound::Welcome { rev, snapshot, ops, you, seen, history, peers, role } => {
+                self.role = CollabRole::parse(role.as_deref().unwrap_or("edit"));
+                visible.set_collab_role(self.role);
                 // The relay's list replaces ours (a reconnect may have missed joins and leaves).
                 self.peers.clear();
                 self.sent = None;
@@ -182,6 +263,34 @@ impl CollabLink {
                 self.peers.remove(&client);
                 Vec::new()
             }
+            Inbound::Refused { seq, reason } => {
+                if let Some(replica) = self.replica.as_mut() {
+                    replica.refused(seq, visible);
+                }
+                self.note = Some(reason);
+                Vec::new()
+            }
+            // Only the confirmed document at exactly that revision is a version of it.
+            Inbound::VersionRequest { rev } => match self.replica.as_ref().filter(|r| r.rev() == rev).map(Replica::snapshot) {
+                Some(Ok(Outbound::Snapshot { doc, .. })) => vec![encode(&Outbound::Version { rev, doc })],
+                _ => Vec::new(),
+            },
+            Inbound::VersionList { versions } => {
+                self.versions = Some(versions);
+                Vec::new()
+            }
+            Inbound::VersionDoc { rev, doc } => {
+                self.version_doc = Some((rev, doc));
+                Vec::new()
+            }
+            Inbound::Export { id, format } => {
+                self.host_requests.push(HostRequest::Export { id, format });
+                Vec::new()
+            }
+            Inbound::Run { id, cmd, params, author } => {
+                self.host_requests.push(HostRequest::Run { id, cmd, params, author });
+                Vec::new()
+            }
         }
     }
 
@@ -214,6 +323,9 @@ impl CollabLink {
         let mut out = Vec::new();
         if let Some(op) = replica.next_to_send() {
             out.push(encode(&Outbound::Op(Box::new(op))));
+        }
+        if let Some(note) = replica.take_notes().pop() {
+            self.note = Some(note);
         }
         if let Some(h) = replica.hash_due() {
             out.push(encode(&h));
@@ -1155,5 +1267,119 @@ mod viewing_replay_tests {
         assert_eq!(s.doc.plain_text(StoryRef::Body), ">Hello a b c");
         assert!(s.viewing, "still viewing");
         assert!(link.take_note().is_none(), "nothing reported as dropped");
+    }
+}
+
+#[cfg(test)]
+mod protocol_v2_tests {
+    use serde_json::{Value, json};
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::{CollabRole, Session};
+
+    use super::*;
+
+    fn snap(text: &str) -> String {
+        let mut s = Session::new(Document::new());
+        s.run("text.insert", &json!({"text": text})).unwrap();
+        String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap()
+    }
+
+    fn joined(text: &str, role: Option<&str>) -> (CollabLink, Session) {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        let w = json!({"t": "Welcome", "rev": 3, "snapshot": snap(text), "ops": [], "you": "me", "role": role});
+        link.on_message(&w.to_string(), &mut s);
+        (link, s)
+    }
+
+    fn parse(m: &str) -> Value {
+        serde_json::from_str(m).unwrap()
+    }
+
+    #[test]
+    fn the_welcomes_role_limits_the_person() {
+        let (link, mut s) = joined("Hi", Some("view"));
+        assert_eq!(link.role(), CollabRole::View);
+        assert!(s.run("text.insert", &json!({"text": "x"})).is_err());
+        let (link, mut s) = joined("Hi", Some("comment"));
+        assert_eq!(link.role(), CollabRole::Comment);
+        assert!(s.run("text.insert", &json!({"text": "x"})).is_err());
+        let (link, _) = joined("Hi", None);
+        assert_eq!(link.role(), CollabRole::Edit, "an older relay sends no role");
+    }
+
+    #[test]
+    fn a_refused_edit_leaves_with_its_reason() {
+        let (mut link, mut s) = joined("Hi", None);
+        s.run("caret.docEnd", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "!"})).unwrap();
+        let out = super::edits_only(link.tick(&mut s, 0.0));
+        let seq = parse(&out[0])["seq"].as_u64().unwrap();
+        link.on_message(&json!({"t": "Refused", "seq": seq, "reason": "You can only comment on this document"}).to_string(), &mut s);
+        assert_eq!(s.doc.plain_text(StoryRef::Body), "Hi");
+        assert_eq!(link.take_note().as_deref(), Some("You can only comment on this document"));
+        assert_eq!(link.pending(), 0);
+    }
+
+    #[test]
+    fn a_version_is_given_only_at_its_revision() {
+        let (mut link, mut s) = joined("Kept", None);
+        assert!(link.on_message(r#"{"t":"VersionRequest","rev":2}"#, &mut s).is_empty());
+        let out = link.on_message(r#"{"t":"VersionRequest","rev":3}"#, &mut s);
+        let v = parse(&out[0]);
+        assert_eq!((v["t"].as_str(), v["rev"].as_u64()), (Some("Version"), Some(3)));
+        assert!(v["doc"].as_str().unwrap().contains("Kept"));
+    }
+
+    #[test]
+    fn versions_list_preview_and_restore() {
+        let (mut link, mut s) = joined("Now", None);
+        assert_eq!(parse(&link.list_versions()), json!({"t": "Versions"}));
+        assert_eq!(parse(&link.get_version(2)), json!({"t": "GetVersion", "rev": 2}));
+        link.on_message(r#"{"t":"VersionList","versions":[{"rev":2,"at":"2026-10-29T10:00:00Z","users":["Ann"]}]}"#, &mut s);
+        assert_eq!(link.take_versions().unwrap()[0].users, ["Ann"]);
+        link.on_message(&json!({"t": "VersionDoc", "rev": 2, "doc": snap("Then")}).to_string(), &mut s);
+        assert!(link.take_version_doc().unwrap().1.unwrap().contains("Then"));
+        assert!(link.restore(2));
+        let out = super::edits_only(link.tick(&mut s, 0.0));
+        let op = parse(&out[0]);
+        assert_eq!((op["kind"].as_str(), op["cmd"].as_str(), op["params"]["version"].as_u64()), (Some("restore"), Some("collab.restore"), Some(2)));
+        let (mut viewer, _) = joined("Now", Some("comment"));
+        assert!(!viewer.restore(2), "only editors restore");
+    }
+
+    #[test]
+    fn export_and_run_requests_go_to_the_host() {
+        let (mut link, mut s) = joined("Hi", None);
+        link.on_message(r#"{"t":"Export","id":"e1","format":"txt"}"#, &mut s);
+        link.on_message(r#"{"t":"Run","id":"r1","cmd":"format.bold","params":{},"author":"API"}"#, &mut s);
+        assert_eq!(
+            link.take_host_requests(),
+            [
+                HostRequest::Export { id: "e1".into(), format: "txt".into() },
+                HostRequest::Run { id: "r1".into(), cmd: "format.bold".into(), params: json!({}), author: "API".into() }
+            ]
+        );
+        assert_eq!(parse(&CollabLink::exported("e1".into(), Ok(b"Hi".to_vec()))), json!({"t": "Exported", "id": "e1", "ok": true, "data": "SGk="}));
+        assert_eq!(
+            parse(&CollabLink::ran("r1".into(), Err("Unknown".into()))),
+            json!({"t": "RunResult", "id": "r1", "ok": false, "error": "Unknown"})
+        );
+    }
+
+    #[test]
+    fn undo_goes_to_the_relay() {
+        let (mut link, mut s) = joined("Hi", None);
+        s.run("caret.docEnd", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "!"})).unwrap();
+        let out = super::edits_only(link.tick(&mut s, 0.0));
+        let mut echo = parse(&out[0]);
+        echo["rev"] = json!(4);
+        link.on_message(&echo.to_string(), &mut s);
+        assert!(link.can_undo());
+        s.run("edit.undo", &json!({})).unwrap();
+        let out = super::edits_only(link.tick(&mut s, 0.0));
+        let op = parse(&out[0]);
+        assert_eq!((op["kind"].as_str(), op["params"]["target"].as_u64()), (Some("undo"), Some(4)));
     }
 }

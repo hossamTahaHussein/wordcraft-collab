@@ -43,18 +43,36 @@ pub fn call(app: &mut WordApp, method: &str, params: &Value) -> Result<Reply, St
         }
         "getDocument" => {
             let format = params.get("format").and_then(Value::as_str).unwrap_or("docx").to_ascii_lowercase();
-            if !FORMATS.contains(&format.as_str()) {
-                return Err(format!("unsupported format `{format}` (one of {})", FORMATS.join(", ")));
-            }
-            let name = format!("{}.{format}", app.title_stem());
-            // Word documents carry the document's password, as a Save writes them.
-            let password = app.session.password.as_ref().map(wordcraft_engine::io::Password::as_str);
-            let bytes = wordcraft_engine::io::save_bytes_with(&name, &app.session.doc, password, &Default::default())?;
+            let (name, bytes) = document_file(app, &format)?;
             return Ok(Reply { result: json!({"name": name}), file: Some((name, bytes)) });
         }
         other => return Err(format!("unknown method `{other}`")),
     };
     Ok(Reply { result, file: None })
+}
+
+/// The document as a file of `format` (one of [`FORMATS`]): its name and bytes.
+pub fn document_file(app: &WordApp, format: &str) -> Result<(String, Vec<u8>), String> {
+    if !FORMATS.contains(&format) {
+        return Err(format!("unsupported format `{format}` (one of {})", FORMATS.join(", ")));
+    }
+    let name = format!("{}.{format}", app.title_stem());
+    // Word documents carry the document's password, as a Save writes them.
+    let password = app.session.password.as_ref().map(wordcraft_engine::io::Password::as_str);
+    let bytes = wordcraft_engine::io::save_bytes_with(&name, &app.session.doc, password, &Default::default())?;
+    Ok((name, bytes))
+}
+
+/// Run command `cmd` for the relay's HTTP API as an edit by `author` (the person's own name is
+/// back afterwards): while co-editing it syncs to everyone as `author`'s edit.
+pub fn run_as(app: &mut WordApp, cmd: &str, params: Value, author: &str) -> Result<Value, String> {
+    if !params.is_object() {
+        return Err(format!("{cmd}: params must be an object"));
+    }
+    let own = std::mem::replace(&mut app.session.author, author.to_string());
+    let result = app.execute(cmd, params);
+    app.session.author = own;
+    result
 }
 
 /// What the page has been told, to tell it what changed.
@@ -137,7 +155,7 @@ mod tests {
     use serde_json::{Value, json};
     use wordcraft_ui_egui::{Services, WordApp};
 
-    use super::{Watcher, call};
+    use super::{Watcher, call, document_file, run_as};
 
     fn app() -> WordApp {
         WordApp::new(wordcraft_engine::Session::new(wordcraft_doc::Document::new()), Services::default())
@@ -170,6 +188,22 @@ mod tests {
             assert!(!file(&mut a, f).unwrap().1.is_empty(), "{f}");
         }
         assert!(file(&mut a, "exe").unwrap_err().contains("unsupported format"));
+    }
+
+    #[test]
+    fn the_relay_api_exports_text_and_runs_as_its_author() {
+        let mut a = app();
+        a.session.author = "Me".into();
+        ok(&mut a, "insertText", json!({"text": "Hi"}));
+        let (name, bytes) = document_file(&a, "txt").unwrap();
+        assert!(name.ends_with(".txt"));
+        assert_eq!(String::from_utf8(bytes).unwrap().trim_end(), "Hi");
+        assert!(document_file(&a, "exe").unwrap_err().contains("unsupported"));
+        a.session.run("review.trackChanges", &json!({"value": true})).unwrap();
+        run_as(&mut a, "text.insert", json!({"text": "!"}), "Robot").unwrap();
+        assert_eq!(a.session.author, "Me");
+        assert_eq!(a.session.doc.revisions.last().map(|r| r.author.as_str()), Some("Robot"), "the edit is Robot's");
+        assert!(run_as(&mut a, "nope.nothing", json!({}), "Robot").is_err());
     }
 
     #[test]
