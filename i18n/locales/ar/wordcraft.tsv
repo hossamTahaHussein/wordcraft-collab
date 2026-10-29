@@ -2584,3 +2584,73 @@ preview	Title	العنوان
 	Saving…	جارٍ الحفظ…
 	All changes saved	تم حفظ كل التغييرات
 	Offline — changes will sync	غير متصل — ستتم مزامنة التغييرات
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	تعذّر حفظ {name}، لذا ما زال مفتوحًا ولم يُفقد شيء: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	تفتح الاستعادة نسخة غير محفوظة. يبقى ملفك الأصلي دون تغيير.
+	Recovery is disabled while this document has a password.	الاسترداد معطّل ما دامت لهذا المستند كلمة مرور.
+	Local recovery is unavailable or still loading.	الاسترداد المحلي غير متاح أو ما زال قيد التحميل.
+	No recovery copies.	لا توجد نسخ استرداد.
+	Recovery copy	نسخة الاسترداد
+	Discard…	تجاهل…
+	Continue without restoring	المتابعة دون استعادة
+	Advanced Properties…	خصائص متقدمة…
+	View and edit the document's custom properties.	اعرض خصائص المستند المخصصة وعدّلها.
+	Current Document	المستند الحالي
+	{n} people editing	{n} أشخاص يحررون
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	تعذّرت قراءة قاموس التدقيق الإملائي للغة {language}، لذا لن يُدقَّق. الملف: {file}. السبب: {reason}
+	Go to {name}	الانتقال إلى {name}
+	Community	المجتمع
+	Questions, ideas and bug reports on GitHub	الأسئلة والأفكار وبلاغات الأخطاء على GitHub
+	{language} (dictionary unreadable)	{language} (تعذّرت قراءة القاموس)
+	Text Size	حجم النص
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	يعمل الاقتصاص على الصفحة مع الصور غير المدوّرة: اجعل التدوير 0° أولًا، أو استخدم مربعات الاقتصاص
+	No matching commands	لا توجد أوامر مطابقة
+	The number must be a divisor of {max}.	يجب أن يكون الرقم قاسمًا للعدد {max}.
+	Nothing of this type in the document.	لا يوجد شيء من هذا النوع في المستند.
+	*Bold* and _italic_ as real formatting	*غامق* و_مائل_ كتنسيق حقيقي
+	Add a period with double-space	إضافة نقطة عند المسافة المزدوجة
+	Built-in Heading styles	أنماط العناوين المضمّنة
+	Set left- and first-indent with tabs and backspaces	ضبط المسافة البادئة اليسرى والأولى باستخدام Tab وBackspace
+	Automatically add words to list (First Letter)	إضافة الكلمات إلى القائمة تلقائيًا (الحرف الأول)
+	Automatically add words to list (INitial CAps)	إضافة الكلمات إلى القائمة تلقائيًا (الحرفان الأولان كبيران)
+	Bookmarks	الإشارات المرجعية
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	معالج نصوص مجاني مفتوح المصدر مكتوب بلغة Rust، مع تحرير مشترك في الوقت الفعلي.\nمبني على WordCraft من فريق ArtCraft.
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	مبني على github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	هل تريد تجاهل نسخة الاسترداد من {name}؟
+	This cannot be undone. Your original file stays unchanged.	لا يمكن التراجع عن هذا. يبقى ملفك الأصلي دون تغيير.
+	Property names are 1–{max} characters.	أسماء الخصائص من 1 إلى {max} حرفًا.
+	Property values are at most {max} bytes.	قيم الخصائص {max} بايت على الأكثر.
+	Only text properties can be changed.	يمكن تغيير الخصائص النصية فقط.
+	Select a property to change.	اختر خاصية لتغييرها.
+	This document has no custom properties.	لا توجد خصائص مخصصة في هذا المستند.
+	Text properties only: Word's number, date and yes-no types aren't offered.	الخصائص النصية فقط: أنواع الرقم والتاريخ ونعم/لا في Word غير متاحة.
+	{field}, record {n}	{field}، السجل {n}
+	Folder path	مسار المجلد
+	File type	نوع الملف
+	No new sources in that file	لا توجد مصادر جديدة في ذلك الملف
+	Imported 1 source	تم استيراد مصدر واحد
+	Imported {n} sources	تم استيراد {n} من المصادر
+	{language}: {file} (unreadable: {reason})	{language}: {file} (تعذّرت القراءة: {reason})
+	Spanish (Latin America)	الإسبانية (أمريكا اللاتينية)
+	Spanish (Uruguay)	الإسبانية (الأوروغواي)
+	Pane Options	خيارات الجزء
+	Dock Left	إرساء إلى اليسار
+	Dock Right	إرساء إلى اليمين
+	Float	عائم
+	Move Pane: {title}	نقل الجزء: {title}
+	Resize Pane	تغيير حجم الجزء
+	Pages in the range	الصفحات ضمن النطاق
+	Scale to paper size	ملاءمة لحجم الورق
+	Viewing	العرض
+	Viewing — read without changing anything	العرض — اقرأ دون تغيير أي شيء
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	لون الصفحة
+	Update check is not supported in the web browser.	التحقق من التحديثات غير مدعوم في متصفح الويب.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} هو أحدث إصدار متاح حاليًا.
+	Could not check for updates:\n{error}	تعذّر التحقق من التحديثات:\n{error}
+	Check for Updates	التحقق من التحديثات
+	Checking for updates…	جارٍ التحقق من التحديثات…
+	WordCraft Collab by Hossam Taha	WordCraft Collab من تطوير حسام طه
+	hossamtaha.me	hossamtaha.me
+	About WordCraft Collab	حول WordCraft Collab
+	WordCraft Collab	WordCraft Collab

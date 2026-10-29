@@ -1107,14 +1107,19 @@ fn about_dialog(ui: &mut Ui, d: &mut Dialog) -> bool {
         1 => crate::credits::contributors_ui(ui),
         2 => crate::credits::models_ui(ui),
         _ => {
-            ui.label(egui::RichText::new(tl!("WordCraft")).font(semibold(22.0)));
-            let build = option_env!("WORDCRAFT_BUILD_SHA").map(|s| s.get(..8).unwrap_or(s)).unwrap_or(tl!("development build"));
-            ui.label(crate::i18n::fmt(tl!("Version {version} ({build})"), &[("version", env!("CARGO_PKG_VERSION")), ("build", build)]));
+            ui.label(egui::RichText::new(tl!("WordCraft Collab")).font(semibold(22.0)));
+            // The commit it was built from, when the build says.
+            let version = match option_env!("WORDCRAFT_BUILD_SHA").map(|s| s.get(..8).unwrap_or(s)) {
+                Some(build) => crate::i18n::fmt(tl!("Version {version} ({build})"), &[("version", env!("CARGO_PKG_VERSION")), ("build", build)]),
+                None => crate::i18n::fmt(tl!("Version {version}"), &[("version", env!("CARGO_PKG_VERSION"))]),
+            };
+            ui.label(version);
             ui.label(tl!("A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team."));
             ui.add_space(6.0);
+            ui.label(egui::RichText::new(tl!("WordCraft Collab by Hossam Taha")).strong());
+            ui.hyperlink_to(tl!("hossamtaha.me"), "https://hossamtaha.me");
             ui.hyperlink_to(tl!("github.com/hossamTahaHussein/wordcraft-collab"), "https://github.com/hossamTahaHussein/wordcraft-collab");
             ui.hyperlink_to(tl!("Based on github.com/storytold/wordcraft"), "https://github.com/storytold/wordcraft");
-            ui.hyperlink_to(tl!("Source code: github.com/storytold/wordcraft"), "https://github.com/storytold/wordcraft");
             ui.add_space(6.0);
             ui.label(egui::RichText::new(tl!("MIT OR Apache-2.0. Copyright (c) 2026 ArtCraft Team and the WordCraft contributors.")).small().weak());
         }

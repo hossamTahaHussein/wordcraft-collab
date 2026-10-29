@@ -4,11 +4,11 @@ members = ["crates/*", "apps/*", "xtask"]
 default-members = ["crates/*", "apps/wordcraft", "apps/wordcraft-cli", "xtask"]
 
 [workspace.package]
-version = "0.12.0"
+version = "1.0.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
-repository = "https://github.com/storytold/wordcraft"
+repository = "https://github.com/hossamTahaHussein/wordcraft-collab"
 
 [workspace.dependencies]
 # internal

@@ -29,6 +29,16 @@ pub(crate) fn comment_time(c: &wordcraft_doc::Comment) -> String {
     stamp(&c.date, c.date_utc.as_deref(), offset_minutes)
 }
 
+/// A UTC time (ISO 8601) from elsewhere, such as a kept version's: `YYYY-MM-DD HH:MM` in local
+/// time, or empty when it isn't a time.
+pub(crate) fn utc_time(iso: &str) -> String {
+    utc_time_at(iso, offset_minutes)
+}
+
+fn utc_time_at(iso: &str, offset: impl Fn(i64) -> i32) -> String {
+    stamp(iso, Some(iso), offset)
+}
+
 fn stamp(date: &str, date_utc: Option<&str>, offset: impl Fn(i64) -> i32) -> String {
     let utc = date_utc.and_then(parse).filter(|t| t.timed).map(|t| Time { zone: Some(t.zone.unwrap_or(0)), ..t });
     let local_date = || parse(date).map(|t| if date.trim_end().ends_with(['Z', 'z']) { Time { zone: None, ..t } } else { t });
@@ -168,6 +178,14 @@ mod tests {
         assert_eq!(stamp("2026-10-12T09:00:00+05:30", None, |_| 0), "2026-10-12 03:30");
         assert_eq!(stamp("2026-10-12T09:00:00.125-0200", None, |_| 0), "2026-10-12 11:00");
         assert_eq!(ours("2026-10-12T04:44Z", toronto), "2026-10-12 00:44");
+    }
+
+    /// A UTC time from elsewhere (the relay's version times) shows in local time.
+    #[test]
+    fn a_utc_time_shows_in_local_time() {
+        assert_eq!(utc_time_at("2026-10-29T21:20:05.123Z", |_| 4 * 60), "2026-10-30 01:20");
+        assert_eq!(utc_time_at("2026-10-29T21:20:05Z", |_| 0), "2026-10-29 21:20");
+        assert_eq!(utc_time_at("bad", |_| 0), "");
     }
 
     /// A Word file's `date` is local time (often with a Z it doesn't mean) and its `dateUtc` the real

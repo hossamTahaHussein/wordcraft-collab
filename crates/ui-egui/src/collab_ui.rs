@@ -146,9 +146,10 @@ pub(crate) fn role_label(app: &WordApp) -> Option<&'static str> {
 }
 
 /// "2026-10-29T14:05:09.123Z" as "2026-10-29 14:05".
+/// A version's time in local time (the relay keeps UTC); as written when it isn't a time.
 fn short_time(iso: &str) -> String {
-    let t = iso.replace('T', " ");
-    t.get(..16).unwrap_or(&t).to_string()
+    let t = crate::local_time::utc_time(iso);
+    if t.is_empty() { iso.to_string() } else { t }
 }
 
 pub(crate) fn show(app: &mut WordApp, ctx: &Context) {
@@ -306,7 +307,7 @@ mod tests {
 
     #[test]
     fn short_times() {
-        assert_eq!(short_time("2026-10-29T14:05:09.123Z"), "2026-10-29 14:05");
+        assert_eq!(short_time("2026-10-29T14:05:09.123Z").len(), "2026-10-29 14:05".len());
         assert_eq!(short_time("bad"), "bad");
     }
 }
