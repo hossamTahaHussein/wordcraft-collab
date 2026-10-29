@@ -20,6 +20,7 @@ pub const COLLAB_DISABLED: &[&str] = &[
     "file.new",
     "file.open",
     "file.close",
+    "file.newFromTemplate",
     "edit.pasteClipboardItem",
     "edit.pasteAllClipboard",
     "edit.insertSpike",
@@ -105,6 +106,11 @@ impl Session {
     ) -> Result<Value, CmdError> {
         if !self.collab.on {
             return run(self);
+        }
+        if matches!(id, "file.new" | "file.open" | "file.close" | "file.newFromTemplate") {
+            return Err(CmdError::Disabled(format!(
+                "{id}: Opening or closing a document isn't available while co-editing: it would replace the shared document for everyone"
+            )));
         }
         if COLLAB_DISABLED.contains(&id) || crate::run_ctx::NONDETERMINISTIC.iter().any(|(nd, _)| *nd == id) {
             return Err(CmdError::Disabled(format!("{id}: Not available while co-editing")));

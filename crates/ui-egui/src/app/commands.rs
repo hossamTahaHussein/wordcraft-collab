@@ -269,7 +269,7 @@ impl WordApp {
         }
         self.after_command(id);
         if let Err(e) = &r {
-            self.status(e.clone());
+            self.status(readable_error(e));
         }
         r
     }
@@ -1057,4 +1057,14 @@ fn flushes_comment_drafts(id: &str, params: &Value) -> bool {
 /// replace only an untouched blank document, which has nothing to lose).
 pub(crate) fn discards_document(id: &str, _params: &Value) -> bool {
     id == "file.close"
+}
+
+/// A command's error as the status line shows it: without the "not available:" kind and the
+/// command id in front ("not available: file.open: Opening… isn't available while co-editing").
+fn readable_error(e: &str) -> String {
+    let e = e.strip_prefix("not available: ").unwrap_or(e);
+    match e.split_once(": ") {
+        Some((id, rest)) if !id.is_empty() && id.contains('.') && !id.contains(' ') => rest.to_string(),
+        _ => e.to_string(),
+    }
 }

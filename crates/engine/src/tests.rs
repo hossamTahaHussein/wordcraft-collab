@@ -11136,3 +11136,15 @@ fn viewing_mode_refuses_edits_but_not_reading_or_saving() {
     assert_eq!(run(&mut s, "document.text", json!({}))["text"], "Hello!");
     let _ = std::fs::remove_dir_all(dir);
 }
+
+/// While co-editing, nothing may replace the shared document: New, Open, Close and New from
+/// Template are refused with a reason a person can read.
+#[test]
+fn co_editing_refuses_replacing_the_shared_document() {
+    let mut s = s();
+    s.set_collab(true);
+    for id in ["file.new", "file.open", "file.close", "file.newFromTemplate"] {
+        let e = s.run(id, &json!({"path": "x.docx"})).unwrap_err().to_string();
+        assert!(e.contains("replace the shared document"), "{id}: {e}");
+    }
+}

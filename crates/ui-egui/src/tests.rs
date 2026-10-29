@@ -7036,3 +7036,18 @@ fn peer_colors_for_the_page() {
     assert_eq!(c, format!("#{:02x}{:02x}{:02x}", t.r(), t.g(), t.b()));
     assert_eq!(crate::peer_css_color(12), c);
 }
+
+/// Opening a file while co-editing would replace the shared document for everyone: it is
+/// refused, and the person is told why instead of nothing happening.
+#[test]
+fn opening_a_file_while_co_editing_says_why_it_cant() {
+    let mut a = app();
+    let inbox: crate::Inbox = Default::default();
+    a.services.inbox = Some(inbox.clone());
+    a.session.set_collab(true);
+    inbox.lock().unwrap().push(("notes.txt".into(), b"Hello".to_vec()));
+    a.drain_inbox();
+    let (msg, _) = a.status_msg.clone().expect("a message");
+    assert!(msg.contains("co-editing") && msg.contains("shared document"), "{msg}");
+    assert!(!msg.contains("file.open"), "no command ids in the message: {msg}");
+}
