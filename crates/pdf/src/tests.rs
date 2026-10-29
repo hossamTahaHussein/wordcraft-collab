@@ -1807,10 +1807,13 @@ fn viewer_words(bytes: &[u8]) -> Vec<String> {
 fn right_to_left_text_extracts_in_logical_order() {
     let d = rtl_sample();
     let words = viewer_words(&export(&d, &PdfOptions::default()).unwrap());
-    for w in ["שלום", "עולם", "مرحبا", "بالعالم", "ייפוי", "כח", "123", "Power", "Attorney", "Hello", "world", "السلام", "مَرْحَبًا", "שָׁלוֹם"]
+    for w in ["שלום", "עולם", "مرحبا", "بالعالم", "ייפוי", "כח", "123", "Power", "Attorney", "Hello", "world", "السلام", "שָׁלוֹם"]
     {
         assert!(words.iter().any(|x| x == w), "{w:?} not extracted intact from {words:?}");
     }
+    // The vocalized مَرْحَبًا reads as its letters: its vowels are drawn but left out of the text,
+    // so the word copies and searches whole (see `arabic_vowels_stay_out_of_the_text_layer`).
+    assert_eq!(words.iter().filter(|x| *x == "مرحبا").count(), 2, "{words:?}");
 }
 
 /// Every glyph's outline on the page, as a rounded bounding box in page space (sorted): what the
@@ -2490,4 +2493,25 @@ fn arabic_text_extracts_as_whole_letters() {
     let raw = String::from_utf8_lossy(&export(&d, &PdfOptions { compress: false, ..Default::default() }).unwrap()).into_owned();
     let actual = |letter: char| raw.contains(&format!("/ActualText<FEFF{:04X}>", u32::from(letter)));
     assert!(actual('ن') || actual('ب'), "the second of ن and ب to use the shared body is named by ActualText");
+}
+
+/// Vowel marks (harakat, tanween) are drawn but left out of the text, so a vocalized word copies
+/// and searches whole: الحلًوة as الحلوة, not split at its raised tanween.
+#[test]
+fn arabic_vowels_stay_out_of_the_text_layer() {
+    let text = "الحلًوة مَرْحَبًا";
+    let mut p = Paragraph::with_text(text, CharProps { rtl: Some(true), ..Default::default() });
+    p.props.bidi = Some(true);
+    let mut d = Document::new();
+    d.body = vec![para_block(p)];
+    let got = extract_text(&export(&d, &PdfOptions::default()).unwrap()).concat();
+    assert!(!got.chars().any(|c| ('\u{064B}'..='\u{065F}').contains(&c)), "no vowel marks in the text: {got:?}");
+    let letters = |s: &str| s.chars().filter(|c| !c.is_whitespace() && !('\u{064B}'..='\u{065F}').contains(c)).count();
+    assert_eq!(letters(&got), letters(text), "every letter once: {got:?}");
+    // Still drawn: the marks are shapes on the page.
+    let raw = String::from_utf8_lossy(&export(&d, &PdfOptions { compress: false, ..Default::default() }).unwrap()).into_owned();
+    assert!(
+        raw.matches(" f\n").count() + raw.matches(" f*").count() + raw.matches("\nf\n").count() > 0 || raw.contains(" re f") || raw.contains("h f"),
+        "marks drawn as filled shapes"
+    );
 }

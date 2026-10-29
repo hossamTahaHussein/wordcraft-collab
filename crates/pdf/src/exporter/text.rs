@@ -44,6 +44,11 @@ fn text_on_base_glyphs(face: &FaceRef, placed: &mut [(u32, f32, f32, std::ops::R
     }
 }
 
+/// An Arabic diacritic: harakat, tanween, shadda, sukun, superscript alef, Quranic marks.
+fn is_arabic_mark(c: char) -> bool {
+    matches!(c, '\u{0610}'..='\u{061A}' | '\u{064B}'..='\u{065F}' | '\u{0670}' | '\u{06D6}'..='\u{06DC}' | '\u{06DF}'..='\u{06E4}' | '\u{06E7}' | '\u{06E8}' | '\u{06EA}'..='\u{06ED}' | '\u{08D3}'..='\u{08FF}')
+}
+
 impl Exporter<'_> {
     /// Unicode text for each glyph: (text, per-glyph byte range). Glyphs and the run's text are
     /// aligned through the font's reverse character map (ligatures take several characters,
@@ -152,8 +157,25 @@ impl Exporter<'_> {
         text_on_base_glyphs(face, &mut placed);
         // The glyphs that carry no text (a letter's dots, marks) are drawn as shapes, so readers
         // see only the glyphs that carry characters.
-        let marks: Vec<(u32, f32, f32)> = placed.iter().filter(|p| p.3.is_empty()).map(|p| (p.0, p.1, p.2)).collect();
-        placed.retain(|p| !p.3.is_empty());
+        // Arabic vowel marks (fatha, tanween, shadda…) are characters of their own, drawn over or
+        // under their letter. In the text they broke words apart (Chrome's PDFium took a raised
+        // mark for another line: الحلًوة was found as الحل … ًوة), so search failed. They are
+        // drawn as shapes and left out of the text, as most readers' search ignores them anyway:
+        // the words copy and search whole, without their vowels.
+        let vowel = |p: &(u32, f32, f32, std::ops::Range<usize>)| {
+            face.advance(p.0) <= 0.0 && txt.get(p.3.clone()).is_some_and(|t| !t.is_empty() && t.chars().all(is_arabic_mark))
+        };
+        let marks: Vec<(u32, f32, f32)> = placed.iter().filter(|p| p.3.is_empty() || vowel(p)).map(|p| (p.0, p.1, p.2)).collect();
+        placed.retain(|p| !p.3.is_empty() && !vowel(p));
+        // A letter whose text holds its vowels too (one glyph group) keeps only the letter.
+        for p in &mut placed {
+            if let Some(t) = txt.get(p.3.clone()) {
+                let kept = t.trim_end_matches(is_arabic_mark).len();
+                if kept > 0 && kept < t.len() {
+                    p.3 = p.3.start..p.3.start + kept;
+                }
+            }
+        }
         let Some(&(_, x0, y0, _)) = placed.first() else { return };
         let kg: Vec<KrillaGlyph> = placed
             .iter()
