@@ -37,7 +37,32 @@ const MAX_CHANGES: usize = 2000;
 pub trait Wire {
     fn send(&mut self, msg: &str) -> Result<(), String>;
     /// The next message, waiting up to `wait`; `Ok(None)` when none came in time.
-    fn recv(&mut self, wait: Duration) -> Result<Option<String>, String>;
+    fn recv(&mut self, wait: Duration) -> Result<Option<String>, WireError>;
+}
+
+/// Why a connection to the relay ended.
+#[derive(Debug)]
+pub enum WireError {
+    /// It broke: try again.
+    Lost(String),
+    /// The relay won't have the agent back (its token, removed, the document closed).
+    Ended(String),
+}
+
+impl WireError {
+    /// The relay closed the connection with `code` and `reason`.
+    pub fn closed(code: u16, reason: &str) -> WireError {
+        let why =
+            if reason.is_empty() { "the relay closed the connection".to_string() } else { format!("the relay closed the connection: {reason}") };
+        // As the SDK: a bad token, removed from the document or the document closed are final.
+        if matches!(code, 4401 | 4403 | 4410) { WireError::Ended(why) } else { WireError::Lost(why) }
+    }
+
+    fn message(self) -> String {
+        match self {
+            WireError::Lost(m) | WireError::Ended(m) => m,
+        }
+    }
 }
 
 /// The relay's WebSocket (`ws://` or `wss://`).
@@ -69,17 +94,17 @@ impl Wire for WsWire {
         self.ws.send(Message::text(msg)).map_err(|e| format!("the relay connection failed: {e}"))
     }
 
-    fn recv(&mut self, wait: Duration) -> Result<Option<String>, String> {
+    fn recv(&mut self, wait: Duration) -> Result<Option<String>, WireError> {
         self.set_timeout(wait);
         match self.ws.read() {
             Ok(Message::Text(t)) => Ok(Some(t.to_string())),
             Ok(Message::Close(frame)) => Err(match frame {
-                Some(f) if !f.reason.is_empty() => format!("the relay closed the connection: {}", f.reason),
-                _ => "the relay closed the connection".into(),
+                Some(f) => WireError::closed(f.code.into(), &f.reason),
+                None => WireError::closed(1005, ""),
             }),
             Ok(_) => Ok(None),
             Err(tungstenite::Error::Io(e)) if matches!(e.kind(), std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut) => Ok(None),
-            Err(e) => Err(format!("the relay connection failed: {e}")),
+            Err(e) => Err(WireError::Lost(format!("the relay connection failed: {e}"))),
         }
     }
 }
@@ -108,6 +133,8 @@ pub struct Collab {
     /// Why the relay refused an edit of this call's.
     refused: Option<String>,
     relay: String,
+    /// The relay won't have the agent back: why (every later call fails with it).
+    ended: Option<String>,
 }
 
 /// A client id for this connection.
@@ -146,7 +173,7 @@ impl Collab {
                     "no welcome from the relay in 15 s: nobody has this document open yet (an agent joins a document a person has open)".into()
                 );
             }
-            let Some(msg) = wire.recv(left)? else { continue };
+            let Some(msg) = wire.recv(left).map_err(WireError::message)? else { continue };
             let Ok(Inbound::Welcome { rev, snapshot, ops, you, history, peers, role, .. }) = decode_inbound(&msg) else { continue };
             let Some(json) = snapshot else {
                 return Err("nobody has opened this document yet: an agent joins a document a person has open".into());
@@ -171,6 +198,7 @@ impl Collab {
                 peers,
                 changes: Vec::new(),
                 refused: None,
+                ended: None,
                 relay: String::new(),
             });
         }
@@ -246,7 +274,11 @@ impl Collab {
             match self.wire.recv(wait) {
                 Ok(Some(msg)) => self.handle(&msg)?,
                 Ok(None) => return Ok(()),
-                Err(e) => return self.reconnect_after(e),
+                Err(WireError::Lost(e)) => return self.reconnect_after(e),
+                Err(WireError::Ended(e)) => {
+                    self.ended = Some(e.clone());
+                    return Err(e);
+                }
             }
             wait = Duration::from_millis(1);
         }
@@ -260,7 +292,7 @@ impl Collab {
         self.wire.send(&hello.to_string())?;
         let deadline = Instant::now() + JOIN_WAIT;
         while Instant::now() < deadline {
-            if let Some(msg) = self.wire.recv(Duration::from_millis(200))? {
+            if let Some(msg) = self.wire.recv(Duration::from_millis(200)).map_err(WireError::message)? {
                 let welcome = msg.contains(r#""t":"Welcome""#);
                 self.handle(&msg)?;
                 if welcome {
@@ -326,6 +358,9 @@ impl Collab {
 
 impl Backend for Collab {
     fn call(&mut self, method: &str, params: Value) -> Result<Value, String> {
+        if let Some(why) = &self.ended {
+            return Err(why.clone());
+        }
         self.pump(Duration::from_millis(1))?;
         let result = match method {
             "collab.who" => Ok(self.who()),
@@ -390,8 +425,14 @@ mod tests {
             self.sent.borrow_mut().push(v);
             Ok(())
         }
-        fn recv(&mut self, _wait: Duration) -> Result<Option<String>, String> {
-            Ok(self.inbox.borrow_mut().pop_front())
+        fn recv(&mut self, _wait: Duration) -> Result<Option<String>, WireError> {
+            match self.inbox.borrow_mut().pop_front() {
+                Some(m) if m.starts_with("CLOSE ") => {
+                    let (code, reason) = m[6..].split_once(' ').unwrap();
+                    Err(WireError::closed(code.parse().unwrap(), reason))
+                }
+                m => Ok(m),
+            }
         }
     }
 
@@ -419,6 +460,35 @@ mod tests {
         let who = c.call("collab.who", json!({})).unwrap();
         assert_eq!(who["people"], json!([{"name": "Ann", "color": 0}]));
         assert_eq!(who["you"], "Helper");
+    }
+
+    /// Removed (4403) or closed (4410): the agent stays out, as the SDK does, and says why.
+    #[test]
+    fn a_removed_agent_does_not_come_back() {
+        for (code, reason) in [(4403, "Removed from this document"), (4410, "This document was closed")] {
+            let fake = Fake { echo: true, ..Fake::default() };
+            let welcome = json!({"t": "Welcome", "rev": 5, "snapshot": snapshot("Hi"), "ops": [], "you": "agent"});
+            fake.inbox.borrow_mut().push_back(welcome.to_string());
+            let reconnects = Rc::new(RefCell::new(0));
+            let counted = reconnects.clone();
+            let mut c = Collab::join(
+                Box::new(fake.clone()),
+                Box::new(move || {
+                    *counted.borrow_mut() += 1;
+                    Err("no".into())
+                }),
+                "tok",
+                "Helper",
+                true,
+            )
+            .unwrap();
+            fake.inbox.borrow_mut().push_back(format!("CLOSE {code} {reason}"));
+            for _ in 0..2 {
+                let err = c.call("collab.who", json!({})).err().unwrap_or_default();
+                assert!(err.contains(reason), "{code}: {err}");
+            }
+            assert_eq!(*reconnects.borrow(), 0, "{code}: no reconnect");
+        }
     }
 
     #[test]
