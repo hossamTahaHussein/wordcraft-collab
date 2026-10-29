@@ -6,3 +6,4 @@
 
 pub mod mapping;
 pub mod proto;
+pub mod replica;
