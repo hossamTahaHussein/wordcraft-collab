@@ -182,3 +182,32 @@ fn the_document_is_not_mirrored() {
     let page_en = app2.canvas.page_rects[0];
     assert!(((caret_ar - page_ar.min.x) - (caret_en - page_en.min.x)).abs() < 1.0, "{caret_ar} in {page_ar:?}, {caret_en} in {page_en:?}");
 }
+
+#[test]
+fn dialog_buttons_sit_at_the_left_and_rows_start_at_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("ui.dialog", serde_json::json!({"name": "zoom"})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let texts: Vec<String> =
+        shapes.iter().filter_map(|c| if let Shape::Text(t) = &c.shape { Some(t.galley.text().to_string()) } else { None }).collect();
+    let ok = text_rect(&shapes, crate::tl!("OK")).unwrap_or_else(|| panic!("OK in {texts:?}"));
+    let cancel = text_rect(&shapes, crate::tl!("Cancel")).expect("Cancel");
+    // The first choice (200%) leads its row from the dialog's right; the buttons end at its left.
+    let choice = text_rect(&shapes, "200%").unwrap_or_else(|| panic!("200% in {texts:?}"));
+    assert!(
+        ok.center().x < choice.center().x && cancel.center().x < choice.center().x,
+        "buttons at the dialog's left, choices at its right: {ok:?} {cancel:?} {choice:?}"
+    );
+    assert!(cancel.center().x < ok.center().x, "mirrored order: Cancel left of OK");
+}
+
+#[test]
+fn a_menu_opens_under_its_buttons_right_edge() {
+    let (mut app, ctx) = app_in("ar");
+    frame(&mut app, &ctx, 1280.0);
+    let more = ctx.read_response(crate::chrome::qat_menu_button_id()).expect("the … button");
+    egui::Popup::open_id(&ctx, egui::Popup::default_response_id(&more));
+    frame(&mut app, &ctx, 1280.0);
+    let popup = ctx.memory(|m| m.area_rect(egui::Popup::default_response_id(&more))).expect("menu shown");
+    assert!((popup.max.x - more.rect.max.x).abs() < 4.0, "right edges level: {popup:?} under {:?}", more.rect);
+}

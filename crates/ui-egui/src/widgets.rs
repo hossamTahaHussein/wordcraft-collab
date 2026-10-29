@@ -37,6 +37,17 @@ pub use tooltip::{key_text, shortcut_text};
 const _: () = assert!(BIG_LABEL_Y + LABEL_PITCH + LABEL_LINE_H <= CONTENT_H);
 const _: () = assert!(BIG_ICON_Y + 16.0 <= BIG_LABEL_Y);
 
+/// A top-aligned row in reading order (a ribbon group's controls, a gallery's thumbnails).
+pub(crate) fn row_top(ui: &Ui) -> egui::Layout {
+    if craft_ui::direction::is_rtl(ui) { egui::Layout::right_to_left(egui::Align::Min) } else { egui::Layout::left_to_right(egui::Align::Min) }
+}
+
+/// A top-aligned row pinned to the reading end (a pane header's close button):
+/// right to left in a left-to-right interface, left to right in a right-to-left one.
+pub(crate) fn trailing_top(ui: &Ui) -> egui::Layout {
+    if craft_ui::direction::is_rtl(ui) { egui::Layout::left_to_right(egui::Align::Min) } else { egui::Layout::right_to_left(egui::Align::Min) }
+}
+
 /// [`Ui::vertical`] against the reading start: a stack of controls in a mirrored row (a ribbon
 /// group's columns) sits against the row's cursor, not at the far side of the space left.
 pub(crate) fn column<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> egui::InnerResponse<R> {

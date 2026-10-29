@@ -368,7 +368,13 @@ fn combo_impl(ui: &mut Ui, options: ComboOptions<'_>) -> Option<String> {
                 ui.ctx().request_discard("font list resized");
             }
             s.rows = n;
-            let area = egui::Area::new(list_id).order(egui::Order::Tooltip).fixed_pos(resp.rect.left_bottom()).sizing_pass(resize);
+            // The list hangs from the box's reading-start corner.
+            let (at, pivot) = if craft_ui::direction::is_rtl(ui) {
+                (resp.rect.right_bottom(), egui::Align2::RIGHT_TOP)
+            } else {
+                (resp.rect.left_bottom(), egui::Align2::LEFT_TOP)
+            };
+            let area = egui::Area::new(list_id).order(egui::Order::Tooltip).fixed_pos(at).pivot(pivot).sizing_pass(resize);
             let shown = area.show(ui.ctx(), |ui| {
                 egui::Frame::popup(ui.style())
                     .show(ui, |ui| {
@@ -469,7 +475,7 @@ fn heading_row(ui: &mut Ui, text: &str, size: egui::Vec2, rule: bool) {
     if rule {
         ui.painter().hline(ui.max_rect().x_range(), ui.cursor().top(), line);
     }
-    ui.allocate_ui_with_layout(size, egui::Layout::left_to_right(egui::Align::Center), |ui| {
+    ui.allocate_ui_with_layout(size, craft_ui::direction::row(ui), |ui| {
         ui.set_min_size(size);
         ui.add_space(6.0);
         ui.add(egui::Label::new(egui::RichText::new(text).small().color(weak)).selectable(false));

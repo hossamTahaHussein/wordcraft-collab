@@ -337,11 +337,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             }
             // Right to left the groups start at the right; the row is as wide as the ribbon so
             // they do, and grows past it only when they don't fit.
-            let row = if craft_ui::direction::is_rtl(ui) {
-                egui::Layout::right_to_left(egui::Align::Min)
-            } else {
-                egui::Layout::left_to_right(egui::Align::Min)
-            };
+            let row = crate::widgets::row_top(ui);
             let scroll = area.show(ui, |ui| {
                 ui.with_layout(row, |ui| {
                     ui.spacing_mut().item_spacing = vec2(2.0, 2.0);

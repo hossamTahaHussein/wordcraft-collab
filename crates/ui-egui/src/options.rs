@@ -410,7 +410,7 @@ fn custom_dictionary(app: &mut WordApp, ui: &mut Ui) {
     egui::ScrollArea::vertical().id_salt("options_dictionary").max_height(180.0).show(ui, |ui| {
         for w in &words {
             ui.horizontal(|ui| {
-                ui.allocate_ui_with_layout(vec2(220.0, 20.0), egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                ui.allocate_ui_with_layout(vec2(220.0, 20.0), craft_ui::direction::row(ui), |ui| {
                     ui.set_min_width(220.0);
                     ui.add(egui::Label::new(w.as_str()).truncate());
                 });

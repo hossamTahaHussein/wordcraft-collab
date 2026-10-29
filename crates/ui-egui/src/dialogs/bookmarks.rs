@@ -84,7 +84,7 @@ pub(super) fn bookmark(app: &mut WordApp, ui: &mut Ui, name: &mut String, by_loc
     ui.add_space(8.0);
     let mut close = ui.input(|i| i.key_pressed(egui::Key::Escape));
     ui.horizontal(|ui| {
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
             close |= ui.button(if *deleted { tl!("Close") } else { tl!("Cancel") }).clicked();
         });
     });

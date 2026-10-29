@@ -1142,7 +1142,7 @@ fn save_changes_dialog(app: &mut WordApp, ui: &mut Ui, d: &mut Dialog) -> bool {
     }
     ui.add_space(8.0);
     let buttons = ui.horizontal(|ui| {
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
             let cancel = ui.button(tl!("Cancel"));
             let dont_save = ui.button(tl!("Don't Save"));
             let save = ui.add(crate::widgets::primary_button(ui, tl!("Save")));

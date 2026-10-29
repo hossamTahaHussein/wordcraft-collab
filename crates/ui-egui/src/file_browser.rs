@@ -315,8 +315,12 @@ pub(crate) fn show(app: &mut WordApp, ctx: &egui::Context) {
         .resizable(false)
         .anchor(Align2::CENTER_CENTER, vec2(0.0, -20.0));
     let shown = crate::window_close::window(ctx, window).show(ctx, |ui| {
-        ui.set_width(620.0);
-        done = body(ui, &mut b, &t);
+        let layout = craft_ui::direction::column(ui);
+        ui.with_layout(layout, |ui| {
+            ui.set_width(620.0);
+            done = body(ui, &mut b, &t);
+        })
+        .inner
     });
     if shown.is_some_and(|s| crate::window_close::show(ctx, &s.response, &t)) {
         done = Some(None);
@@ -459,7 +463,7 @@ fn body(ui: &mut Ui, b: &mut FileBrowser, t: &Tokens) -> Option<Option<PathBuf>>
     let mut cancel = ui.input(|i| i.key_pressed(egui::Key::Escape));
     let enter = !location_done && ui.input(|i| i.key_pressed(egui::Key::Enter));
     ui.horizontal(|ui| {
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
             let (ok, cancelb) =
                 crate::dialogs::ok_cancel_responses(ui, |ui| ui.add(crate::widgets::primary_button(ui, tl!(b.ok_label()))), tl!("Cancel"));
             cancel |= cancelb.clicked();

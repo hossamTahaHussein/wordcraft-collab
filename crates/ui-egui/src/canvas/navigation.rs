@@ -42,8 +42,9 @@ pub(super) fn scrollbar_page_tip(app: &mut WordApp, ui: &Ui, scroll: egui::Id, r
     egui::Area::new(egui::Id::unique("scrollbar_page_tip"))
         .order(egui::Order::Tooltip)
         .interactable(false)
-        .pivot(egui::Align2::RIGHT_CENTER)
-        .fixed_pos(at - vec2(16.0, 0.0))
+        // Beside the pointer on the side away from the scroll bar (at the left right to left).
+        .pivot(if craft_ui::direction::is_rtl(ui) { egui::Align2::LEFT_CENTER } else { egui::Align2::RIGHT_CENTER })
+        .fixed_pos(at + vec2(16.0 * -craft_ui::direction::forward(ui), 0.0))
         .show(ui.ctx(), |ui| {
             egui::Frame::popup(ui.style()).show(ui, |ui| {
                 // Unwrapped: the area keeps last frame's width, too narrow once the number grows (#3341).

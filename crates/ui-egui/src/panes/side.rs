@@ -31,7 +31,7 @@ pub(super) fn clipboard(app: &mut WordApp, ui: &mut Ui) {
                     let _ = app.run("edit.pasteClipboardItem", json!({"index": i}));
                     app.canvas.want_focus = true;
                 }
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
+                ui.with_layout(crate::widgets::trailing_top(ui), |ui| {
                     if ui.small_button(tl!("Delete")).clicked() {
                         let _ = app.run("edit.deleteClipboardItem", json!({"index": i}));
                         app.canvas.want_focus = true;
@@ -87,7 +87,7 @@ pub(super) fn styles(app: &mut WordApp, ui: &mut Ui) {
         for (id, name, is_char, builtin) in list {
             ui.horizontal(|ui| {
                 let r = ui.selectable_label(id == cur, &name);
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
                     ui.label(egui::RichText::new(if is_char { "a" } else { "¶" }).weak());
                 });
                 if r.clicked() {

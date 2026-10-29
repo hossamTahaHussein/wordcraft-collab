@@ -163,7 +163,7 @@ pub fn body(app: &mut WordApp, ui: &mut Ui, f: &mut ControlForm) -> bool {
     let mut done = false;
     ui.add_space(8.0);
     ui.horizontal(|ui| {
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
             // #1906: no forced label color; the theme button text reads on the theme fill.
             let (okb, cancelb) = crate::dialogs::ok_cancel_responses(ui, |ui| ui.button(tl!("OK")), tl!("Cancel"));
             if cancelb.clicked() || crate::dialogs::cancel_key_pressed(ui) {

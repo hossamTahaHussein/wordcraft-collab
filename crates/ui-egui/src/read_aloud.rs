@@ -72,13 +72,20 @@ pub fn show(app: &mut WordApp, ctx: &egui::Context) {
     let state = app.session.read_aloud.state();
     let (index, count) = app.session.read_aloud.progress();
     let mut run: Option<(&str, serde_json::Value)> = None;
-    let right_top = app.canvas.canvas_rect.map_or(ctx.content_rect().right_top() + vec2(-24.0, 160.0), |r| r.right_top() + vec2(-24.0, 16.0));
+    // The player sits in the canvas's top corner at the reading end.
+    let rtl = craft_ui::direction::is_rtl(ctx);
+    let area = app.canvas.canvas_rect.unwrap_or_else(|| ctx.content_rect().with_min_y(ctx.content_rect().min.y + 144.0));
+    let (corner, pivot) = if rtl {
+        (area.left_top() + vec2(24.0, 16.0), egui::Align2::LEFT_TOP)
+    } else {
+        (area.right_top() + vec2(-24.0, 16.0), egui::Align2::RIGHT_TOP)
+    };
     let window = egui::Window::new(tl!("Read Aloud"))
         .id(egui::Id::unique("read-aloud-player"))
         .collapsible(false)
         .resizable(false)
-        .pivot(egui::Align2::RIGHT_TOP)
-        .default_pos(right_top);
+        .pivot(pivot)
+        .default_pos(corner);
     let shown = crate::window_close::window(ctx, window).show(ctx, |ui| {
         ui.set_width(236.0);
         ui.horizontal(|ui| {

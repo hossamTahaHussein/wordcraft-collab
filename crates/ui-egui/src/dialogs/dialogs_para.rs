@@ -283,7 +283,7 @@ pub fn tabs(app: &mut WordApp, ui: &mut Ui, f: &mut TabsForm) -> bool {
                                         f.set_leader(i, l);
                                         pick = Some(i);
                                     }
-                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                    ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
                                         ui.add_space(10.0); // clear of the scrollbar
                                         if ui.add(egui::Button::new("×").small().frame(false)).on_hover_text(tl!("Clear")).clicked() {
                                             remove = Some(i);
