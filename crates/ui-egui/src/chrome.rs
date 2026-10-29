@@ -299,9 +299,12 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                 let max = ui.ctx().input(|i| i.viewport().maximized.unwrap_or(false));
                 ui.ctx().send_viewport_cmd(egui::ViewportCommand::Maximized(!max));
             }
-            let mut qat_end = full.min.x;
-            let mut right_start = full.max.x;
-            ui.horizontal_centered(|ui| {
+            // The edges of the row's two groups nearest the centred title: the Quick Access
+            // Toolbar's (at the reading start) and the controls' (at the reading end).
+            let rtl = craft_ui::direction::is_rtl(ui);
+            let mut qat_end = if rtl { full.max.x } else { full.min.x };
+            let mut right_start = if rtl { full.min.x } else { full.max.x };
+            ui.with_layout(craft_ui::direction::row(ui), |ui| {
                 ui.spacing_mut().item_spacing = vec2(2.0, 0.0);
                 // AutoSave switch: greyed out, with the reason as its tooltip, when AutoSave can't
                 // cover the document (#196, #176); clicking it then offers Save As where that helps.
@@ -344,8 +347,8 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                 if app.ui.quick_access_toolbar {
                     quick_access(ui, app);
                 }
-                qat_end = ui.min_rect().max.x;
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                qat_end = if rtl { ui.min_rect().min.x } else { ui.min_rect().max.x };
+                ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
                     // Account / community.
                     let (r, resp) = ui.allocate_exact_size(vec2(control_h, control_h), Sense::click());
                     ui.painter().circle_filled(r.center(), control_h / 2.0 - 1.0, t.accent);
@@ -394,7 +397,7 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                         ui.add_space(8.0);
                     }
                     search_box(app, ui, control_h);
-                    right_start = ui.min_rect().min.x;
+                    right_start = if rtl { ui.min_rect().max.x } else { ui.min_rect().min.x };
                 });
             });
             // Centred title.
@@ -417,7 +420,7 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
             let font = TypeRung::Chrome.semibold();
             let track = TypeRung::Chrome.tracking();
             let cx = full.center().x;
-            let available = 2.0 * (cx - qat_end - 10.0).min(right_start - 10.0 - cx);
+            let available = 2.0 * ((cx - qat_end).abs() - 10.0).min((right_start - cx).abs() - 10.0);
             let mut shown: String = title.chars().take(240).collect();
             if text_width(ui.painter(), &shown, &font, track, t.text) > available {
                 while !shown.is_empty() && text_width(ui.painter(), &format!("{shown}…"), &font, track, t.text) > available {
@@ -576,7 +579,8 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
             if !app.has_document() {
                 return;
             }
-            ui.horizontal_centered(|ui| {
+            let rtl = craft_ui::direction::is_rtl(ui);
+            ui.with_layout(craft_ui::direction::row(ui), |ui| {
                 ui.spacing_mut().item_spacing = vec2(14.0, 0.0);
                 let l = app.session.layout();
                 let page = if let Some(p) = app.canvas.viewed_page {
@@ -652,8 +656,10 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                 // long one (the path of a file that isn't there) must not be drawn over the
                 // Focus and view buttons.
                 let msg_at = ui.cursor().min;
-                let mut controls_left = f32::INFINITY;
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                // Right to left the row's cursor runs leftwards: the message ends at its right edge.
+                let msg_end = ui.cursor().max.x;
+                let mut controls_left = if rtl { f32::NEG_INFINITY } else { f32::INFINITY };
+                ui.with_layout(craft_ui::direction::trailing(ui), |ui| {
                     ui.spacing_mut().item_spacing = vec2(4.0, 0.0);
                     let reading = app.session.view.read_mode;
                     let z = (if reading { app.session.view.read_zoom } else { app.canvas.scale / crate::canvas::PX_PER_PT } * 100.0).round();
@@ -664,35 +670,64 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                     // A fixed width for three digits plus a small reserve, so the controls to the
                     // left don't shift as the percentage gains or loses digits (#1975).
                     let zslot = text_width(ui.painter(), "000%", &zfont, ztrack, t.text_dim) + 4.0;
-                    let (zr, zresp) = ui.allocate_exact_size(vec2(zw.max(zslot) + 1.0, TypeRung::Caption.line_height()), Sense::click());
-                    paint_text(ui.painter(), pos2(zr.max.x - 1.0, zr.min.y), Align2::RIGHT_TOP, &ztxt, &zfont, ztrack, t.text_dim);
-                    if zresp.clicked() && !reading {
-                        let _ = app.run("ui.dialog", json!({ "name": "zoom" }));
+                    // Unmirrored::SliderValue: the zoom group reads − slider + 100% left to right in
+                    // either direction, so right to left (laid out from the left) its parts go in
+                    // the other order.
+                    #[derive(Clone, Copy)]
+                    enum Zoom {
+                        Percent,
+                        In,
+                        Slider,
+                        Out,
                     }
-                    if small_icon(ui, "plus", tl!("Zoom In")) {
-                        if reading {
-                            let _ = app.run("view.readTextSize", json!({"value": (z + 10.0).min(150.0)}));
-                        } else {
-                            let _ = app.run("view.zoomIn", json!({}));
-                        }
-                    }
-                    // Reading zoom changes only reading presentation, never the normal view zoom.
-                    let mut v = if reading { app.session.view.read_zoom } else { app.canvas.scale / crate::canvas::PX_PER_PT };
-                    let slider = egui::Slider::new(&mut v, if reading { 0.75..=1.5 } else { 0.1..=5.0 }).logarithmic(!reading).show_value(false);
-                    ui.spacing_mut().slider_width = 110.0;
-                    let response = ui.add(slider);
-                    response.widget_info(|| {
-                        egui::WidgetInfo::labeled(egui::Role::Slider, ui.is_enabled(), if reading { tl!("Text Size") } else { tl!("Zoom") })
-                    });
-                    if response.changed() {
-                        let command = if reading { "view.readTextSize" } else { "view.zoom" };
-                        let _ = app.run(command, json!({"value": (v * 100.0).round()}));
-                    }
-                    if small_icon(ui, "minus", tl!("Zoom Out")) {
-                        if reading {
-                            let _ = app.run("view.readTextSize", json!({"value": (z - 10.0).max(75.0)}));
-                        } else {
-                            let _ = app.run("view.zoomOut", json!({}));
+                    let parts =
+                        if rtl { [Zoom::Out, Zoom::Slider, Zoom::In, Zoom::Percent] } else { [Zoom::Percent, Zoom::In, Zoom::Slider, Zoom::Out] };
+                    for part in parts {
+                        match part {
+                            Zoom::Percent => {
+                                let (zr, zresp) = ui.allocate_exact_size(vec2(zw.max(zslot) + 1.0, TypeRung::Caption.line_height()), Sense::click());
+                                paint_text(ui.painter(), pos2(zr.max.x - 1.0, zr.min.y), Align2::RIGHT_TOP, &ztxt, &zfont, ztrack, t.text_dim);
+                                if zresp.clicked() && !reading {
+                                    let _ = app.run("ui.dialog", json!({ "name": "zoom" }));
+                                }
+                            }
+                            Zoom::In => {
+                                if small_icon(ui, "plus", tl!("Zoom In")) {
+                                    if reading {
+                                        let _ = app.run("view.readTextSize", json!({"value": (z + 10.0).min(150.0)}));
+                                    } else {
+                                        let _ = app.run("view.zoomIn", json!({}));
+                                    }
+                                }
+                            }
+                            Zoom::Slider => {
+                                // Reading zoom changes only reading presentation, never the normal view zoom.
+                                let mut v = if reading { app.session.view.read_zoom } else { app.canvas.scale / crate::canvas::PX_PER_PT };
+                                let slider =
+                                    egui::Slider::new(&mut v, if reading { 0.75..=1.5 } else { 0.1..=5.0 }).logarithmic(!reading).show_value(false);
+                                ui.spacing_mut().slider_width = 110.0;
+                                let response = ui.add(slider);
+                                response.widget_info(|| {
+                                    egui::WidgetInfo::labeled(
+                                        egui::Role::Slider,
+                                        ui.is_enabled(),
+                                        if reading { tl!("Text Size") } else { tl!("Zoom") },
+                                    )
+                                });
+                                if response.changed() {
+                                    let command = if reading { "view.readTextSize" } else { "view.zoom" };
+                                    let _ = app.run(command, json!({"value": (v * 100.0).round()}));
+                                }
+                            }
+                            Zoom::Out => {
+                                if small_icon(ui, "minus", tl!("Zoom Out")) {
+                                    if reading {
+                                        let _ = app.run("view.readTextSize", json!({"value": (z - 10.0).max(75.0)}));
+                                    } else {
+                                        let _ = app.run("view.zoomOut", json!({}));
+                                    }
+                                }
+                            }
                         }
                     }
                     ui.add_space(10.0);
@@ -719,9 +754,10 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                     let focus = tl!("Focus");
                     let focus_w = ui.ctx().fonts_mut(|f| f.layout_no_wrap(focus.to_string(), regular(11.5), t.text_dim).size().x);
                     let (r, resp) = ui.allocate_exact_size(vec2((focus_w + 26.0).max(56.0), 20.0), Sense::click());
-                    // The Focus button is the last of the controls, so it is the leftmost one: the
-                    // message has to stop before it (#2402).
-                    controls_left = r.min.x;
+                    // The Focus button is the last of the controls, so it is the one nearest the
+                    // message (the leftmost; the rightmost right to left): the message has to stop
+                    // before it (#2402).
+                    controls_left = if rtl { r.max.x } else { r.min.x };
                     if resp.hovered() {
                         ui.painter().rect_filled(r, 3.0, t.hover);
                     }
@@ -748,11 +784,12 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                     let font = TypeRung::Caption.regular();
                     let track = TypeRung::Caption.tracking();
                     // The room the message has: what is left between here and the controls.
-                    let room = controls_left - ui.spacing().item_spacing.x - msg_at.x;
+                    let room = if rtl { msg_end - controls_left } else { controls_left - msg_at.x } - ui.spacing().item_spacing.x;
                     let msg_shown = fit_text(ui.painter(), msg, &font, track, t.accent_text, room);
                     if !msg_shown.is_empty() {
                         let w = text_width(ui.painter(), &msg_shown, &font, track, t.accent_text);
-                        let rect = Rect::from_min_size(msg_at, vec2(w + 1.0, TypeRung::Caption.line_height()));
+                        let at = if rtl { pos2(msg_end - w - 1.0, msg_at.y) } else { msg_at };
+                        let rect = Rect::from_min_size(at, vec2(w + 1.0, TypeRung::Caption.line_height()));
                         // The whole message is in the tooltip; the bar only has room for the
                         // beginning of it (#2402).
                         let _ = ui.interact(rect, status_message_id(), Sense::hover()).on_hover_text(msg.clone());

@@ -71,3 +71,24 @@ fn a_theme_change_keeps_the_interface_mirrored() {
     assert!(ctx.global_style().right_to_left);
     assert!(craft_ui::direction::is_rtl(&ctx));
 }
+
+#[test]
+fn the_title_and_status_bars_mirror() {
+    let (mut app, ctx) = app_in("ar");
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let save = text_rect(&shapes, crate::tl!("AutoSave")).expect("AutoSave label");
+    assert!(save.center().x > 640.0, "AutoSave and the Quick Access Toolbar at the right: {save:?}");
+    let zoom = text_rect(&shapes, "100%").expect("zoom");
+    assert!(zoom.center().x < 640.0, "the zoom control at the status bar's left: {zoom:?}");
+    let page = shapes.iter().find_map(|c| match &c.shape {
+        Shape::Text(t) if t.galley.text().contains('1') && t.visual_bounding_rect().min.y > 760.0 && t.galley.text() != "100%" => {
+            Some(t.visual_bounding_rect())
+        }
+        _ => None,
+    });
+    assert!(page.expect("page count").center().x > 640.0, "page and word counts at the right");
+    let (mut app, ctx) = app_in("en");
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    assert!(text_rect(&shapes, "AutoSave").unwrap().center().x < 640.0, "English unchanged");
+    assert!(text_rect(&shapes, "100%").unwrap().center().x > 640.0);
+}
