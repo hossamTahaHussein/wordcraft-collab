@@ -20,8 +20,9 @@ use wordcraft_doc::offsets::{linear_text, offset_of, pos_at};
 use wordcraft_doc::{Document, Pos, StoryRef};
 use wordcraft_engine::{Selection, Session};
 
+use crate::hash::{HASH_EVERY, doc_hash};
 use crate::mapping::{Span, changed_stories, map, span};
-use crate::proto::{Anchor, Op, OpKind};
+use crate::proto::{Anchor, Op, OpKind, Outbound};
 
 /// How many revisions of changes a replica keeps for moving late edits' selections; an edit
 /// whose base is older needs a resync.
@@ -97,6 +98,8 @@ pub struct Replica {
     in_flight: bool,
     next_seq: u64,
     history: History,
+    /// The last revision whose fingerprint was reported.
+    hashed: u64,
 }
 
 impl Replica {
@@ -111,6 +114,7 @@ impl Replica {
             in_flight: false,
             next_seq: 1,
             history: History { oldest: rev, revs: VecDeque::new() },
+            hashed: rev,
         };
         for op in tail {
             replica.check_next(&op)?;
@@ -142,6 +146,23 @@ impl Replica {
 
     pub fn confirmed(&self) -> &Document {
         &self.confirmed.doc
+    }
+
+    /// The confirmed document's fingerprint, once per [`HASH_EVERY`] revisions.
+    pub fn hash_due(&mut self) -> Option<Outbound> {
+        let at = self.rev - self.rev % HASH_EVERY;
+        if at == 0 || at <= self.hashed || at != self.rev {
+            return None;
+        }
+        self.hashed = at;
+        Some(Outbound::Hash { rev: at, h: doc_hash(&self.confirmed.doc) })
+    }
+
+    /// The confirmed document in WordCraft's native JSON, for the relay to give new joiners.
+    pub fn snapshot(&self) -> Result<Outbound, CollabError> {
+        let bytes = wordcraft_engine::io::save_bytes("doc.json", &self.confirmed.doc).map_err(CollabError::Snapshot)?;
+        let doc = String::from_utf8(bytes).map_err(|e| CollabError::Snapshot(e.to_string()))?;
+        Ok(Outbound::Snapshot { rev: self.rev, doc })
     }
 
     /// Turn the edits the person just made in `visible` into pending ops.
