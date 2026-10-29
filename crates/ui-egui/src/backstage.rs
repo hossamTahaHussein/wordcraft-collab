@@ -58,9 +58,16 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
                 }
                 // The chevron's stroke starts at the content edge.
-                let c = back_chevron_c(band.min.x, band.center().y, app.session.view.full_screen, app.mac_titlebar.content_left);
+                // Right to left the menu is at the window's right, away from the traffic lights:
+                // the chevron sits at the menu's reading start, as without a title bar.
+                let c = if rtl {
+                    pos2(from_start(band, 26.0), band.center().y)
+                } else {
+                    back_chevron_c(band.min.x, band.center().y, app.session.view.full_screen, app.mac_titlebar.content_left)
+                };
                 let resp = ui.interact(Rect::from_center_size(c, vec2(22.0, band.height())), ui.scope_id().with("backstage_back"), Sense::click());
-                icons::paint(ui.painter(), Rect::from_center_size(c, vec2(18.0, 18.0)), "chevronLeft", egui::Color32::WHITE, egui::Color32::WHITE);
+                let chevron = if rtl { "chevronRight" } else { "chevronLeft" };
+                icons::paint(ui.painter(), Rect::from_center_size(c, vec2(18.0, 18.0)), chevron, egui::Color32::WHITE, egui::Color32::WHITE);
                 resp
             } else {
                 // The hit area is scoped to the chevron, not the whole 200px-wide row (#3041):
@@ -148,21 +155,27 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             });
         });
     egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.ribbon).inner_margin(egui::Margin::symmetric(40, 30))).show(ui, |ui| {
-        // The Print page fills the pane and scrolls its settings and its preview itself (#1156).
-        if app.ui.backstage_page == "print" {
-            export_page(app, ui);
-            return;
-        }
-        egui::ScrollArea::vertical().show(ui, |ui| match app.ui.backstage_page.as_str() {
-            "home" => home_page(app, ui),
-            "new" => new_page(app, ui),
-            "open" => open_page(app, ui),
-            "saveAs" => save_as_page(app, ui),
-            "info" => info_page(app, ui),
-            "recover" => recovery_page(app, ui),
-            "print" | "export" => export_page(app, ui),
-            "options" => crate::options::page(app, ui),
-            _ => home_page(app, ui),
+        // Right to left the page reads from the right, next to the menu.
+        let layout = craft_ui::direction::column(ui);
+        ui.with_layout(layout, |ui| {
+            // The Print page fills the pane and scrolls its settings and its preview itself (#1156).
+            if app.ui.backstage_page == "print" {
+                export_page(app, ui);
+                return;
+            }
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                crate::widgets::column(ui, |ui| match app.ui.backstage_page.as_str() {
+                    "home" => home_page(app, ui),
+                    "new" => new_page(app, ui),
+                    "open" => open_page(app, ui),
+                    "saveAs" => save_as_page(app, ui),
+                    "info" => info_page(app, ui),
+                    "recover" => recovery_page(app, ui),
+                    "print" | "export" => export_page(app, ui),
+                    "options" => crate::options::page(app, ui),
+                    _ => home_page(app, ui),
+                })
+            });
         });
     });
 }
@@ -234,7 +247,7 @@ fn heading(ui: &mut Ui, s: &str) {
 /// region-aware page preview, and creates a document from the template on click.
 fn template_tile(ui: &mut Ui, app: &mut WordApp, label: &str, template: &str) {
     let t = Tokens::get(ui.ctx());
-    ui.vertical(|ui| {
+    crate::widgets::column(ui, |ui| {
         // The thumbnail and its caption are one button named by the caption, so a screen reader
         // announces "Blank document, button" rather than unnamed text (#3176); the caption opens
         // the template too, as in Word.
@@ -478,7 +491,7 @@ fn matching_personal(query: &str, list: &[PersonalTemplate]) -> Vec<PersonalTemp
 /// click makes a new document from it.
 fn personal_tile(ui: &mut Ui, app: &mut WordApp, p: &PersonalTemplate) {
     let t = Tokens::get(ui.ctx());
-    ui.vertical(|ui| {
+    crate::widgets::column(ui, |ui| {
         ui.spacing_mut().item_spacing.y = 0.0;
         ui.set_max_width(150.0);
         let (r, resp) = ui.allocate_exact_size(vec2(150.0, 194.0), Sense::click());

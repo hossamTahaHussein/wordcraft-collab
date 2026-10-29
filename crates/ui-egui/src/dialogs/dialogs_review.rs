@@ -198,7 +198,7 @@ fn compare_ui(app: &mut WordApp, ui: &mut Ui, f: &mut CompareForm) -> bool {
         ui.label(egui::RichText::new(tl!("Comparing with another file needs the desktop app.")).small().weak());
     }
     egui::Grid::new("compare_files").num_columns(2).spacing(vec2(16.0, 4.0)).show(ui, |ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             heading(ui, "Original document");
             ui.radio_value(&mut f.original_current, true, tl!("This document"));
             ui.horizontal(|ui| {
@@ -209,7 +209,7 @@ fn compare_ui(app: &mut WordApp, ui: &mut Ui, f: &mut CompareForm) -> bool {
                 }
             });
         });
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             heading(ui, "Revised document");
             ui.horizontal(|ui| {
                 ui.add_enabled(browse, egui::TextEdit::singleline(&mut f.revised).desired_width(170.0));
@@ -246,12 +246,12 @@ fn compare_ui(app: &mut WordApp, ui: &mut Ui, f: &mut CompareForm) -> bool {
                 .weak(),
         );
         egui::Grid::new("compare_show").num_columns(2).spacing(vec2(24.0, 2.0)).show(ui, |ui| {
-            ui.vertical(|ui| {
+            crate::widgets::column(ui, |ui| {
                 heading(ui, "Show changes at:");
                 ui.radio_value(&mut f.character_level, false, tl!("Word level"));
                 ui.radio_value(&mut f.character_level, true, tl!("Character level"));
             });
-            ui.vertical(|ui| {
+            crate::widgets::column(ui, |ui| {
                 heading(ui, "Show changes in:");
                 for (v, l) in [("original", "Original document"), ("revised", "Revised document"), ("new", "New document")] {
                     ui.radio_value(&mut f.show_in, v.to_string(), tl!(l));

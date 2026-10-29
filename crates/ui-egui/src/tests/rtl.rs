@@ -298,3 +298,13 @@ fn navigation_headings_indent_from_the_right() {
     let sub = text_rect(&shapes, "Sub").expect("Sub heading");
     assert!(top.max.x - sub.max.x > 8.0, "the sub-heading ends further from the right edge: {top:?} {sub:?}");
 }
+
+#[test]
+fn the_file_page_reads_from_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("ui.backstage", serde_json::json!({"value": true, "page": "home"})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let blank = text_rect(&shapes, crate::tl!("Blank document")).expect("Blank document");
+    let recent = text_rect(&shapes, crate::tl!("Recent")).expect("Recent heading");
+    assert!(blank.center().x > 640.0 && recent.center().x > 640.0, "the page starts at the right, next to the menu: {blank:?} {recent:?}");
+}

@@ -284,7 +284,7 @@ pub(crate) fn recipient_list(
     let mut x_w = X_W;
     let mut focused = None;
     egui::ScrollArea::horizontal().id_salt("recipients_h").max_width(720.0).show(ui, |ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.allocate_exact_size(vec2(NUM_W, ROW_H - 4.0), Sense::hover());
                 for (i, f) in fields.iter_mut().enumerate() {

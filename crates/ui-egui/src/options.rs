@@ -141,7 +141,7 @@ pub fn page(app: &mut WordApp, ui: &mut Ui) {
     ui.add_space(16.0);
     let current = if PANES.contains(&app.ui.options_pane.as_str()) { app.ui.options_pane.clone() } else { "general".to_string() };
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.set_width(170.0);
             for id in PANES {
                 let label = tl!(pane_label(id));
@@ -165,7 +165,7 @@ pub fn page(app: &mut WordApp, ui: &mut Ui) {
         let (line, _) = ui.allocate_exact_size(vec2(1.0, 420.0), egui::Sense::hover());
         ui.painter().rect_filled(line, 0.0, t.border);
         ui.add_space(20.0);
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.set_max_width(640.0);
             match current.as_str() {
                 "display" => display(app, ui),

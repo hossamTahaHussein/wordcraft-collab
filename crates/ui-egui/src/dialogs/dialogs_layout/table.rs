@@ -126,7 +126,7 @@ pub(super) fn sort_ui(app: &mut WordApp, ui: &mut Ui, f: &mut SortForm) -> bool 
                 ui.selectable_value(&mut f.column, i, label);
             }
         });
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.radio_value(&mut f.descending, false, tl!("Ascending"));
             ui.radio_value(&mut f.descending, true, tl!("Descending"));
         });

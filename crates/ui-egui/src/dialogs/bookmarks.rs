@@ -32,7 +32,7 @@ pub(super) fn bookmark(app: &mut WordApp, ui: &mut Ui, name: &mut String, by_loc
     let t = Tokens::get(ui.ctx());
     let (mut add, mut delete, mut go_to) = (false, false, false);
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             let name_label = ui.label(tl!("Bookmark name:"));
             ui.add(egui::TextEdit::singleline(name).desired_width(240.0)).labelled_by(name_label.id);
             egui::Frame::NONE.stroke(egui::Stroke::new(1.0, t.border)).inner_margin(4).show(ui, |ui| {
@@ -51,7 +51,7 @@ pub(super) fn bookmark(app: &mut WordApp, ui: &mut Ui, name: &mut String, by_loc
                 });
             });
         });
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.add_space(18.0);
             let listed = marks.iter().any(|n| n == name.trim());
             let w = vec2(90.0, 0.0);
@@ -63,7 +63,7 @@ pub(super) fn bookmark(app: &mut WordApp, ui: &mut Ui, name: &mut String, by_loc
     ui.add_space(6.0);
     ui.horizontal_top(|ui| {
         ui.label(tl!("Sort by:"));
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.radio_value(by_location, false, tl!("Name"));
             ui.radio_value(by_location, true, tl!("Location"));
         });

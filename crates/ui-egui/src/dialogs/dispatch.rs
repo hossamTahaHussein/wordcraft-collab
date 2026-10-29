@@ -478,14 +478,14 @@ fn enclose_dialog(app: &mut WordApp, ui: &mut Ui, d: &mut Dialog) -> bool {
     });
     ui.add_space(6.0);
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.label(tl!("Text:"));
             ui.add(egui::TextEdit::singleline(text).desired_width(110.0).char_limit(2));
             ui.add_space(6.0);
             enclose_preview(ui, style, text, shape);
         });
         ui.add_space(12.0);
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.label(tl!("Enclosure"));
             for (v, l) in [("circle", "Circle"), ("square", "Square"), ("triangle", "Triangle"), ("diamond", "Diamond")] {
                 ui.add_enabled_ui(style != "none", |ui| ui.selectable_value(shape, v.to_string(), tl!(l)));

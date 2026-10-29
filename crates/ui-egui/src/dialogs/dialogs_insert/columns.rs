@@ -381,7 +381,7 @@ pub(super) fn columns_ui(app: &mut WordApp, ui: &mut Ui, f: &mut ColumnsForm) ->
     ui.add_space(6.0);
     ui.label(egui::RichText::new(tl!("Width and spacing")).font(semibold(12.5)));
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             let mut changed = None;
             egui::ScrollArea::vertical().id_salt("columns_widths").max_height(130.0).show(ui, |ui| {
                 egui::Grid::new("columns_grid").num_columns(3).spacing(vec2(12.0, 4.0)).show(ui, |ui| {
@@ -424,7 +424,7 @@ pub(super) fn columns_ui(app: &mut WordApp, ui: &mut Ui, f: &mut ColumnsForm) ->
             }
         });
         ui.add_space(8.0);
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.label(tl!("Preview"));
             columns_preview(ui, f, &t);
         });

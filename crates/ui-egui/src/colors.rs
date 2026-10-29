@@ -497,14 +497,14 @@ fn body(ui: &mut Ui, d: &mut ColorsDialog) -> Option<bool> {
     });
     ui.separator();
     ui.horizontal(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.set_width(330.0);
             match d.tab {
                 ColorsTab::Standard => standard(ui, d),
                 ColorsTab::Custom => custom(ui, d),
             }
         });
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.add_space(110.0);
             preview(ui, d, &t);
         });

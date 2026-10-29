@@ -172,7 +172,7 @@ pub fn define_list(app: &mut WordApp, ui: &mut Ui, f: &mut ListForm) -> bool {
         ui.label(egui::RichText::new(tl!(s)).font(semibold(12.5)));
     };
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.label(tl!("Click level to modify:"));
             for i in 0..LEVELS {
                 if ui.selectable_label(f.level == i, format!("{}", i + 1)).clicked() {
@@ -180,7 +180,7 @@ pub fn define_list(app: &mut WordApp, ui: &mut Ui, f: &mut ListForm) -> bool {
                 }
             }
         });
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.label(egui::RichText::new(tl!("Preview")).small().weak());
             preview(ui, f);
         });

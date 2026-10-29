@@ -157,7 +157,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
     app.ui.print.preview = app.ui.print.preview.min(total.saturating_sub(1));
 
     ui.horizontal_top(|ui| {
-        ui.vertical(|ui| {
+        crate::widgets::column(ui, |ui| {
             ui.set_width(380.0);
             // The settings scroll on their own: the preview beside them keeps the whole height (#1156).
             egui::ScrollArea::vertical().id_salt("print_settings").show(ui, |ui| {
@@ -257,7 +257,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             });
         });
         ui.add_space(24.0);
-        ui.vertical(|ui| preview(app, ui, &lay, total));
+        crate::widgets::column(ui, |ui| preview(app, ui, &lay, total));
     });
 }
 
