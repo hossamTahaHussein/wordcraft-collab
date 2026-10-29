@@ -67,6 +67,9 @@ pub enum Inbound {
         snapshot: Option<String>,
         ops: Vec<Op>,
         you: String,
+        /// With a snapshot: the last of this replica's edits it holds (`Replica::resume`).
+        #[serde(default)]
+        seen: Option<u64>,
     },
     Op(Box<Op>),
     /// Upload a snapshot of the confirmed document.
@@ -76,6 +79,8 @@ pub enum Inbound {
         rev: u64,
         snapshot: String,
         ops: Vec<Op>,
+        #[serde(default)]
+        seen: Option<u64>,
     },
     /// Save the document now (autosave).
     Save,
@@ -172,11 +177,13 @@ mod tests {
     #[test]
     fn welcome_and_resync_decode() {
         let w = decode_inbound(r#"{"t":"Welcome","rev":3,"snapshot":null,"ops":[],"you":"c1"}"#).unwrap();
-        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into() });
+        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None });
         assert_eq!(decode_inbound(r#"{"t":"Save"}"#).unwrap(), Inbound::Save);
         assert_eq!(decode_inbound(r#"{"t":"SnapshotRequest"}"#).unwrap(), Inbound::SnapshotRequest);
         let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[]}"#).unwrap();
-        assert!(matches!(r, Inbound::Resync { rev: 9, .. }));
+        assert!(matches!(r, Inbound::Resync { rev: 9, seen: None, .. }));
+        let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[],"seen":4}"#).unwrap();
+        assert!(matches!(r, Inbound::Resync { seen: Some(4), .. }));
     }
 
     #[test]

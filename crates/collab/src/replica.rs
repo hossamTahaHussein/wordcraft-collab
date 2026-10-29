@@ -208,7 +208,12 @@ impl Replica {
         // Edits the person made since the host last collected them were made on the visible
         // document as it is now: take them before it is rebuilt.
         self.drain_local(visible);
-        let own = self.in_flight && op.client == self.client && self.pending.front().is_some_and(|p| p.seq == op.seq);
+        self.apply_from_relay(op, visible)
+    }
+
+    /// One relay edit: this replica's own (the first pending one) or someone else's.
+    fn apply_from_relay(&mut self, op: Op, visible: &mut Session) -> Result<Applied, CollabError> {
+        let own = op.client == self.client && self.pending.front().is_some_and(|p| p.seq == op.seq);
         if own {
             self.apply_confirmed(&op)?;
             self.pending.pop_front();
@@ -222,30 +227,34 @@ impl Replica {
     }
 
     /// After a reconnect (`Welcome`) or a `Resync`: start again from `snapshot` at `rev` if
-    /// given, apply `tail`, and rebuild the visible document. Edits of this replica's in `tail`
-    /// are confirmed; the rest of the pending edits are returned to send again (one at a time:
-    /// the first is returned, marked in flight).
-    pub fn resume(&mut self, rev: u64, snapshot: Option<Document>, tail: Vec<Op>, visible: &mut Session) -> Result<Vec<Op>, CollabError> {
+    /// given — `seen` is the last of this replica's edits the snapshot holds, which aren't sent
+    /// again — then apply `tail` one edit at a time, exactly as if it had arrived live. Returns
+    /// the next edit to send (the rest follow one at a time).
+    pub fn resume(
+        &mut self,
+        rev: u64,
+        snapshot: Option<Document>,
+        tail: Vec<Op>,
+        seen: Option<u64>,
+        visible: &mut Session,
+    ) -> Result<Vec<Op>, CollabError> {
         self.drain_local(visible);
-        let before = self.confirmed.doc.clone();
+        self.in_flight = false;
         if let Some(doc) = snapshot {
-            self.confirmed = headless(doc);
+            let before = std::mem::replace(&mut self.confirmed, headless(doc)).doc;
             self.rev = rev;
             self.history = History { oldest: rev, revs: VecDeque::new() };
+            self.hashed = rev;
+            let seen = seen.unwrap_or(0);
+            self.rebuild_skipping(visible, before, |op| op.seq <= seen);
         }
-        self.in_flight = false;
         for op in tail {
             if op.rev.is_some_and(|r| r <= self.rev) {
                 continue;
             }
             self.check_next(&op)?;
-            if op.client == self.client {
-                self.pending.retain(|p| p.seq != op.seq);
-            }
-            self.apply_confirmed(&op)?;
+            self.apply_from_relay(op, visible)?;
         }
-        // The pending selections were made against the old confirmed document.
-        self.rebuild(visible, before);
         Ok(self.next_to_send().into_iter().collect())
     }
 
@@ -294,6 +303,13 @@ impl Replica {
     /// from the old chain (`before` + pending) to the new one. Returns how many pending edits
     /// failed and were dropped (an edit in flight is kept: the relay will confirm it).
     fn rebuild(&mut self, visible: &mut Session, before: Document) -> usize {
+        self.rebuild_skipping(visible, before, |_| false)
+    }
+
+    /// [`Self::rebuild`], where pending edits matching `confirmed_already` are part of the old
+    /// chain but already in the confirmed document: they are replayed on the old chain only and
+    /// leave the pending list.
+    fn rebuild_skipping(&mut self, visible: &mut Session, before: Document, confirmed_already: impl Fn(&Op) -> bool) -> usize {
         let old_visible = visible.doc.clone();
         let caret = anchor_of(&old_visible, &visible.sel);
         self.scratch.doc = before;
@@ -306,6 +322,9 @@ impl Replica {
             let moved = span(&linear_text(&self.scratch.doc, story), &linear_text(&visible.doc, story));
             let new_sel = move_anchor(&op.sel, moved.as_ref());
             let _ = run_at(&mut self.scratch, &op, &op.sel.clone());
+            if confirmed_already(&op) {
+                continue;
+            }
             let ok = run_at(visible, &op, &new_sel).is_ok();
             op.sel = new_sel;
             if ok || (i == 0 && self.in_flight) {

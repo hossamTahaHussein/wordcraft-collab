@@ -149,7 +149,7 @@ fn resume_pops_echoed_and_returns_unsent() {
     a.type_text(" two");
     assert_eq!(a.replica.pending_len(), 2);
     let tail = relay.log.clone();
-    let resend = a.replica.resume(0, None, tail, &mut a.visible).unwrap();
+    let resend = a.replica.resume(0, None, tail, None, &mut a.visible).unwrap();
     assert_eq!(resend.len(), 1);
     assert_eq!(resend[0].params, json!({"text": " two"}));
     assert_eq!(a.replica.rev(), 1);
@@ -222,4 +222,62 @@ fn an_edit_not_yet_drained_survives_a_remote_edit() {
     relay.settle(&mut [&mut a, &mut b]);
     assert_eq!(a.text(), "B0123456789A");
     assert_eq!(b.text(), a.text());
+}
+
+/// Reconnecting after a relay restart: the tail holds some of this replica's own edits and
+/// someone else's; the rest of its typing must stay where it was typed.
+#[test]
+fn resume_with_own_echoes_in_the_tail_keeps_typing_in_place() {
+    let mut relay = Relay::new(doc_with("Start End"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    a.act("caret.docStart", json!({}));
+    for _ in 0..5 {
+        a.act("caret.right", json!({}));
+    }
+    b.act("caret.docEnd", json!({}));
+    a.type_text(" ");
+    a.type_text("one");
+    b.type_text(" two");
+    // Ann's first edit and Bob's reach the relay; Ann hears nothing back and keeps typing.
+    relay.collect(&mut [&mut a, &mut b], &[0, 1]);
+    a.inbox.clear();
+    a.type_text(" ");
+    a.type_text("three");
+    let tail = relay.log.clone();
+    let resend = a.replica.resume(0, None, tail, None, &mut a.visible).unwrap();
+    assert_eq!(a.text(), "Start one three End two", "Ann's typing stays where she typed it");
+    assert_eq!(resend.len(), 1);
+    // Ann reconnected, so only what she resends from here on travels.
+    a.inbox.clear();
+    let mut op = resend.into_iter().next().unwrap();
+    op.rev = Some(relay.rev() + 1);
+    relay.log.push(op.clone());
+    for p in [&mut a, &mut b] {
+        p.inbox.push_back(op.clone());
+    }
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(a.text(), "Start one three End two");
+    assert_eq!(b.text(), a.text());
+}
+
+/// A full resync from a snapshot that already holds some of this replica's pending edits:
+/// those aren't sent again.
+#[test]
+fn resync_from_snapshot_drops_pending_edits_the_relay_has_seen() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    a.act("caret.docEnd", json!({}));
+    a.type_text("!");
+    relay.collect(&mut [&mut a], &[0]);
+    a.inbox.clear();
+    a.type_text("?");
+    let typed = a.text();
+    // The relay's snapshot already includes Ann's "!" (her seq 1).
+    let fresh = wordcraft_collab::replica::Replica::join("s".into(), 0, relay.base.clone(), relay.log.clone()).unwrap();
+    let snapshot = fresh.confirmed().clone();
+    let resend = a.replica.resume(1, Some(snapshot), Vec::new(), Some(1), &mut a.visible).unwrap();
+    assert_eq!(resend.len(), 1);
+    assert_eq!(resend[0].params, json!({"text": "?"}));
+    assert_eq!(a.text(), typed);
 }

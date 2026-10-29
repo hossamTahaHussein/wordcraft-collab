@@ -57,7 +57,7 @@ impl CollabLink {
             }
         };
         match message {
-            Inbound::Welcome { rev, snapshot, ops, you } => self.welcome(rev, snapshot, ops, you, visible),
+            Inbound::Welcome { rev, snapshot, ops, you, seen } => self.welcome(rev, snapshot, ops, you, seen, visible),
             Inbound::Op(op) => self.op(*op, visible),
             Inbound::SnapshotRequest => match self.replica.as_ref().map(Replica::snapshot) {
                 Some(Ok(s)) => vec![encode(&s)],
@@ -67,7 +67,7 @@ impl CollabLink {
                 }
                 None => Vec::new(),
             },
-            Inbound::Resync { rev, snapshot, ops } => self.resume(rev, Some(snapshot), ops, visible),
+            Inbound::Resync { rev, snapshot, ops, seen } => self.resume(rev, Some(snapshot), ops, seen, visible),
             Inbound::Save => {
                 self.save_requested = self.replica.is_some();
                 Vec::new()
@@ -107,11 +107,11 @@ impl CollabLink {
         out
     }
 
-    fn welcome(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, you: String, visible: &mut Session) -> Vec<String> {
+    fn welcome(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, you: String, seen: Option<u64>, visible: &mut Session) -> Vec<String> {
         self.you = Some(you.clone());
         if self.replica.is_some() {
             // A reconnect: catch up and send what the relay didn't get.
-            return self.resume(rev, snapshot, ops, visible);
+            return self.resume(rev, snapshot, ops, seen, visible);
         }
         let Some(json) = snapshot else {
             // The first person: the host opens the document, which becomes revision 0.
@@ -156,7 +156,7 @@ impl CollabLink {
         }
     }
 
-    fn resume(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, visible: &mut Session) -> Vec<String> {
+    fn resume(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, seen: Option<u64>, visible: &mut Session) -> Vec<String> {
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         let doc = match snapshot.map(|json| wordcraft_engine::io::open_bytes("shared.json", json.as_bytes())).transpose() {
             Ok(d) => d,
@@ -165,7 +165,7 @@ impl CollabLink {
                 return Vec::new();
             }
         };
-        match replica.resume(rev, doc, ops, visible) {
+        match replica.resume(rev, doc, ops, seen, visible) {
             Ok(resend) => resend.into_iter().map(|op| encode(&Outbound::Op(Box::new(op)))).collect(),
             Err(e) => {
                 log::warn!("co-editing: couldn't catch up: {e}");
@@ -302,5 +302,33 @@ mod tests {
         assert_eq!(out.len(), 1);
         assert_eq!(parse(&out[0])["params"]["text"], "!");
         assert_eq!(s.doc.plain_text(StoryRef::Body), typed);
+    }
+}
+
+#[cfg(test)]
+mod seen_tests {
+    use serde_json::json;
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    #[test]
+    fn a_resync_snapshot_holding_an_edit_does_not_resend_it() {
+        let mut s0 = Session::new(Document::new());
+        s0.run("text.insert", &json!({"text": "ab"})).unwrap();
+        let snap = |s: &Session| String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap();
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap(&s0), "ops": [], "you": "c1"}).to_string(), &mut s);
+        s.run("caret.docEnd", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "X"})).unwrap();
+        assert_eq!(link.tick(&mut s).len(), 1);
+        // The relay took it into a snapshot (seen = 1) before this replica heard back.
+        let mut s1 = Session::new(Document::new());
+        s1.run("text.insert", &json!({"text": "abX"})).unwrap();
+        let out = link.on_message(&json!({"t": "Resync", "rev": 1, "snapshot": snap(&s1), "ops": [], "seen": 1}).to_string(), &mut s);
+        assert!(out.is_empty(), "nothing to resend: {out:?}");
+        assert_eq!(s.doc.plain_text(StoryRef::Body), "abX");
     }
 }
