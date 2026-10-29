@@ -84,6 +84,8 @@ impl Session {
             goal_x: _,
             page_hint: _,
             registry: _,
+            // The co-editing outbox: a previewed command that is rolled back was never an edit.
+            collab,
             author: _,
             initials: _,
             painter: _,
@@ -177,6 +179,7 @@ impl Session {
             join_anchor: *join_anchor,
             dirty: *dirty,
             ime_body_epoch: *ime_body_epoch,
+            outbox_len: collab.outbox_len(),
         }
     }
 
@@ -198,7 +201,9 @@ impl Session {
             join_anchor,
             dirty,
             ime_body_epoch,
+            outbox_len,
         } = snap;
+        self.collab.truncate_outbox(outbox_len);
         let gone = usize::try_from(self.undo_evicted.saturating_sub(evicted)).unwrap_or(usize::MAX);
         if gone > 0 {
             let back = gone.min(head.len());

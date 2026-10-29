@@ -119,6 +119,7 @@ impl Session {
             join_anchor,
             autocap,
             rev,
+            collab: Default::default(),
             document_id,
             untitled,
             made_rev,

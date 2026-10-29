@@ -30,6 +30,8 @@ pub struct EditSnapshot {
     /// The body's replacement epoch then: a previewed replacement that is rolled back is not a
     /// replacement after all.
     pub(super) ime_body_epoch: u64,
+    /// How many co-editing edits were recorded then.
+    pub(super) outbox_len: usize,
 }
 
 /// Undo steps that the commands run between [`Session::edit_snapshot`] and [`Session::restore`]

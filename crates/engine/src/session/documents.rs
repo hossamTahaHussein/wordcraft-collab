@@ -246,6 +246,8 @@ impl Session {
             clipboard_html: _,
             clip_history: _,
             registry: _,
+            // Collab mode belongs to the session (switching documents is refused while on).
+            collab: _,
             author: _,
             initials: _,
             painter: _,

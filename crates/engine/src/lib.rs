@@ -16,6 +16,7 @@ mod io_ext;
 pub mod keymap;
 pub(crate) mod locale;
 pub mod math_gallery;
+pub mod outbox;
 pub(crate) mod prefs;
 pub mod print;
 pub mod recovery;
@@ -33,6 +34,7 @@ use serde_json::Value;
 
 pub use io::Password;
 pub use keymap::KeyMap;
+pub use outbox::{COLLAB_DISABLED, Recorded};
 pub use ribbon::RibbonLayout;
 pub use run_ctx::{EditingPrefs, RunCtx, with_clock};
 pub use session::{

@@ -118,6 +118,8 @@ pub struct Session {
     /// The newest automatic capitalisation, for Word's "Automatically add words to list" (#1857).
     pub(crate) autocap: Option<crate::cmd::tools::AutoCap>,
     rev: u64,
+    /// Co-editing: collab mode and the outbox of recorded edits (`crate::outbox`).
+    pub(crate) collab: crate::outbox::CollabState,
     /// Which document this is, unique in the process: changes when [`Session::set_document`]
     /// replaces it (an open into an untouched blank document, recover), never on an edit or when
     /// another document becomes active and this one comes back.

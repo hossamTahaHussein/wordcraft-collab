@@ -13,6 +13,7 @@ mod bidi;
 mod documents;
 mod fonts;
 mod ime_noop;
+mod outbox;
 mod revision_checks;
 mod run_ctx;
 mod typing;
