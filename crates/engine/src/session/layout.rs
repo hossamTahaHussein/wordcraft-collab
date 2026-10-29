@@ -141,6 +141,7 @@ impl Session {
         copy.last_highlight = self.last_highlight;
         copy.system_region = self.system_region.clone();
         copy.editing_lang = self.editing_lang.clone();
+        copy.editing_lang_bidi = self.editing_lang_bidi.clone();
         // The copy shares the paragraph layouts, so only what the command changed is laid out.
         std::mem::swap(&mut copy.cache, &mut self.cache);
         let layout = copy.run(id, params).is_ok().then(|| {
@@ -196,9 +197,28 @@ impl Session {
             return;
         }
         self.editing_lang = tag;
+        let lang = Some(self.editing_lang.clone().unwrap_or_else(|| "en-US".into()));
+        self.set_untouched_default(|c| c.lang = lang);
+    }
+
+    /// Set the language of right-to-left text in new documents ([`Session::editing_lang_bidi`];
+    /// `None` or a malformed tag: unset). The untouched first document switches too, as with
+    /// [`Session::set_editing_language`].
+    pub fn set_editing_bidi_language(&mut self, tag: Option<&str>) {
+        let tag = tag.and_then(wordcraft_proof::lang::normalize_tag);
+        if self.editing_lang_bidi == tag {
+            return;
+        }
+        self.editing_lang_bidi = tag.clone();
+        self.set_untouched_default(|c| c.lang_bidi = tag);
+    }
+
+    /// Change the default character formatting of a document nobody has touched yet (untitled,
+    /// unchanged, no undo steps, no text), without making it changed or adding an undo step.
+    fn set_untouched_default(&mut self, change: impl FnOnce(&mut wordcraft_doc::CharProps)) {
         let untouched = self.path.is_none() && !self.dirty && self.history.is_empty() && self.redo.is_empty();
         if untouched && self.doc.plain_text(StoryRef::Body).trim().is_empty() && self.doc.paragraph_count() <= 1 {
-            self.doc.styles.default_chr.lang = Some(self.editing_lang.clone().unwrap_or_else(|| "en-US".into()));
+            change(&mut self.doc.styles.default_chr);
             self.rev = self.rev.wrapping_add(1);
             // Not an edit: the document is as untouched as it was.
             if self.made_rev == self.rev.wrapping_sub(1) {

@@ -232,6 +232,9 @@ pub(crate) fn normal_document(s: &Session) -> Document {
     if let Some(lang) = s.prefs.default_language.as_ref().or(s.editing_lang.as_ref()) {
         d.styles.default_chr.lang = Some(lang.clone());
     }
+    if let Some(lang) = &s.editing_lang_bidi {
+        d.styles.default_chr.lang_bidi = Some(lang.clone());
+    }
     d
 }
 

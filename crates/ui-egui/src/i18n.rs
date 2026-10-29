@@ -190,6 +190,17 @@ impl Lang {
         self.info().and_then(|l| l.editing_lang)
     }
 
+    /// The language of right-to-left text in new blank documents with this interface (`w:lang
+    /// w:bidi`): a right-to-left interface's own, so Persian words aren't checked as Arabic.
+    pub fn editing_lang_bidi(self) -> Option<&'static str> {
+        match self.code() {
+            "ar" => Some("ar-SA"),
+            "fa" => Some("fa-IR"),
+            "he" => Some("he-IL"),
+            _ => None,
+        }
+    }
+
     /// Is the interface written in CJK script (its own name is), so it needs a CJK face?
     pub fn uses_cjk(self) -> bool {
         self.name().chars().any(|c| ('\u{2E80}'..='\u{9FFF}').contains(&c) || ('\u{AC00}'..='\u{D7AF}').contains(&c))

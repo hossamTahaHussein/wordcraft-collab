@@ -1180,3 +1180,25 @@ fn the_other_right_to_left_languages_are_available() {
         assert!(Lang::all().any(|l| l.code() == code), "{code}");
     }
 }
+
+/// A right-to-left interface writes new documents' right-to-left text in its language, as Word
+/// does: Persian words aren't checked against the Arabic dictionary; Latin text stays English.
+#[test]
+fn a_right_to_left_interface_sets_the_right_to_left_editing_language() {
+    needs_catalogs!();
+    let mut app = crate::WordApp::new(wordcraft_engine::Session::new(wordcraft_doc::Document::new()), Default::default());
+    let ctx = egui::Context::default();
+    let frame = |app: &mut crate::WordApp| ctx.run_ui(egui::RawInput::default(), |ui| app.logic(ui.ctx())).drop_without_applying_deltas();
+    frame(&mut app);
+    assert_eq!(app.session.editing_lang_bidi, None);
+    for (code, bidi) in [("fa", "fa-IR"), ("he", "he-IL"), ("ar", "ar-SA")] {
+        app.run("ui.language", serde_json::json!({"value": code})).unwrap();
+        frame(&mut app);
+        assert_eq!(app.session.editing_lang_bidi.as_deref(), Some(bidi), "{code}");
+        assert_eq!(app.session.editing_lang, None, "{code}: Latin text stays US English");
+    }
+    assert_eq!(app.session.doc.styles.default_chr.lang_bidi.as_deref(), Some("ar-SA"), "the untouched first document follows");
+    app.run("ui.language", serde_json::json!({"value": "en"})).unwrap();
+    frame(&mut app);
+    assert_eq!(app.session.editing_lang_bidi, None);
+}

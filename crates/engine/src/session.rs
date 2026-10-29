@@ -199,6 +199,10 @@ pub struct Session {
     /// `None` is WordCraft's default, US English. The front end sets it from the interface
     /// language with [`Session::set_editing_language`] (a Polish interface writes Polish).
     pub editing_lang: Option<String>,
+    /// The language of right-to-left text in new blank documents (`w:lang w:bidi`); `None` leaves
+    /// it unset, which proofs Arabic-script words as Arabic. Set with
+    /// [`Session::set_editing_bidi_language`] (a Persian interface writes Persian).
+    pub editing_lang_bidi: Option<String>,
     /// Editing inside an equation: which one and the caret in it.
     pub math: Option<MathEdit>,
     /// Equations are typed in LaTeX rather than the linear format.

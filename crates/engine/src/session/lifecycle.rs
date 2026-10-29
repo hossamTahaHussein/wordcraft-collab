@@ -155,6 +155,7 @@ impl Session {
             keymap: crate::KeyMap::default(),
             ribbon: crate::RibbonLayout::default(),
             editing_lang: None,
+            editing_lang_bidi: None,
             read_aloud: Default::default(),
             password,
             #[cfg(not(target_arch = "wasm32"))]

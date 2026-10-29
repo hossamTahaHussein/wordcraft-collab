@@ -1,18 +1,25 @@
 use super::{CharProps, Document, Paragraph, ResolvedChar};
 
 /// One run's proofing: its bytes in the paragraph, its language (`w:lang`, resolved through the
-/// styles: the document default, paragraph and character styles, direct formatting) and whether
-/// it is left unchecked ("Do not check spelling or grammar", hidden text, hyperlinks).
+/// styles: the document default, paragraph and character styles, direct formatting), the
+/// language of its right-to-left words (`w:lang w:bidi`, when set) and whether it is left
+/// unchecked ("Do not check spelling or grammar", hidden text, hyperlinks).
 #[derive(Clone, Debug, PartialEq)]
 pub struct ProofRun {
     pub range: std::ops::Range<usize>,
     pub lang: wordcraft_proof::ProofLang,
+    pub bidi: Option<wordcraft_proof::ProofLang>,
     pub skip: bool,
 }
 
 impl ProofRun {
     pub(super) fn of(range: std::ops::Range<usize>, rc: &ResolvedChar) -> ProofRun {
-        ProofRun { range, lang: wordcraft_proof::ProofLang::from_tag(rc.lang.as_deref()), skip: rc.no_proof || rc.hidden || rc.link.is_some() }
+        ProofRun {
+            range,
+            lang: wordcraft_proof::ProofLang::from_tag(rc.lang.as_deref()),
+            bidi: rc.lang_bidi.as_deref().map(|t| wordcraft_proof::ProofLang::from_tag(Some(t))),
+            skip: rc.no_proof || rc.hidden || rc.link.is_some(),
+        }
     }
 }
 
@@ -46,8 +53,9 @@ pub fn paragraph_issues(
     }
     let text = proof_text(p);
     let spans: Vec<(std::ops::Range<usize>, wordcraft_proof::ProofLang)> = runs.iter().map(|r| (r.range.clone(), r.lang)).collect();
+    let bidi: Vec<(std::ops::Range<usize>, wordcraft_proof::ProofLang)> = runs.iter().filter_map(|r| Some((r.range.clone(), r.bidi?))).collect();
     let skip = |a: usize, b: usize| runs.iter().any(|r| r.skip && r.range.start < b && a < r.range.end);
-    wordcraft_proof::check_text_with(&text, &spans, spelling, grammar, list_item).into_iter().filter(|i| !skip(i.start, i.end)).collect()
+    wordcraft_proof::check_text_bidi(&text, &spans, &bidi, spelling, grammar, list_item).into_iter().filter(|i| !skip(i.start, i.end)).collect()
 }
 
 /// Whether the paragraph is a list item: its own numbering, or its style's, names a list (not 0).

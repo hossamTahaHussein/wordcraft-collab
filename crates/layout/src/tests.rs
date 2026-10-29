@@ -7907,6 +7907,24 @@ fn hyphenation_and_proofing_follow_each_runs_language() {
     assert_eq!(issues[1].lang, wordcraft_proof::ProofLang::En);
 }
 
+/// Arabic-script words are proofed in the run's right-to-left language (`w:lang w:bidi`), Arabic
+/// when none is set, as in Word; Persian (no dictionary) gets no marks.
+#[test]
+fn arabic_script_words_follow_the_right_to_left_language() {
+    let text = "I read الكتبب and الكتاب today";
+    let mut d = Document::from_text(text);
+    let flagged = |d: &Document| {
+        let p = d.para(StoryRef::Body, &Path::top(0)).unwrap();
+        let issues = para::paragraph_issues(p, &para::proof_runs(d, p, None), &Default::default(), false, false);
+        issues.iter().map(|i| (text[i.start..i.end].to_string(), i.lang)).collect::<Vec<_>>()
+    };
+    assert_eq!(flagged(&d), [("الكتبب".to_string(), wordcraft_proof::ProofLang::Ar)]);
+    d.format_range(&Pos::body(0, 0), &Pos::body(0, text.len()), &|c| c.lang_bidi = Some("fa-IR".into())).unwrap();
+    assert_eq!(flagged(&d), []);
+    d.format_range(&Pos::body(0, 0), &Pos::body(0, text.len()), &|c| c.lang_bidi = Some("ar-EG".into())).unwrap();
+    assert_eq!(flagged(&d).len(), 1);
+}
+
 /// A list item may be a fragment: the drawn squiggles skip its first word's missing capital, a
 /// plain paragraph's keep it (#1741). The list comes from the paragraph's own numbering or its
 /// style's; a paragraph that switches the style's list off (`num: 0`) is plain again.

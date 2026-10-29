@@ -8610,6 +8610,27 @@ fn new_documents_follow_the_editing_language() {
     assert_eq!(s.editing_lang, None);
 }
 
+/// The right-to-left editing language (an Arabic or Persian interface's): new blank documents
+/// write their right-to-left text in it (`w:lang w:bidi`), so Persian words aren't checked
+/// against the Arabic dictionary; a document with changes keeps its own.
+#[test]
+fn new_documents_follow_the_right_to_left_editing_language() {
+    let mut s = s();
+    s.set_editing_bidi_language(Some("fa-IR"));
+    assert_eq!(s.doc.styles.default_chr.lang_bidi.as_deref(), Some("fa-IR"), "the untouched blank document switches");
+    assert!(!s.dirty && !s.can_undo(), "no change to save or undo");
+    run(&mut s, "text.insert", json!({"text": "می‌خواهم کتابها را بخوانم"}));
+    assert_eq!(run(&mut s, "review.issues", json!({})), json!([]), "Persian words aren't Arabic misspellings");
+    s.set_editing_bidi_language(Some("ar-SA"));
+    assert_eq!(s.doc.styles.default_chr.lang_bidi.as_deref(), Some("fa-IR"), "a document with changes keeps its language");
+    run(&mut s, "file.new", json!({}));
+    assert_eq!(s.doc.styles.default_chr.lang_bidi.as_deref(), Some("ar-SA"));
+    run(&mut s, "text.insert", json!({"text": "الكتبب"}));
+    assert_eq!(run(&mut s, "review.issues", json!({})).as_array().map(Vec::len), Some(1), "Arabic is checked");
+    s.set_editing_bidi_language(Some("not a tag"));
+    assert_eq!(s.editing_lang_bidi, None);
+}
+
 /// #2882: Set As Default survives preference serialization and overrides the interface language.
 #[test]
 fn default_proofing_language_survives_a_restart() {

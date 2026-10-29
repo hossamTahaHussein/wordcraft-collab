@@ -39,6 +39,10 @@ Generated-in-code art is original and has no file to list: the UI icon set (`cra
 | `assets/fonts/NotoSansHebrew-Regular.ttf` | Google / Noto project | https://github.com/notofonts/hebrew/releases/tag/NotoSansHebrew-v3.001 (via storytold/craft-fonts) | OFL-1.1 (`assets/fonts/OFL-NotoSansHebrew.txt`) | Hebrew text in documents and the interface |
 | `assets/fonts/OFL-NotoSansArabic.txt` | Google / Noto project | as above | OFL-1.1 | Licence of Noto Sans Arabic |
 | `assets/fonts/OFL-NotoSansHebrew.txt` | Google / Noto project | as above | OFL-1.1 | Licence of Noto Sans Hebrew |
+| `assets/proofing/ar/ar.aff` | Mohamed Kebdani, Taha Zerrouki and the Ayaspell project | https://github.com/LibreOffice/dictionaries/tree/10e0418ad6a7e1c519cbcf6b9329f0940bd07c9f/ar (Ayaspell, http://ayaspell.sourceforge.net/) | MPL-2.0 (offered as GPL-2.0-or-later / LGPL-2.1-or-later / MPL-1.1-or-later; used under the MPL; `assets/proofing/ar/COPYING.txt`) | Arabic spelling rules |
+| `assets/proofing/ar/ar.dic` | Mohamed Kebdani, Taha Zerrouki and the Ayaspell project | as above | as above | Arabic spelling dictionary |
+| `assets/proofing/ar/COPYING.txt` | Ayaspell project | as above | as above | Licence of the Arabic dictionary |
+| `assets/proofing/ar/AUTHORS.txt` | Ayaspell project | as above | as above | Authors of the Arabic dictionary |
 | `assets/fonts/Inter-Medium.ttf` | Rasmus Andersson / The Inter Project Authors | https://github.com/rsms/inter | OFL-1.1 (`assets/fonts/OFL-Inter.txt`) | Open-source typeface (Latin UI/document font, carried over from DesignCraft) |
 | `assets/fonts/Inter-Regular.ttf` | Rasmus Andersson / The Inter Project Authors | https://github.com/rsms/inter | OFL-1.1 (`assets/fonts/OFL-Inter.txt`) | Open-source typeface (Latin UI/document font, carried over from DesignCraft) |
 | `assets/fonts/Inter-SemiBold.ttf` | Rasmus Andersson / The Inter Project Authors | https://github.com/rsms/inter | OFL-1.1 (`assets/fonts/OFL-Inter.txt`) | Open-source typeface (Latin UI/document font, carried over from DesignCraft) |

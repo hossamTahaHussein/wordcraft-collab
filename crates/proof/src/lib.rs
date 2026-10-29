@@ -50,6 +50,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 pub mod affix;
+pub mod ar;
 pub mod bg;
 pub mod cs;
 pub mod dict;
@@ -490,7 +491,8 @@ fn accepted_by_options(word: &str, opts: &Options) -> bool {
     w.chars().count() <= 1
         || !w.chars().any(char::is_alphabetic)
         || (opts.ignore_numbers && w.chars().any(|c| c.is_ascii_digit()))
-        || (opts.ignore_uppercase && w.chars().all(|c| !c.is_lowercase()))
+        // A script without case (Arabic) has no words in capitals.
+        || (opts.ignore_uppercase && w.chars().any(char::is_uppercase) && w.chars().all(|c| !c.is_lowercase()))
         // The whole word: the languages split a hyphenated word into its parts, and an added
         // `Unigranrio-RJ` is none of them (#2082).
         || in_user_dictionary(&w.to_lowercase())
@@ -683,7 +685,7 @@ pub fn check_spelling(text: &str) -> Vec<Issue> {
 
 /// [`check_spelling`] with the File › Options › Proofing choices.
 pub fn check_spelling_with(text: &str, opts: &Options) -> Vec<Issue> {
-    spelling_issues(text, |_| ProofLang::En, opts)
+    spelling_issues(text, |_, _| ProofLang::En, opts)
 }
 
 /// Spelling issues in a paragraph of text in `lang` (none for a language without a dictionary;
@@ -692,7 +694,7 @@ pub fn check_spelling_in(text: &str, lang: ProofLang) -> Vec<Issue> {
     if !lang.is_proofed() {
         return Vec::new();
     }
-    spelling_issues(text, |_| lang, &Options::default())
+    spelling_issues(text, |_, _| lang, &Options::default())
 }
 
 /// Spelling issues of every word of `text`, each word spelled in `lang(word_start)`.
@@ -701,7 +703,7 @@ pub fn check_spelling_in(text: &str, lang: ProofLang) -> Vec<Issue> {
 /// once per token and shared by every word punctuation splits out of it. Classifying per word
 /// rescanned the token each time, so a long whitespace-free run of punctuation-separated words
 /// cost quadratic scanning (#1335).
-fn spelling_issues(text: &str, lang: impl Fn(usize) -> ProofLang, opts: &Options) -> Vec<Issue> {
+fn spelling_issues(text: &str, lang: impl Fn(usize, &str) -> ProofLang, opts: &Options) -> Vec<Issue> {
     let mut token = (0, 0, false);
     words(text)
         .into_iter()
@@ -709,7 +711,7 @@ fn spelling_issues(text: &str, lang: impl Fn(usize) -> ProofLang, opts: &Options
             if a < token.0 || a >= token.1 {
                 token = enclosing_token(text, a, b);
             }
-            spelling_issue(text, a, b, lang(a), opts, token.2)
+            spelling_issue(text, a, b, lang(a, text.get(a..b).unwrap_or("")), opts, token.2)
         })
         .collect()
 }
@@ -749,6 +751,7 @@ fn spelling_issue(text: &str, a: usize, b: usize, lang: ProofLang, opts: &Option
         ProofLang::Cs => "Možná pravopisná chyba",
         ProofLang::Id => "Kemungkinan salah eja",
         ProofLang::Es | ProofLang::EsMx | ProofLang::Es419 | ProofLang::EsUy => "Posible error ortográfico",
+        ProofLang::Ar => "خطأ إملائي محتمل",
         _ => "Possible spelling mistake",
     };
     Some(Issue { start: a, end: b, kind: IssueKind::Spelling, message: message.into(), suggestions: Vec::new(), lang })
@@ -787,6 +790,7 @@ pub fn is_correct_in_with(word: &str, lang: ProofLang, opts: &Options) -> bool {
         }
         ProofLang::Cs => accepted_by_options(word, opts) || cs::is_correct_with_options(word, opts),
         ProofLang::Id => accepted_by_options(word, opts) || id::is_correct_with_options(word, opts),
+        ProofLang::Ar => accepted_by_options(word, opts) || ar::is_correct(word),
         ProofLang::Bg | ProofLang::De | ProofLang::Other => true,
     }
 }
@@ -806,6 +810,7 @@ pub fn suggest_in(word: &str, max: usize, lang: ProofLang) -> Vec<String> {
         ProofLang::Cs => cs::suggest(word, max),
         ProofLang::Id => id::suggest(word, max),
         ProofLang::Es | ProofLang::EsMx | ProofLang::Es419 | ProofLang::EsUy => es::suggest(word, max, lang),
+        ProofLang::Ar => ar::suggest(word, max),
         ProofLang::Bg | ProofLang::De | ProofLang::Other => Vec::new(),
     }
 }
@@ -835,7 +840,7 @@ fn grammar_in(text: &str, lang: ProofLang, capital_first: bool) -> Vec<Issue> {
         ProofLang::Id => id::grammar::check(text),
         // Spanish has no sentence-capital rule either.
         ProofLang::Es | ProofLang::EsMx | ProofLang::Es419 | ProofLang::EsUy => es::grammar::check(text, lang),
-        ProofLang::Bg | ProofLang::De | ProofLang::Other => Vec::new(),
+        ProofLang::Ar | ProofLang::Bg | ProofLang::De | ProofLang::Other => Vec::new(),
     }
 }
 
@@ -855,6 +860,20 @@ pub fn check_text(text: &str, spans: &[(Range<usize>, ProofLang)]) -> Vec<Issue>
 /// `list_item` marks a list paragraph: items are often fragments, so the English rule asking for
 /// a capital on the paragraph's first word is off for it (later sentences are still checked).
 pub fn check_text_with(text: &str, spans: &[(Range<usize>, ProofLang)], opts: &Options, grammar: bool, list_item: bool) -> Vec<Issue> {
+    check_text_bidi(text, spans, &[], opts, grammar, list_item)
+}
+
+/// [`check_text_with`] where `bidi` gives the right-to-left language of byte ranges (`w:lang
+/// w:bidi`, in order, not overlapping): Arabic-script words are spelled in it, in Arabic where
+/// none is given (Word's default).
+pub fn check_text_bidi(
+    text: &str,
+    spans: &[(Range<usize>, ProofLang)],
+    bidi: &[(Range<usize>, ProofLang)],
+    opts: &Options,
+    grammar: bool,
+    list_item: bool,
+) -> Vec<Issue> {
     // Sorted, empty ones dropped, neighbours of one language merged.
     let mut sorted: Vec<&(Range<usize>, ProofLang)> = spans.iter().filter(|(r, _)| r.start < r.end).collect();
     sorted.sort_by_key(|s| s.0.start);
@@ -879,7 +898,13 @@ pub fn check_text_with(text: &str, spans: &[(Range<usize>, ProofLang)], opts: &O
         let k = merged.partition_point(|(r, _)| r.end <= i);
         merged.get(k).filter(|(r, _)| r.start <= i).map_or(default, |s| s.1)
     };
-    let mut v: Vec<Issue> = spelling_issues(text, lang_at, opts);
+    // An Arabic-script word is spelled in the right-to-left language, Arabic unless one is given.
+    let bidi_at = |i: usize| -> ProofLang {
+        let k = bidi.partition_point(|(r, _)| r.end <= i);
+        bidi.get(k).filter(|(r, _)| r.start <= i).map_or(ProofLang::Ar, |s| s.1)
+    };
+    let word_lang = |i: usize, w: &str| if ar::is_arabic_script(w) { bidi_at(i) } else { lang_at(i) };
+    let mut v: Vec<Issue> = spelling_issues(text, word_lang, opts);
     if !grammar {
         v.sort_by_key(|i| (i.start, i.end));
         return v;
@@ -1041,10 +1066,11 @@ mod tests {
             assert_eq!(dictionary_needed(l, false), Some(name), "{l:?}");
             assert_eq!(dictionary_needed(l, true), None, "{l:?}");
         }
-        // Every proofed language other than English has a Hunspell dictionary to report.
+        // Every proofed language other than English and Arabic (bundled dictionaries) has a
+        // Hunspell dictionary to report.
         for l in ProofLang::PROOFED {
-            let english = matches!(l, ProofLang::En | ProofLang::EnGb | ProofLang::EnCa);
-            assert_eq!(dictionary_needed(l, false).is_some(), !english, "{l:?}");
+            let bundled = matches!(l, ProofLang::En | ProofLang::EnGb | ProofLang::EnCa | ProofLang::Ar);
+            assert_eq!(dictionary_needed(l, false).is_some(), !bundled, "{l:?}");
         }
         for l in [ProofLang::En, ProofLang::Bg, ProofLang::De, ProofLang::Other] {
             assert_eq!(dictionary_needed(l, false), None);

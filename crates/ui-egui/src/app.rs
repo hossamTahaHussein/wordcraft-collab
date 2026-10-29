@@ -232,6 +232,7 @@ impl WordApp {
         };
         if self.applied_editing.as_ref().is_none_or(|(l, e)| *l != lang || *e != editing) {
             self.session.set_editing_language(editing.as_deref());
+            self.session.set_editing_bidi_language(lang.editing_lang_bidi());
             self.applied_editing = Some((lang, editing));
         }
         options::sync(self);

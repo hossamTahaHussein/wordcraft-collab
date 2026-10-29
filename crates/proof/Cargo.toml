@@ -3,7 +3,7 @@ name = "wordcraft-proof"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "WordCraft proofing per language: spelling, suggestions, grammar checks and hyphenation for English (public-domain word list) and Polish (installed Hunspell dictionary, TeX patterns)"
+description = "WordCraft proofing per language: spelling, suggestions, grammar checks and hyphenation for English (public-domain word list), Arabic (bundled Ayaspell dictionary) and Polish (installed Hunspell dictionary, TeX patterns)"
 
 [lints]
 workspace = true
@@ -11,7 +11,11 @@ workspace = true
 [dependencies]
 log = { workspace = true }
 miniz_oxide = "0.9"
+spellbook = "0.4.2"
 unicode-normalization = "0.1"
+
+[build-dependencies]
+miniz_oxide = "0.9"
 
 [dev-dependencies]
 proptest = { workspace = true }
