@@ -15,6 +15,8 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 #[cfg(any(target_arch = "wasm32", test))]
+mod api;
+#[cfg(any(target_arch = "wasm32", test))]
 mod collab_link;
 #[cfg(any(target_arch = "wasm32", test))]
 mod prefs;

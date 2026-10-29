@@ -66,6 +66,8 @@ pub struct CollabLink {
     presence_waiting: bool,
     /// The time of the last tick, for marking who typed.
     now: f64,
+    /// The names of the people whose edits were applied since [`CollabLink::take_edited_by`].
+    edited_by: Vec<String>,
 }
 
 impl CollabLink {
@@ -83,6 +85,7 @@ impl CollabLink {
             sent: None,
             presence_waiting: false,
             now: 0.0,
+            edited_by: Vec::new(),
         }
     }
 
@@ -247,6 +250,11 @@ impl CollabLink {
             .collect()
     }
 
+    /// The names of the people whose edits were applied since the last call, in order.
+    pub fn take_edited_by(&mut self) -> Vec<String> {
+        std::mem::take(&mut self.edited_by)
+    }
+
     /// The selection moved but wasn't sent yet: the host should tick again shortly, even
     /// without input.
     pub fn presence_pending(&self) -> bool {
@@ -285,6 +293,9 @@ impl CollabLink {
         }
         let me = self.you.clone().unwrap_or_default();
         for m in moved {
+            if let Some(p) = self.peers.get(&m.client).filter(|_| m.client != me) {
+                self.edited_by.push(p.name.clone());
+            }
             if m.client == me {
                 // Others saw this person's caret move with the edit: say again where it is.
                 self.sent = None;
@@ -1057,5 +1068,52 @@ mod presence_review_tests {
         link.on_message(&json!({"t": "Resync", "rev": 0, "snapshot": snap("Hello world"), "ops": []}).to_string(), &mut s);
         link.tick(&mut s, 10.0);
         assert_eq!(off(&link, &s, "a"), Some(6));
+    }
+}
+
+#[cfg(test)]
+mod api_tests {
+    use serde_json::json;
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    fn joined() -> (CollabLink, Session) {
+        let mut base = Session::new(Document::new());
+        base.run("text.insert", &json!({"text": "Hello"})).unwrap();
+        let snap = String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &base.doc).unwrap()).unwrap();
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        let peers = json!([{"client": "a", "user": "Ann", "color": 2}]);
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap, "ops": [], "you": "me", "peers": peers}).to_string(), &mut s);
+        link.tick(&mut s, 0.0);
+        (link, s)
+    }
+
+    fn ann_types(rev: u64, at: usize, text: &str) -> String {
+        json!({"t": "Op", "client": "a", "seq": rev, "base": rev - 1, "kind": "cmd", "cmd": "text.insert", "params": {"text": text},
+            "sel": {"story": "body", "anchor": at, "head": at}, "ctx": {}, "rev": rev})
+        .to_string()
+    }
+
+    /// Read only (Viewing) refuses this person's edits, not other people's.
+    #[test]
+    fn viewing_still_receives_remote_edits() {
+        let (mut link, mut s) = joined();
+        s.run("view.viewing", &json!({"value": true})).unwrap();
+        link.on_message(&ann_types(1, 5, "!"), &mut s);
+        link.tick(&mut s, 10.0);
+        assert_eq!(s.doc.plain_text(StoryRef::Body), "Hello!");
+        assert!(s.run("text.insert", &json!({"text": "x"})).is_err());
+    }
+
+    #[test]
+    fn take_edited_by_names_remote_authors() {
+        let (mut link, mut s) = joined();
+        assert!(link.take_edited_by().is_empty());
+        link.on_message(&ann_types(1, 5, "!"), &mut s);
+        assert_eq!(link.take_edited_by(), ["Ann"]);
+        assert!(link.take_edited_by().is_empty(), "taken once");
     }
 }
