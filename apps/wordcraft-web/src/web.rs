@@ -108,7 +108,16 @@ pub fn start() {
                     // `?collab=1`: co-editing through the parent page (`collab_link`).
                     let collab = (app_bridge.is_some() && query_param("collab").as_deref() == Some("1"))
                         .then(|| crate::collab_link::CollabLink::new(query_param("docName")));
-                    Ok(Box::new(WebShell { app, inbox, messages, prefs, collab, bridge: app_bridge.clone(), collab_status: (0, None, 1) }))
+                    Ok(Box::new(WebShell {
+                        app,
+                        inbox,
+                        messages,
+                        prefs,
+                        collab,
+                        bridge: app_bridge.clone(),
+                        collab_status: (0, None, 1),
+                        watcher: crate::api::Watcher::default(),
+                    }))
                 }),
             )
             .await;
@@ -147,6 +156,8 @@ struct WebShell {
     bridge: Option<crate::host::Bridge>,
     /// The co-editing status last posted to the parent (pending edits, revision).
     collab_status: (usize, Option<u64>, usize),
+    /// What the page's JavaScript API was last told (`crate::api::Watcher`).
+    watcher: crate::api::Watcher,
 }
 
 fn local_storage() -> Option<web_sys::Storage> {
@@ -210,6 +221,20 @@ impl eframe::App for WebShell {
             if status != self.collab_status {
                 self.collab_status = status;
                 bridge.post_collab_status(status.0, status.1, status.2);
+            }
+        }
+        // The page's JavaScript API: run its calls, then tell it what changed this frame.
+        if let Some(bridge) = self.bridge.as_ref() {
+            for (id, method, params) in bridge.take_calls() {
+                bridge.post_result(id, crate::api::call(&mut self.app, &method, &params));
+            }
+            let (rev, edited_by) = match self.collab.as_mut() {
+                Some(link) => (link.rev().unwrap_or(0), link.take_edited_by()),
+                None => (self.app.session.rev(), Vec::new()),
+            };
+            let people: Vec<(String, u8)> = self.app.peers.iter().map(|p| (p.name.clone(), p.color)).collect();
+            for (event, detail) in self.watcher.events(&self.app, rev, &edited_by, &people) {
+                bridge.post_event(event, &detail);
             }
         }
         // Store changed preferences straight away: a reload or closed tab runs no exit code (#2132).

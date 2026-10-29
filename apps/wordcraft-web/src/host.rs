@@ -22,6 +22,12 @@
 //! - `wordcraft:collab` (both ways, with `?collab=1`): `{ msg }`, one co-editing relay message
 //!   as a JSON string (`wordcraft_collab::proto`); the parent carries them to and from the relay.
 //! - `wordcraft:collab.status` (to the parent): `{ pending, rev, people }` when any changes.
+//! - `wordcraft:call` (from the parent): `{ id, method, params }`, a JavaScript API call
+//!   (`crate::api::call`); answered with `wordcraft:result` `{ id, ok: true, result }` or
+//!   `{ id, ok: false, error }`. `getDocument` adds `name` and `bytes` (a transferred
+//!   `ArrayBuffer`).
+//! - `wordcraft:event` (to the parent): `{ event, detail }`, what changed this frame
+//!   (`crate::api::Watcher`): `change`, `selectionchange`, `presence` and `comment`.
 //!
 //! Only the parent window on the page's own origin is heard or answered. In host mode the parent
 //! guards leaving the page, and `?author=` names the user for comments and tracked changes.
@@ -45,6 +51,8 @@ pub struct Bridge {
     origin: String,
     /// Co-editing messages from the parent, waiting for the next frame.
     collab: Rc<RefCell<VecDeque<String>>>,
+    /// API calls from the parent (id, method, params), waiting for the next frame.
+    calls: Rc<RefCell<VecDeque<(f64, String, serde_json::Value)>>>,
 }
 
 impl Bridge {
@@ -66,7 +74,7 @@ impl Bridge {
         if parent.location().origin().ok()? != origin {
             return None;
         }
-        Some(Self { window, parent, origin, collab: Rc::default() })
+        Some(Self { window, parent, origin, collab: Rc::default(), calls: Rc::default() })
     }
 
     /// Hand saved and exported files to the parent instead of downloading them, report unsaved
@@ -121,6 +129,42 @@ impl Bridge {
             .map_err(|e| e.as_string().unwrap_or_else(|| format!("{e:?}")))
     }
 
+    /// The API calls the parent sent since the last frame.
+    pub fn take_calls(&self) -> Vec<(f64, String, serde_json::Value)> {
+        self.calls.borrow_mut().drain(..).collect()
+    }
+
+    /// Answer API call `id`; a file goes as a transferred `ArrayBuffer`.
+    pub fn post_result(&self, id: f64, reply: Result<crate::api::Reply, String>) {
+        let id = JsValue::from_f64(id);
+        let sent = match reply {
+            Ok(crate::api::Reply { result, file }) => {
+                let result = js_sys::JSON::parse(&result.to_string()).unwrap_or(JsValue::NULL);
+                let mut fields = vec![("type", "wordcraft:result".into()), ("id", id), ("ok", true.into()), ("result", result)];
+                match file {
+                    Some((name, bytes)) => {
+                        let buffer = js_sys::Uint8Array::from(bytes.as_slice()).buffer();
+                        fields.push(("name", name.as_str().into()));
+                        fields.push(("bytes", buffer.clone().into()));
+                        message(&fields)
+                            .is_some_and(|m| self.parent.post_message_with_transfer(&m, &self.origin, &js_sys::Array::of1(&buffer)).is_ok())
+                    }
+                    None => self.send(&fields),
+                }
+            }
+            Err(error) => self.send(&[("type", "wordcraft:result".into()), ("id", id), ("ok", false.into()), ("error", error.as_str().into())]),
+        };
+        if !sent {
+            log::warn!("api: couldn't answer a call");
+        }
+    }
+
+    /// Tell the parent what changed (`wordcraft:event`).
+    pub fn post_event(&self, event: &str, detail: &serde_json::Value) {
+        let detail = js_sys::JSON::parse(&detail.to_string()).unwrap_or(JsValue::NULL);
+        self.send(&[("type", "wordcraft:event".into()), ("event", event.into()), ("detail", detail)]);
+    }
+
     /// The co-editing messages the parent sent since the last call.
     pub fn take_collab(&self) -> Vec<String> {
         self.collab.borrow_mut().drain(..).collect()
@@ -148,6 +192,7 @@ impl Bridge {
         let parent = self.parent.clone();
         let origin = self.origin.clone();
         let collab = self.collab.clone();
+        let calls = self.calls.clone();
         let on_message = Closure::<dyn FnMut(web_sys::MessageEvent)>::new(move |event: web_sys::MessageEvent| {
             if event.origin() != origin || !event.source().is_some_and(|s| js_sys::Object::is(&s, &parent)) {
                 return;
@@ -155,6 +200,22 @@ impl Bridge {
             let data = event.data();
             match string(&data, "type").as_deref() {
                 Some("wordcraft:open") => {}
+                Some("wordcraft:call") => {
+                    let id = js_sys::Reflect::get(&data, &JsValue::from_str("id")).ok().and_then(|v| v.as_f64());
+                    let method = string(&data, "method");
+                    let params = js_sys::Reflect::get(&data, &JsValue::from_str("params"))
+                        .ok()
+                        .filter(|p| p.is_object())
+                        .and_then(|p| js_sys::JSON::stringify(&p).ok())
+                        .and_then(|p| p.as_string())
+                        .and_then(|p| serde_json::from_str(&p).ok())
+                        .unwrap_or_else(|| serde_json::json!({}));
+                    if let (Some(id), Some(method)) = (id, method) {
+                        calls.borrow_mut().push_back((id, method, params));
+                        ctx.request_repaint();
+                    }
+                    return;
+                }
                 Some("wordcraft:collab") => {
                     if let Some(msg) = string(&data, "msg") {
                         collab.borrow_mut().push_back(msg);
