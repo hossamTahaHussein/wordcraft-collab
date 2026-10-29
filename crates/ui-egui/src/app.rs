@@ -219,6 +219,13 @@ impl WordApp {
         updates_ui::tick(self, ctx);
         let lang = i18n::Lang::from_pref(&self.ui.language);
         i18n::set_current(lang);
+        // A right-to-left interface language mirrors the window (Word's Arabic and Hebrew
+        // versions). Checked each frame: a theme install can replace egui's style.
+        let dir = craft_ui::direction::resolve(lang.code(), craft_ui::direction::Setting::Language);
+        let rtl = dir == craft_ui::direction::Direction::Rtl;
+        if craft_ui::direction::is_rtl(ctx) != rtl || ctx.global_style().right_to_left != rtl {
+            craft_ui::direction::apply(ctx, dir);
+        }
         // New documents are written in the interface's language when WordCraft can proof it
         // (a Polish interface: Polish spelling, grammar and hyphenation from the first word).
         // An English interface writes the region's English (English (UK) on a British system,
