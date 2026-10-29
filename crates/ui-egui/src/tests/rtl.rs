@@ -28,7 +28,8 @@ fn click(app: &mut WordApp, ctx: &egui::Context, width: f32, at: egui::Pos2) -> 
             egui::Event::PointerMoved(at),
             egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed, modifiers: Default::default() },
         ];
-        let input = egui::RawInput { screen_rect: Some(screen), time: Some(10.0 + i as f64 / 60.0), events, ..Default::default() };
+        let time = ctx.input(|inp| inp.time) + (i + 1) as f64 / 60.0;
+        let input = egui::RawInput { screen_rect: Some(screen), time: Some(time), events, ..Default::default() };
         let mut out = ctx.run_ui(input, |ui| {
             app.logic(ui.ctx());
             app.ui(ui);
@@ -43,7 +44,9 @@ fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) 
     let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, height));
     let mut shapes = Vec::new();
     for i in 0..4 {
-        let input = egui::RawInput { screen_rect: Some(screen), time: Some(f64::from(i) / 60.0), ..Default::default() };
+        // The clock only moves on (egui checks in debug builds).
+        let time = ctx.input(|inp| inp.time) + f64::from(i + 1) / 60.0;
+        let input = egui::RawInput { screen_rect: Some(screen), time: Some(time), ..Default::default() };
         let mut out = ctx.run_ui(input, |ui| {
             app.logic(ui.ctx());
             app.ui(ui);
