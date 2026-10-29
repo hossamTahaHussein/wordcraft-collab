@@ -21,8 +21,8 @@ use wordcraft_doc::{Document, Pos, StoryRef};
 use wordcraft_engine::{Selection, Session};
 
 use crate::hash::{HASH_EVERY, doc_hash};
-use crate::mapping::{Span, changed_stories, map, span};
-use crate::proto::{Anchor, Op, OpKind, Outbound};
+use crate::mapping::{Span, changed_stories, map, span, span_near};
+use crate::proto::{Anchor, HistEntry, HistSpan, Op, OpKind, Outbound};
 
 /// How many revisions of changes a replica keeps for moving late edits' selections; an edit
 /// whose base is older needs a resync.
@@ -49,6 +49,8 @@ pub enum Applied {
     /// Someone else's edit; `dropped_pending` of this person's unconfirmed edits could no longer
     /// be applied after it and were dropped.
     Remote { dropped_pending: usize },
+    /// An edit this replica already has (sent again after a reconnect): nothing to do.
+    Duplicate,
 }
 
 /// The changes each recent revision made, per story.
@@ -60,6 +62,27 @@ struct History {
 }
 
 impl History {
+    /// The history a snapshot at `rev` carried.
+    fn from_entries(rev: u64, entries: Vec<HistEntry>) -> History {
+        let entries: Vec<HistEntry> = entries.into_iter().filter(|e| e.rev <= rev).collect();
+        let oldest = entries.first().map_or(rev, |e| e.rev.saturating_sub(1));
+        let revs = entries
+            .into_iter()
+            .map(|e| (e.rev, e.spans.into_iter().map(|s| (s.story, Span { start: s.start, old_end: s.old_end, new_end: s.new_end })).collect()))
+            .collect();
+        History { oldest, revs }
+    }
+
+    fn entries(&self) -> Vec<HistEntry> {
+        self.revs
+            .iter()
+            .map(|(rev, spans)| HistEntry {
+                rev: *rev,
+                spans: spans.iter().map(|(story, s)| HistSpan { story: *story, start: s.start, old_end: s.old_end, new_end: s.new_end }).collect(),
+            })
+            .collect()
+    }
+
     fn push(&mut self, rev: u64, spans: Vec<(StoryRef, Span)>) {
         self.revs.push_back((rev, spans));
         while self.revs.len() > HISTORY_REVS {
@@ -105,6 +128,12 @@ pub struct Replica {
 impl Replica {
     /// Start from the relay's snapshot at `rev` and the edits after it.
     pub fn join(client: String, rev: u64, snapshot: Document, tail: Vec<Op>) -> Result<Replica, CollabError> {
+        Self::join_with_history(client, rev, snapshot, Vec::new(), tail)
+    }
+
+    /// [`Replica::join`] with the changes of the revisions before the snapshot, so edits in
+    /// `tail` based on an earlier revision can be placed.
+    pub fn join_with_history(client: String, rev: u64, snapshot: Document, history: Vec<HistEntry>, tail: Vec<Op>) -> Result<Replica, CollabError> {
         let mut replica = Replica {
             client,
             rev,
@@ -113,7 +142,7 @@ impl Replica {
             pending: VecDeque::new(),
             in_flight: false,
             next_seq: 1,
-            history: History { oldest: rev, revs: VecDeque::new() },
+            history: History::from_entries(rev, history),
             hashed: rev,
         };
         for op in tail {
@@ -162,7 +191,7 @@ impl Replica {
     pub fn snapshot(&self) -> Result<Outbound, CollabError> {
         let bytes = wordcraft_engine::io::save_bytes("doc.json", &self.confirmed.doc).map_err(CollabError::Snapshot)?;
         let doc = String::from_utf8(bytes).map_err(|e| CollabError::Snapshot(e.to_string()))?;
-        Ok(Outbound::Snapshot { rev: self.rev, doc })
+        Ok(Outbound::Snapshot { rev: self.rev, doc, history: self.history.entries() })
     }
 
     /// Turn the edits the person just made in `visible` into pending ops.
@@ -204,6 +233,9 @@ impl Replica {
 
     /// Apply an op from the relay.
     pub fn receive(&mut self, op: Op, visible: &mut Session) -> Result<Applied, CollabError> {
+        if op.rev.is_some_and(|r| r <= self.rev) {
+            return Ok(Applied::Duplicate);
+        }
         self.check_next(&op)?;
         // Edits the person made since the host last collected them were made on the visible
         // document as it is now: take them before it is rebuilt.
@@ -222,8 +254,20 @@ impl Replica {
         }
         let before = self.confirmed.doc.clone();
         let spans = self.apply_confirmed(&op)?;
-        let dropped_pending = if self.pending.is_empty() { self.follow(visible, &spans) } else { self.rebuild(visible, before) };
+        let hint = spans.iter().find(|(story, _)| *story == op.sel.story).map(|(story, s)| (*story, s.start));
+        let dropped_pending = if self.pending.is_empty() { self.follow(visible, &spans) } else { self.rebuild(visible, before, hint) };
         Ok(Applied::Remote { dropped_pending })
+    }
+
+    /// Skip revision `rev`, which no replica could read (a malformed edit): every replica skips
+    /// it the same way, as an edit that changed nothing.
+    pub fn skip(&mut self, rev: u64) -> Result<(), CollabError> {
+        if rev != self.rev + 1 {
+            return Err(CollabError::Gap { have: self.rev, got: rev });
+        }
+        self.rev = rev;
+        self.history.push(rev, Vec::new());
+        Ok(())
     }
 
     /// After a reconnect (`Welcome`) or a `Resync`: start again from `snapshot` at `rev` if
@@ -233,20 +277,20 @@ impl Replica {
     pub fn resume(
         &mut self,
         rev: u64,
-        snapshot: Option<Document>,
+        snapshot: Option<(Document, Vec<HistEntry>)>,
         tail: Vec<Op>,
         seen: Option<u64>,
         visible: &mut Session,
     ) -> Result<Vec<Op>, CollabError> {
         self.drain_local(visible);
         self.in_flight = false;
-        if let Some(doc) = snapshot {
+        if let Some((doc, history)) = snapshot {
             let before = std::mem::replace(&mut self.confirmed, headless(doc)).doc;
             self.rev = rev;
-            self.history = History { oldest: rev, revs: VecDeque::new() };
+            self.history = History::from_entries(rev, history);
             self.hashed = rev;
             let seen = seen.unwrap_or(0);
-            self.rebuild_skipping(visible, before, |op| op.seq <= seen);
+            self.rebuild_skipping(visible, before, None, |op| op.seq <= seen);
         }
         for op in tail {
             if op.rev.is_some_and(|r| r <= self.rev) {
@@ -272,7 +316,7 @@ impl Replica {
         let before = self.confirmed.doc.clone();
         // A command that fails here fails on every replica: it is skipped everywhere.
         let _ = run_at(&mut self.confirmed, op, &sel);
-        let spans = spans_between(&before, &self.confirmed.doc);
+        let spans = spans_between(&before, &self.confirmed.doc, Some((sel.story, sel.anchor.min(sel.head))));
         self.rev += 1;
         self.history.push(self.rev, spans.clone());
         Ok(spans)
@@ -302,14 +346,24 @@ impl Replica {
     /// Rebuild the visible document as confirmed + pending, each pending edit's selection moved
     /// from the old chain (`before` + pending) to the new one. Returns how many pending edits
     /// failed and were dropped (an edit in flight is kept: the relay will confirm it).
-    fn rebuild(&mut self, visible: &mut Session, before: Document) -> usize {
-        self.rebuild_skipping(visible, before, |_| false)
+    fn rebuild(&mut self, visible: &mut Session, before: Document, hint: Option<(StoryRef, usize)>) -> usize {
+        self.rebuild_skipping(visible, before, hint, |_| false)
     }
 
     /// [`Self::rebuild`], where pending edits matching `confirmed_already` are part of the old
     /// chain but already in the confirmed document: they are replayed on the old chain only and
     /// leave the pending list.
-    fn rebuild_skipping(&mut self, visible: &mut Session, before: Document, confirmed_already: impl Fn(&Op) -> bool) -> usize {
+    ///
+    /// `hint`: where the remote change happened, in `before`'s offsets — it decides between
+    /// places a change of repeated letters could be (`mapping::span_near`), and follows the old
+    /// chain's own edits.
+    fn rebuild_skipping(
+        &mut self,
+        visible: &mut Session,
+        before: Document,
+        mut hint: Option<(StoryRef, usize)>,
+        confirmed_already: impl Fn(&Op) -> bool,
+    ) -> usize {
         let old_visible = visible.doc.clone();
         let caret = anchor_of(&old_visible, &visible.sel);
         self.scratch.doc = before;
@@ -319,9 +373,17 @@ impl Replica {
         let mut dropped = 0;
         for (i, mut op) in std::mem::take(&mut self.pending).into_iter().enumerate() {
             let story = op.sel.story;
-            let moved = span(&linear_text(&self.scratch.doc, story), &linear_text(&visible.doc, story));
+            let old_text = linear_text(&self.scratch.doc, story);
+            let moved = diff_near(&old_text, &linear_text(&visible.doc, story), story, hint);
             let new_sel = move_anchor(&op.sel, moved.as_ref());
             let _ = run_at(&mut self.scratch, &op, &op.sel.clone());
+            // The remote change's place moves with this edit on the old chain.
+            if let Some((hs, h)) = hint
+                && hs == story
+                && let Some(own) = span(&old_text, &linear_text(&self.scratch.doc, story))
+            {
+                hint = Some((hs, map(&own, h, false)));
+            }
             if confirmed_already(&op) {
                 continue;
             }
@@ -336,7 +398,7 @@ impl Replica {
         visible.set_recording(true);
         self.pending = kept;
         if let Some(a) = caret {
-            let moved = span(&linear_text(&old_visible, a.story), &linear_text(&visible.doc, a.story));
+            let moved = diff_near(&linear_text(&old_visible, a.story), &linear_text(&visible.doc, a.story), a.story, hint);
             visible.sel = selection_at(&visible.doc, &move_anchor(&a, moved.as_ref()));
         }
         visible.clamp_selection();
@@ -415,9 +477,18 @@ fn move_anchor(a: &Anchor, s: Option<&Span>) -> Anchor {
     }
 }
 
-fn spans_between(before: &Document, after: &Document) -> Vec<(StoryRef, Span)> {
+/// What changed in each story; in the story of `hint` (the edit's selection start), the change is
+/// placed there when it could be (`mapping::span_near`).
+fn spans_between(before: &Document, after: &Document, hint: Option<(StoryRef, usize)>) -> Vec<(StoryRef, Span)> {
     changed_stories(before, after)
         .into_iter()
-        .filter_map(|story| span(&linear_text(before, story), &linear_text(after, story)).map(|s| (story, s)))
+        .filter_map(|story| diff_near(&linear_text(before, story), &linear_text(after, story), story, hint).map(|s| (story, s)))
         .collect()
+}
+
+fn diff_near(before: &str, after: &str, story: StoryRef, hint: Option<(StoryRef, usize)>) -> Option<Span> {
+    match hint {
+        Some((hs, h)) if hs == story => span_near(before, after, h),
+        _ => span(before, after),
+    }
 }

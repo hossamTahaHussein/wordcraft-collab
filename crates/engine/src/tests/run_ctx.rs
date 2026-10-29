@@ -10,7 +10,7 @@ fn native_json(doc: &wordcraft_doc::Document) -> String {
 }
 
 fn ctx(author: &str) -> RunCtx {
-    RunCtx { author: author.into(), initials: "A".into(), time: 1_800_000_000, track: false, editing: EditingPrefs::default() }
+    RunCtx { author: author.into(), initials: "A".into(), time: 1_800_000_000, track: false, editing: EditingPrefs::default(), ..RunCtx::default() }
 }
 
 #[test]

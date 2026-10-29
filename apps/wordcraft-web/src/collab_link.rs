@@ -2,8 +2,8 @@
 //! between this frame and the relay as JSON strings; this turns them into replica calls on the
 //! visible session and returns what to send back. No browser APIs here, so it is tested natively.
 
-use wordcraft_collab::proto::{Inbound, Op, Outbound, decode_inbound};
-use wordcraft_collab::replica::{CollabError, Replica};
+use wordcraft_collab::proto::{HistEntry, Inbound, Op, Outbound, decode_inbound};
+use wordcraft_collab::replica::{Applied, CollabError, Replica};
 use wordcraft_engine::Session;
 
 pub struct CollabLink {
@@ -16,11 +16,13 @@ pub struct CollabLink {
     doc_name: Option<String>,
     document_ready: bool,
     save_requested: bool,
+    /// A message for the person (an edit of theirs couldn't be applied).
+    note: Option<String>,
 }
 
 impl CollabLink {
     pub fn new(doc_name: Option<String>) -> CollabLink {
-        CollabLink { replica: None, you: None, awaiting: None, doc_name, document_ready: false, save_requested: false }
+        CollabLink { replica: None, you: None, awaiting: None, doc_name, document_ready: false, save_requested: false, note: None }
     }
 
     pub fn rev(&self) -> Option<u64> {
@@ -34,6 +36,11 @@ impl CollabLink {
     /// True once, when the shared document is first shown (the host leaves the start screen).
     pub fn take_document_ready(&mut self) -> bool {
         std::mem::take(&mut self.document_ready)
+    }
+
+    /// A message for the status bar, once.
+    pub fn take_note(&mut self) -> Option<String> {
+        self.note.take()
     }
 
     /// True once after the relay asked this replica to save.
@@ -53,11 +60,19 @@ impl CollabLink {
             Ok(m) => m,
             Err(e) => {
                 log::warn!("co-editing: ignored a relay message: {e}");
+                // An edit nobody can read still takes its revision: skip it, as every replica does.
+                if let Some(rev) = unreadable_op_rev(json)
+                    && let Some(replica) = self.replica.as_mut()
+                    && rev == replica.rev() + 1
+                    && replica.skip(rev).is_ok()
+                {
+                    return Vec::new();
+                }
                 return Vec::new();
             }
         };
         match message {
-            Inbound::Welcome { rev, snapshot, ops, you, seen } => self.welcome(rev, snapshot, ops, you, seen, visible),
+            Inbound::Welcome { rev, snapshot, ops, you, seen, history } => self.welcome(rev, snapshot, ops, you, seen, history, visible),
             Inbound::Op(op) => self.op(*op, visible),
             Inbound::SnapshotRequest => match self.replica.as_ref().map(Replica::snapshot) {
                 Some(Ok(s)) => vec![encode(&s)],
@@ -67,7 +82,14 @@ impl CollabLink {
                 }
                 None => Vec::new(),
             },
-            Inbound::Resync { rev, snapshot, ops, seen } => self.resume(rev, Some(snapshot), ops, seen, visible),
+            Inbound::Resync { rev, snapshot, ops, seen, history } => {
+                if self.replica.is_none() {
+                    // It couldn't join from its Welcome: start from this snapshot instead.
+                    let you = self.you.clone().unwrap_or_default();
+                    return self.join(rev, snapshot, history, ops, you, visible);
+                }
+                self.resume(rev, Some(snapshot), ops, seen, history, visible)
+            }
             Inbound::Save => {
                 self.save_requested = self.replica.is_some();
                 Vec::new()
@@ -107,25 +129,40 @@ impl CollabLink {
         out
     }
 
-    fn welcome(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, you: String, seen: Option<u64>, visible: &mut Session) -> Vec<String> {
+    #[allow(clippy::too_many_arguments)]
+    fn welcome(
+        &mut self,
+        rev: u64,
+        snapshot: Option<String>,
+        ops: Vec<Op>,
+        you: String,
+        seen: Option<u64>,
+        history: Vec<HistEntry>,
+        visible: &mut Session,
+    ) -> Vec<String> {
         self.you = Some(you.clone());
         if self.replica.is_some() {
             // A reconnect: catch up and send what the relay didn't get.
-            return self.resume(rev, snapshot, ops, seen, visible);
+            return self.resume(rev, snapshot, ops, seen, history, visible);
         }
         let Some(json) = snapshot else {
             // The first person: the host opens the document, which becomes revision 0.
             self.awaiting = Some(visible.document_id());
             return Vec::new();
         };
+        self.join(rev, json, history, ops, you, visible)
+    }
+
+    /// Start the replica from a snapshot and show it; on failure ask for a resync.
+    fn join(&mut self, rev: u64, json: String, history: Vec<HistEntry>, ops: Vec<Op>, you: String, visible: &mut Session) -> Vec<String> {
         let doc = match wordcraft_engine::io::open_bytes("shared.json", json.as_bytes()) {
             Ok(d) => d,
             Err(e) => {
                 log::warn!("co-editing: bad snapshot: {e}");
-                return Vec::new();
+                return vec![encode(&Outbound::ResyncRequest { have: rev })];
             }
         };
-        match Replica::join(you, rev, doc, ops) {
+        match Replica::join_with_history(you, rev, doc, history, ops) {
             Ok(r) => {
                 visible.set_document(r.confirmed().clone());
                 visible.path = self.doc_name.as_ref().map(std::path::PathBuf::from);
@@ -145,6 +182,10 @@ impl CollabLink {
     fn op(&mut self, op: Op, visible: &mut Session) -> Vec<String> {
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         match replica.receive(op, visible) {
+            Ok(Applied::Remote { dropped_pending }) if dropped_pending > 0 => {
+                self.note = Some(dropped_note(dropped_pending));
+                Vec::new()
+            }
             Ok(_) => Vec::new(),
             Err(CollabError::Gap { have, .. }) | Err(CollabError::TooOld { oldest: have, .. }) => {
                 vec![encode(&Outbound::ResyncRequest { have })]
@@ -156,7 +197,15 @@ impl CollabLink {
         }
     }
 
-    fn resume(&mut self, rev: u64, snapshot: Option<String>, ops: Vec<Op>, seen: Option<u64>, visible: &mut Session) -> Vec<String> {
+    fn resume(
+        &mut self,
+        rev: u64,
+        snapshot: Option<String>,
+        ops: Vec<Op>,
+        seen: Option<u64>,
+        history: Vec<HistEntry>,
+        visible: &mut Session,
+    ) -> Vec<String> {
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         let doc = match snapshot.map(|json| wordcraft_engine::io::open_bytes("shared.json", json.as_bytes())).transpose() {
             Ok(d) => d,
@@ -165,7 +214,7 @@ impl CollabLink {
                 return Vec::new();
             }
         };
-        match replica.resume(rev, doc, ops, seen, visible) {
+        match replica.resume(rev, doc.map(|d| (d, history)), ops, seen, visible) {
             Ok(resend) => resend.into_iter().map(|op| encode(&Outbound::Op(Box::new(op)))).collect(),
             Err(e) => {
                 log::warn!("co-editing: couldn't catch up: {e}");
@@ -173,6 +222,20 @@ impl CollabLink {
             }
         }
     }
+}
+
+fn dropped_note(n: usize) -> String {
+    if n == 1 {
+        "Your last edit couldn't be applied after someone else's change.".to_string()
+    } else {
+        format!("{n} of your edits couldn't be applied after someone else's change.")
+    }
+}
+
+/// The revision of a relay op that couldn't be decoded, if it has one.
+fn unreadable_op_rev(json: &str) -> Option<u64> {
+    let v: serde_json::Value = serde_json::from_str(json).ok()?;
+    (v.get("t")?.as_str()? == "Op").then(|| v.get("rev")?.as_u64())?
 }
 
 fn encode(m: &Outbound) -> String {
@@ -330,5 +393,73 @@ mod seen_tests {
         let out = link.on_message(&json!({"t": "Resync", "rev": 1, "snapshot": snap(&s1), "ops": [], "seen": 1}).to_string(), &mut s);
         assert!(out.is_empty(), "nothing to resend: {out:?}");
         assert_eq!(s.doc.plain_text(StoryRef::Body), "abX");
+    }
+}
+
+#[cfg(test)]
+mod review_tests {
+    use serde_json::json;
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    fn snap(text: &str) -> String {
+        let mut s = Session::new(Document::new());
+        s.run("text.insert", &json!({"text": text})).unwrap();
+        String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap()
+    }
+
+    /// Review C2: a joiner whose Welcome couldn't be used asks for a Resync, and the Resync then
+    /// starts it (there's no replica yet).
+    #[test]
+    fn a_resync_starts_a_replica_that_could_not_join() {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": "not a document", "ops": [], "you": "c1"}).to_string(), &mut s);
+        assert_eq!(link.rev(), None);
+        link.on_message(&json!({"t": "Resync", "rev": 2, "snapshot": snap("Shared"), "ops": []}).to_string(), &mut s);
+        assert_eq!(link.rev(), Some(2));
+        assert_eq!(s.doc.plain_text(StoryRef::Body), "Shared");
+        assert!(link.take_document_ready());
+    }
+
+    /// Review I5: an op no replica can decode, at the next revision, is skipped.
+    #[test]
+    fn an_unreadable_op_at_the_next_revision_is_skipped() {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap("x"), "ops": [], "you": "c1"}).to_string(), &mut s);
+        let out = link.on_message(&json!({"t": "Op", "rev": 1, "sel": "garbage"}).to_string(), &mut s);
+        assert!(out.is_empty(), "{out:?}");
+        assert_eq!(link.rev(), Some(1));
+    }
+
+    /// Review I6: an edit dropped after someone else's change is reported.
+    #[test]
+    fn a_dropped_edit_leaves_a_note() {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap("Intro"), "ops": [], "you": "c1"}).to_string(), &mut s);
+        s.run("caret.docEnd", &json!({})).unwrap();
+        s.run("text.newParagraph", &json!({})).unwrap();
+        s.run("insert.table", &json!({"rows": 2, "cols": 2})).unwrap();
+        // Simulate: this replica's two edits are confirmed, then its row edit waits while
+        // someone else's delete of everything arrives.
+        let mut rev = 0;
+        for _ in 0..2 {
+            let out = link.tick(&mut s);
+            let mut op: serde_json::Value = serde_json::from_str(&out[0]).unwrap();
+            rev += 1;
+            op["rev"] = json!(rev);
+            link.on_message(&op.to_string(), &mut s);
+        }
+        s.run("table.insertRowBelow", &json!({})).unwrap();
+        // Someone else deletes everything (the row edit hasn't been sent yet).
+        let other = json!({"t": "Op", "client": "c9", "seq": 1, "base": rev, "kind": "cmd", "cmd": "text.delete", "params": {},
+            "sel": {"story": "body", "anchor": 0, "head": 100000}, "ctx": {}, "rev": rev + 1});
+        link.on_message(&other.to_string(), &mut s);
+        let note = link.take_note().expect("a note");
+        assert!(note.contains("couldn't be applied"), "{note}");
     }
 }

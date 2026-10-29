@@ -43,7 +43,7 @@ impl Peer {
             let Some(op) = self.inbox.pop_front() else { return };
             match self.replica.receive(op, &mut self.visible).unwrap() {
                 Applied::Remote { dropped_pending } => self.dropped += dropped_pending,
-                Applied::Echo => {}
+                Applied::Echo | Applied::Duplicate => {}
             }
         }
     }

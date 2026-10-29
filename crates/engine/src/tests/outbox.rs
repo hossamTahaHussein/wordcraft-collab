@@ -110,3 +110,101 @@ fn a_rolled_back_preview_records_nothing() {
     let ids: Vec<String> = s.take_outbox().into_iter().map(|r| r.id).collect();
     assert_eq!(ids, ["text.insert"]);
 }
+
+/// Review C3: paste reads the person's own clipboard; the recorded context carries it, so every
+/// replica pastes the same thing.
+#[test]
+fn paste_carries_the_clipboard_it_pasted() {
+    let mut a = collab();
+    a.run("text.insert", &json!({"text": "Hello world"})).unwrap();
+    a.run("select.text", &json!({"text": "Hello"})).unwrap();
+    a.run("format.bold", &json!({})).unwrap();
+    a.run("edit.copy", &json!({})).unwrap();
+    a.run("caret.docEnd", &json!({})).unwrap();
+    let before = a.doc.clone();
+    a.take_outbox();
+    a.run("edit.paste", &json!({})).unwrap();
+    let r = a.take_outbox().pop().unwrap();
+    assert!(r.ctx.clipboard.is_some(), "paste records the clipboard it used");
+    // Another replica with nothing on its clipboard replays it the same way.
+    let mut b = Session::new(before);
+    let (story, anchor, head) = r.anchor.unwrap();
+    b.sel = crate::Selection {
+        anchor: wordcraft_doc::offsets::pos_at(&b.doc, story, anchor),
+        focus: wordcraft_doc::offsets::pos_at(&b.doc, story, head),
+    };
+    b.run_with(&r.ctx, &r.id, &r.params).unwrap();
+    assert_eq!(crate::io::save_bytes("x.json", &b.doc).unwrap(), crate::io::save_bytes("x.json", &a.doc).unwrap());
+    assert!(b.clipboard.is_none(), "the replay doesn't leave the author's clipboard behind");
+}
+
+#[test]
+fn typing_records_no_clipboard() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hi"})).unwrap();
+    s.run("select.all", &json!({})).unwrap();
+    s.run("edit.copy", &json!({})).unwrap();
+    s.run("caret.docEnd", &json!({})).unwrap();
+    s.take_outbox();
+    s.run("text.insert", &json!({"text": "x"})).unwrap();
+    assert!(s.take_outbox().pop().unwrap().ctx.clipboard.is_none());
+}
+
+#[test]
+fn the_editing_language_travels_in_the_context() {
+    let mut s = collab();
+    s.editing_lang = Some("tr-TR".into());
+    s.run("text.insert", &json!({"text": "x"})).unwrap();
+    let r = s.take_outbox().pop().unwrap();
+    assert_eq!(r.ctx.editing_lang.as_deref(), Some("tr-TR"));
+    let mut other = Session::new(wordcraft_doc::Document::new());
+    other.editing_lang = Some("en-US".into());
+    other.run_with(&r.ctx, "text.insert", &json!({"text": "i"})).unwrap();
+    assert_eq!(other.editing_lang.as_deref(), Some("en-US"), "restored after the run");
+}
+
+#[test]
+fn session_only_inputs_are_refused_while_co_editing() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hello"})).unwrap();
+    for id in ["edit.pasteClipboardItem", "edit.pasteAllClipboard", "edit.insertSpike", "edit.pasteFormat", "insert.quickParts", "insert.autoText"] {
+        match s.run(id, &json!({})) {
+            Err(CmdError::Disabled(m)) => assert!(m.contains("co-editing"), "{id}: {m}"),
+            other => panic!("{id}: {other:?}"),
+        }
+    }
+}
+
+#[test]
+fn edits_with_several_selections_are_refused_while_co_editing() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hello world"})).unwrap();
+    s.run("select.text", &json!({"text": "Hello"})).unwrap();
+    s.also_selected = vec![wordcraft_doc::Pos::body(0, 6), wordcraft_doc::Pos::body(0, 11)];
+    match s.run("format.bold", &json!({})) {
+        Err(CmdError::Disabled(m)) => assert!(m.contains("co-editing"), "{m}"),
+        other => panic!("{other:?}"),
+    }
+    assert!(s.take_outbox().iter().all(|r| r.id != "format.bold"));
+}
+
+#[test]
+fn an_edit_whose_selection_has_no_story_offset_is_refused() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "Hello"})).unwrap();
+    s.sel = crate::Selection {
+        anchor: wordcraft_doc::Pos::body(0, 0),
+        focus: wordcraft_doc::Pos::new(StoryRef::Part(99), wordcraft_doc::Path(vec![0]), 0),
+    };
+    assert!(matches!(s.run("format.bold", &json!({})), Err(CmdError::Disabled(_))));
+}
+
+#[test]
+fn a_paste_too_large_to_send_is_refused() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "y".repeat(300 * 1024)})).unwrap();
+    s.run("select.all", &json!({})).unwrap();
+    s.run("edit.copy", &json!({})).unwrap();
+    s.run("caret.docEnd", &json!({})).unwrap();
+    assert!(matches!(s.run("edit.paste", &json!({})), Err(CmdError::Disabled(_))));
+}

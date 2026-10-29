@@ -146,7 +146,7 @@ fn hash_is_due_every_50_revisions() {
 fn snapshot_round_trips() {
     let relay = Relay::new(doc_with("Snap"));
     let a = Peer::join("a", "A", &relay);
-    let wordcraft_collab::proto::Outbound::Snapshot { rev, doc } = a.replica.snapshot().unwrap() else { panic!("not a snapshot") };
+    let wordcraft_collab::proto::Outbound::Snapshot { rev, doc, .. } = a.replica.snapshot().unwrap() else { panic!("not a snapshot") };
     assert_eq!(rev, 0);
     let back = wordcraft_engine::io::open_bytes("s.json", doc.as_bytes()).unwrap();
     assert_eq!(doc_hash(&back), doc_hash(a.replica.confirmed()));

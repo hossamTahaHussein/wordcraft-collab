@@ -53,6 +53,12 @@ pub struct RunCtx {
     /// Track this person's changes (their Suggesting mode).
     pub track: bool,
     pub editing: EditingPrefs,
+    /// The language new text is written in ([`Session::editing_lang`]): case rules follow it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub editing_lang: Option<String>,
+    /// The person's own clipboard, for a command that pastes it (otherwise none).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clipboard: Option<wordcraft_doc::edit::Fragment>,
 }
 
 impl Session {
@@ -68,10 +74,12 @@ impl Session {
                 typing_replaces_selection: self.prefs.typing_replaces_selection,
                 overtype: self.prefs.overtype,
             },
+            editing_lang: self.editing_lang.clone(),
+            clipboard: None,
         }
     }
 
-    /// [`Session::run`] under `ctx`: its author, clock, tracking and editing preferences apply
+    /// [`Session::run`] under `ctx`: its author, clock, tracking, language, clipboard and editing preferences apply
     /// for this command only, and the session's own are put back afterwards. Tracking stays as
     /// the command left it when the command itself switched it (Review › Track Changes).
     pub fn run_with(&mut self, ctx: &RunCtx, id: &str, params: &Value) -> Result<Value, CmdError> {
@@ -81,7 +89,11 @@ impl Session {
         let replaces = std::mem::replace(&mut self.prefs.typing_replaces_selection, ctx.editing.typing_replaces_selection);
         let overtype = std::mem::replace(&mut self.prefs.overtype, ctx.editing.overtype);
         let track = std::mem::replace(&mut self.doc.settings.track_changes, ctx.track);
+        let lang = std::mem::replace(&mut self.editing_lang, ctx.editing_lang.clone());
+        let clipboard = std::mem::replace(&mut self.clipboard, ctx.clipboard.clone());
         let result = with_clock(ctx.time, || self.run(id, params));
+        self.editing_lang = lang;
+        self.clipboard = clipboard;
         self.author = author;
         self.initials = initials;
         self.prefs.autocorrect = autocorrect;

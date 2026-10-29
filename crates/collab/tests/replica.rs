@@ -276,8 +276,84 @@ fn resync_from_snapshot_drops_pending_edits_the_relay_has_seen() {
     // The relay's snapshot already includes Ann's "!" (her seq 1).
     let fresh = wordcraft_collab::replica::Replica::join("s".into(), 0, relay.base.clone(), relay.log.clone()).unwrap();
     let snapshot = fresh.confirmed().clone();
-    let resend = a.replica.resume(1, Some(snapshot), Vec::new(), Some(1), &mut a.visible).unwrap();
+    let resend = a.replica.resume(1, Some((snapshot, Vec::new())), Vec::new(), Some(1), &mut a.visible).unwrap();
     assert_eq!(resend.len(), 1);
     assert_eq!(resend[0].params, json!({"text": "?"}));
     assert_eq!(a.text(), typed);
+}
+
+/// Review C2: a late joiner starts from a snapshot taken mid-stream; the tail holds an edit
+/// based on a revision before the snapshot. The snapshot's history lets it place that edit.
+#[test]
+fn late_join_from_a_mid_stream_snapshot_with_an_older_based_tail() {
+    let mut relay = Relay::new(doc_with("Hello world"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    a.act("caret.docStart", json!({}));
+    a.type_text("A");
+    b.act("caret.docEnd", json!({}));
+    b.type_text("B");
+    // Both are sent before either hears of the other: Bob's is based on revision 0.
+    relay.collect(&mut [&mut a, &mut b], &[0, 1]);
+    a.deliver(1); // Ann has revision 1 and takes the snapshot there.
+    let wordcraft_collab::proto::Outbound::Snapshot { rev, doc, history } = a.replica.snapshot().unwrap() else { panic!("not a snapshot") };
+    assert_eq!(rev, 1);
+    let tail: Vec<_> = relay.log.iter().filter(|o| o.rev > Some(1)).cloned().collect();
+    assert_eq!(tail[0].base, 0, "the tail edit is based before the snapshot");
+    let doc = wordcraft_engine::io::open_bytes("s.json", doc.as_bytes()).unwrap();
+    let late = wordcraft_collab::replica::Replica::join_with_history("late".into(), rev, doc, history, tail).unwrap();
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(late.confirmed().plain_text(wordcraft_doc::StoryRef::Body), a.confirmed_text());
+}
+
+/// Review I3: a relay edit this replica already has is ignored, not reported as a gap.
+#[test]
+fn an_edit_already_applied_is_ignored() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    b.type_text("1");
+    relay.settle(&mut [&mut a, &mut b]);
+    let again = relay.log[0].clone();
+    assert_eq!(a.replica.receive(again, &mut a.visible), Ok(Applied::Duplicate));
+    assert_eq!(a.replica.rev(), 1);
+}
+
+/// Review I1: in "Hello", Bob types "o" before the last "o" while Ann's caret is at the end.
+/// Ann's caret and Ann's own "!" stay after the whole word.
+#[test]
+fn repeated_letters_do_not_pull_text_into_the_other_word() {
+    for concurrent in [false, true] {
+        let mut relay = Relay::new(doc_with("Hello"));
+        let mut a = Peer::join("a", "Ann", &relay);
+        let mut b = Peer::join("b", "Bob", &relay);
+        a.act("caret.docEnd", json!({}));
+        b.act("caret.docEnd", json!({}));
+        b.act("caret.left", json!({}));
+        b.type_text("o");
+        if concurrent {
+            a.type_text("!");
+            relay.collect(&mut [&mut a, &mut b], &[1, 0]);
+        } else {
+            relay.settle(&mut [&mut a, &mut b]);
+            a.type_text("!");
+        }
+        relay.settle(&mut [&mut a, &mut b]);
+        assert_eq!(a.text(), "Helloo!", "concurrent={concurrent}");
+        assert_eq!(b.text(), a.text());
+    }
+}
+
+/// Review I5: a revision no replica can decode is skipped the same way everywhere.
+#[test]
+fn a_skipped_revision_advances_every_replica() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    a.replica.skip(1).unwrap();
+    assert_eq!(a.replica.rev(), 1);
+    assert!(a.replica.skip(5).is_err(), "only the next revision can be skipped");
+    a.type_text("y");
+    relay.log.push(wordcraft_collab::proto::Op { rev: Some(1), ..Default::default() });
+    relay.settle(&mut [&mut a]);
+    assert_eq!(a.replica.rev(), 2);
 }

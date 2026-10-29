@@ -39,6 +39,25 @@ pub fn span(before: &str, after: &str) -> Option<Span> {
     Some(Span { start, old_end, new_end })
 }
 
+/// [`span`], placed at `hint` when the change could be there too. Inserting or deleting text that
+/// repeats its neighbours ("o" before the "o" of "Hello") reads the same at several places, and
+/// the shared-start rule picks the last; `hint` (where the edit's selection started) picks the
+/// one that happened.
+pub fn span_near(before: &str, after: &str, hint: usize) -> Option<Span> {
+    let s = span(before, after)?;
+    if hint >= s.start {
+        return Some(s);
+    }
+    let (old_end, new_end) = (hint + (s.old_end - s.start), hint + (s.new_end - s.start));
+    let fits = before.is_char_boundary(hint)
+        && after.is_char_boundary(hint)
+        && before.is_char_boundary(old_end)
+        && after.is_char_boundary(new_end)
+        && before.as_bytes().get(..hint) == after.as_bytes().get(..hint)
+        && before.as_bytes().get(old_end..) == after.as_bytes().get(new_end..);
+    Some(if fits { Span { start: hint, old_end, new_end } } else { s })
+}
+
 /// Where `offset` (in the text before) is after the change. The author's own caret at the
 /// change goes after what they inserted; everyone else's stays before it.
 pub fn map(span: &Span, offset: usize, is_author_caret: bool) -> usize {
@@ -108,6 +127,15 @@ mod tests {
         // "aaa" → "aaaa": the prefix takes 3, the suffix may not take more than what's left.
         let s = sp("aaa", "aaaa");
         assert_eq!((s.start, s.old_end, s.new_end), (3, 3, 4));
+    }
+
+    #[test]
+    fn span_near_places_an_ambiguous_insert_at_the_hint() {
+        assert_eq!(span_near("Hello", "Helloo", 4), Some(Span { start: 4, old_end: 4, new_end: 5 }));
+        assert_eq!(span_near("Hello", "Helloo", 5), Some(Span { start: 5, old_end: 5, new_end: 6 }));
+        // A hint where the change can't be keeps the plain span.
+        assert_eq!(span_near("Hello", "Helloo", 1), Some(Span { start: 5, old_end: 5, new_end: 6 }));
+        assert_eq!(span_near("aaa", "aa", 0), Some(Span { start: 0, old_end: 1, new_end: 0 }));
     }
 
     #[test]

@@ -170,6 +170,9 @@ impl eframe::App for WebShell {
             if link.take_document_ready() {
                 self.app.ui.backstage = false;
             }
+            if let Some(note) = link.take_note() {
+                self.app.status(note);
+            }
         }
         self.app.logic(ctx);
         if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {

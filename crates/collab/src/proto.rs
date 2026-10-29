@@ -55,6 +55,24 @@ pub struct Op {
     pub user: Option<String>,
 }
 
+/// One revision's changes (`mapping::Span`s, per story): what a replica needs to place an edit
+/// based on an earlier revision. Snapshots carry the recent ones.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistEntry {
+    pub rev: u64,
+    pub spans: Vec<HistSpan>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistSpan {
+    pub story: StoryRef,
+    pub start: usize,
+    pub old_end: usize,
+    pub new_end: usize,
+}
+
 /// Relay → replica.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "t")]
@@ -70,6 +88,9 @@ pub enum Inbound {
         /// With a snapshot: the last of this replica's edits it holds (`Replica::resume`).
         #[serde(default)]
         seen: Option<u64>,
+        /// With a snapshot: the changes of the revisions before it.
+        #[serde(default)]
+        history: Vec<HistEntry>,
     },
     Op(Box<Op>),
     /// Upload a snapshot of the confirmed document.
@@ -81,6 +102,8 @@ pub enum Inbound {
         ops: Vec<Op>,
         #[serde(default)]
         seen: Option<u64>,
+        #[serde(default)]
+        history: Vec<HistEntry>,
     },
     /// Save the document now (autosave).
     Save,
@@ -99,6 +122,8 @@ pub enum Outbound {
     Snapshot {
         rev: u64,
         doc: String,
+        #[serde(default)]
+        history: Vec<HistEntry>,
     },
     Saved {
         rev: u64,
@@ -177,7 +202,7 @@ mod tests {
     #[test]
     fn welcome_and_resync_decode() {
         let w = decode_inbound(r#"{"t":"Welcome","rev":3,"snapshot":null,"ops":[],"you":"c1"}"#).unwrap();
-        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None });
+        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None, history: vec![] });
         assert_eq!(decode_inbound(r#"{"t":"Save"}"#).unwrap(), Inbound::Save);
         assert_eq!(decode_inbound(r#"{"t":"SnapshotRequest"}"#).unwrap(), Inbound::SnapshotRequest);
         let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[]}"#).unwrap();
@@ -190,7 +215,7 @@ mod tests {
     fn outbound_messages_have_their_tags() {
         let t = |m: &Outbound| serde_json::to_value(m).unwrap()["t"].as_str().unwrap().to_string();
         assert_eq!(t(&Outbound::Hash { rev: 50, h: "ab".into() }), "Hash");
-        assert_eq!(t(&Outbound::Snapshot { rev: 1, doc: "{}".into() }), "Snapshot");
+        assert_eq!(t(&Outbound::Snapshot { rev: 1, doc: "{}".into(), history: vec![] }), "Snapshot");
         assert_eq!(t(&Outbound::Saved { rev: 1 }), "Saved");
         assert_eq!(serde_json::to_value(Outbound::ResyncRequest { have: 7 }).unwrap(), json!({"t": "ResyncRequest", "have": 7}));
     }

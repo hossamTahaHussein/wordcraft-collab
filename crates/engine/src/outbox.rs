@@ -9,9 +9,31 @@ use wordcraft_doc::offsets::offset_of;
 
 use crate::{CmdError, RunCtx, Selection, Session};
 
-/// Commands refused while co-editing: undo works per person through the co-editing layer, and
-/// a co-edited document can't be swapped for another one.
-pub const COLLAB_DISABLED: &[&str] = &["edit.undo", "edit.undoTo", "edit.redo", "file.new", "file.open", "file.close"];
+/// Commands refused while co-editing: undo works per person through the co-editing layer, a
+/// co-edited document can't be swapped for another one, and what pastes from this session's own
+/// stores (the Clipboard pane, the Spike, Quick Parts, the format painter) can't be replayed by
+/// the other replicas.
+pub const COLLAB_DISABLED: &[&str] = &[
+    "edit.undo",
+    "edit.undoTo",
+    "edit.redo",
+    "file.new",
+    "file.open",
+    "file.close",
+    "edit.pasteClipboardItem",
+    "edit.pasteAllClipboard",
+    "edit.insertSpike",
+    "edit.pasteFormat",
+    "insert.quickParts",
+    "insert.autoText",
+];
+
+/// Commands that paste this session's clipboard: their record carries it ([`RunCtx::clipboard`]).
+const CLIPBOARD_READERS: &[&str] = &["edit.paste", "edit.pasteSpecial", "edit.pasteText", "edit.pasteMerge"];
+
+/// The largest clipboard a recorded paste may carry, in bytes of JSON (the relay takes edits of
+/// up to 256 KB).
+const MAX_CLIPBOARD_BYTES: usize = 200 * 1024;
 
 /// One recorded edit.
 #[derive(Clone, Debug, PartialEq)]
@@ -91,9 +113,21 @@ impl Session {
         if !mutates || !self.collab.recording || self.collab.busy {
             return run(self);
         }
+        let refuse = |why: &str| Err(CmdError::Disabled(format!("{id}: {why} isn't available while co-editing")));
+        if !self.also_selected.is_empty() || self.column.is_some() {
+            return refuse("Editing several selections at once");
+        }
         let sel_before = self.sel.clone();
-        let anchor = anchor_of(self, &sel_before);
-        let ctx = self.run_ctx();
+        let Some(anchor) = anchor_of(self, &sel_before) else { return refuse("Editing a selection across stories") };
+        let anchor = Some(anchor);
+        let mut ctx = self.run_ctx();
+        if CLIPBOARD_READERS.contains(&id) {
+            ctx.clipboard = self.clipboard.clone();
+            let size = ctx.clipboard.as_ref().and_then(|f| serde_json::to_vec(f).ok()).map_or(0, |v| v.len());
+            if size > MAX_CLIPBOARD_BYTES {
+                return refuse("Pasting this much at once");
+            }
+        }
         let rev_before = self.rev();
         self.collab.busy = true;
         let result = crate::with_clock(ctx.time, || run(self));
