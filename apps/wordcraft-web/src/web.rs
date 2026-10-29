@@ -176,8 +176,12 @@ impl eframe::App for WebShell {
         }
         self.app.logic(ctx);
         if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
-            for out in link.tick(&mut self.app.session) {
+            for out in link.tick(&mut self.app.session, js_sys::Date::now()) {
                 bridge.post_collab(&out);
+            }
+            // A moved selection waits out the presence limit: come back for it without input.
+            if link.presence_pending() {
+                ctx.request_repaint_after(std::time::Duration::from_millis(100));
             }
             // Autosave: the relay chose this editor to save the shared document.
             if link.take_save_request() {

@@ -5,6 +5,7 @@
 use std::collections::BTreeSet;
 use std::sync::Arc;
 
+use wordcraft_doc::offsets::linear_text;
 use wordcraft_doc::{Blocks, Document, StoryRef};
 
 /// The changed part of a text: `start..old_end` before became `start..new_end` after. All three
@@ -92,6 +93,22 @@ pub fn changed_stories(before: &Document, after: &Document) -> Vec<StoryRef> {
 
 fn same_blocks(a: &Blocks, b: &Blocks) -> bool {
     a.len() == b.len() && a.iter().zip(b).all(|(x, y)| Arc::ptr_eq(x, y) || x == y)
+}
+
+/// What changed in each story; in the story of `hint` (the edit's selection start), the change is
+/// placed there when it could be (`mapping::span_near`).
+pub fn changes(before: &Document, after: &Document, hint: Option<(StoryRef, usize)>) -> Vec<(StoryRef, Span)> {
+    changed_stories(before, after)
+        .into_iter()
+        .filter_map(|story| diff_near(&linear_text(before, story), &linear_text(after, story), story, hint).map(|s| (story, s)))
+        .collect()
+}
+
+pub fn diff_near(before: &str, after: &str, story: StoryRef, hint: Option<(StoryRef, usize)>) -> Option<Span> {
+    match hint {
+        Some((hs, h)) if hs == story => span_near(before, after, h),
+        _ => span(before, after),
+    }
 }
 
 #[cfg(test)]

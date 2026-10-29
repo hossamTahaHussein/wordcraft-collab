@@ -2,9 +2,43 @@
 //! between this frame and the relay as JSON strings; this turns them into replica calls on the
 //! visible session and returns what to send back. No browser APIs here, so it is tested natively.
 
-use wordcraft_collab::proto::{HistEntry, Inbound, Op, Outbound, decode_inbound};
+use std::collections::BTreeMap;
+
+use wordcraft_collab::mapping::{changes, map};
+use wordcraft_collab::proto::{Anchor, HistEntry, Inbound, Op, Outbound, Peer, decode_inbound};
 use wordcraft_collab::replica::{Applied, CollabError, Replica};
-use wordcraft_engine::Session;
+use wordcraft_doc::Document;
+use wordcraft_doc::offsets::{offset_of, pos_at};
+use wordcraft_engine::{Selection, Session};
+
+/// How often a replica may say where its selection is.
+const PRESENCE_EVERY_MS: f64 = 100.0;
+/// How long a peer counts as typing after its last edit.
+const TYPING_MS: f64 = 3000.0;
+
+/// Someone else in the document, as the UI shows them.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PeerView {
+    pub client: String,
+    pub name: String,
+    pub color: u8,
+    pub sel: Option<Selection>,
+    pub typed_at: Option<f64>,
+}
+
+impl PeerView {
+    /// Whether they edited in the last three seconds (their name flag shows).
+    pub fn typing(&self, now_ms: f64) -> bool {
+        self.typed_at.is_some_and(|t| now_ms - t < TYPING_MS)
+    }
+}
+
+struct PeerState {
+    name: String,
+    color: u8,
+    anchor: Option<Anchor>,
+    typed_at: Option<f64>,
+}
 
 pub struct CollabLink {
     replica: Option<Replica>,
@@ -18,11 +52,34 @@ pub struct CollabLink {
     save_requested: bool,
     /// A message for the person (an edit of theirs couldn't be applied).
     note: Option<String>,
+    /// The others here, by client id.
+    peers: BTreeMap<String, PeerState>,
+    /// The visible document as the peers' positions last followed it (its revision, a copy).
+    followed: Option<(u64, Document)>,
+    /// This replica's selection as last sent, and when.
+    sent: Option<(Anchor, f64)>,
+    /// The selection moved but wasn't sent yet (too soon after the last one).
+    presence_waiting: bool,
+    /// The time of the last tick, for marking who typed.
+    now: f64,
 }
 
 impl CollabLink {
     pub fn new(doc_name: Option<String>) -> CollabLink {
-        CollabLink { replica: None, you: None, awaiting: None, doc_name, document_ready: false, save_requested: false, note: None }
+        CollabLink {
+            replica: None,
+            you: None,
+            awaiting: None,
+            doc_name,
+            document_ready: false,
+            save_requested: false,
+            note: None,
+            peers: BTreeMap::new(),
+            followed: None,
+            sent: None,
+            presence_waiting: false,
+            now: 0.0,
+        }
     }
 
     pub fn rev(&self) -> Option<u64> {
@@ -72,7 +129,14 @@ impl CollabLink {
             }
         };
         match message {
-            Inbound::Welcome { rev, snapshot, ops, you, seen, history, .. } => self.welcome(rev, snapshot, ops, you, seen, history, visible),
+            Inbound::Welcome { rev, snapshot, ops, you, seen, history, peers } => {
+                // The relay's list replaces ours (a reconnect may have missed joins and leaves).
+                self.peers.clear();
+                for peer in peers {
+                    self.note_peer(peer);
+                }
+                self.welcome(rev, snapshot, ops, you, seen, history, visible)
+            }
             Inbound::Op(op) => self.op(*op, visible),
             Inbound::SnapshotRequest => match self.replica.as_ref().map(Replica::snapshot) {
                 Some(Ok(s)) => vec![encode(&s)],
@@ -94,13 +158,22 @@ impl CollabLink {
                 self.save_requested = self.replica.is_some();
                 Vec::new()
             }
-            Inbound::Join(_) | Inbound::Leave { .. } | Inbound::Presence(_) => Vec::new(),
+            Inbound::Join(peer) | Inbound::Presence(peer) => {
+                self.note_peer(peer);
+                Vec::new()
+            }
+            Inbound::Leave { client } => {
+                self.peers.remove(&client);
+                Vec::new()
+            }
         }
     }
 
     /// After the person's edits this frame: the next edit to send and a fingerprint when due;
     /// for the first person, the opened document as revision 0.
-    pub fn tick(&mut self, visible: &mut Session) -> Vec<String> {
+    pub fn tick(&mut self, visible: &mut Session, now_ms: f64) -> Vec<String> {
+        self.now = now_ms;
+        self.follow_changes(visible);
         if let Some(blank) = self.awaiting {
             if visible.document_id() == blank {
                 return Vec::new();
@@ -127,7 +200,82 @@ impl CollabLink {
         if let Some(h) = replica.hash_due() {
             out.push(encode(&h));
         }
+        if let Some(p) = self.presence_due(visible, now_ms) {
+            out.push(p);
+        }
         out
+    }
+
+    /// The others here, their selections in the visible document.
+    pub fn peers(&self, visible: &Session) -> Vec<PeerView> {
+        self.peers
+            .iter()
+            .map(|(client, p)| PeerView {
+                client: client.clone(),
+                name: p.name.clone(),
+                color: p.color,
+                sel: p
+                    .anchor
+                    .as_ref()
+                    .map(|a| Selection { anchor: pos_at(&visible.doc, a.story, a.anchor), focus: pos_at(&visible.doc, a.story, a.head) }),
+                typed_at: p.typed_at,
+            })
+            .collect()
+    }
+
+    /// The selection moved but wasn't sent yet: the host should tick again shortly, even
+    /// without input.
+    pub fn presence_pending(&self) -> bool {
+        self.presence_waiting
+    }
+
+    fn note_peer(&mut self, peer: Peer) {
+        let entry = self.peers.entry(peer.client).or_insert(PeerState { name: String::new(), color: 0, anchor: None, typed_at: None });
+        entry.name = peer.user;
+        entry.color = peer.color;
+        if peer.sel.is_some() {
+            entry.anchor = peer.sel;
+        }
+    }
+
+    /// Move the peers' positions through whatever changed in the visible document since the last
+    /// tick: someone's edit, or this person's own typing.
+    fn follow_changes(&mut self, visible: &Session) {
+        let rev = visible.rev();
+        if let Some((seen, before)) = &self.followed {
+            if *seen == rev {
+                return;
+            }
+            let spans = changes(before, &visible.doc, None);
+            for a in self.peers.values_mut().filter_map(|p| p.anchor.as_mut()) {
+                for (story, s) in &spans {
+                    if *story == a.story {
+                        a.anchor = map(s, a.anchor, false);
+                        a.head = map(s, a.head, false);
+                    }
+                }
+            }
+        }
+        self.followed = Some((rev, visible.doc.clone()));
+    }
+
+    /// This person's selection for the relay, when it moved and the last one is 100 ms old.
+    fn presence_due(&mut self, visible: &Session, now_ms: f64) -> Option<String> {
+        let sel = &visible.sel;
+        if sel.anchor.story != sel.focus.story {
+            return None;
+        }
+        let here = Anchor { story: sel.anchor.story, anchor: offset_of(&visible.doc, &sel.anchor)?, head: offset_of(&visible.doc, &sel.focus)? };
+        self.presence_waiting = false;
+        if self.sent.as_ref().is_some_and(|(last, _)| *last == here) {
+            return None;
+        }
+        if self.sent.as_ref().is_some_and(|(_, at)| now_ms - at < PRESENCE_EVERY_MS) {
+            self.presence_waiting = true;
+            return None;
+        }
+        self.sent = Some((here.clone(), now_ms));
+        Some(encode(&Outbound::Presence { sel: here }))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -181,6 +329,9 @@ impl CollabLink {
     }
 
     fn op(&mut self, op: Op, visible: &mut Session) -> Vec<String> {
+        if let Some(p) = self.peers.get_mut(&op.client) {
+            p.typed_at = Some(self.now);
+        }
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         match replica.receive(op, visible) {
             Ok(Applied::Remote { dropped_pending }) if dropped_pending > 0 => {
@@ -243,6 +394,12 @@ fn encode(m: &Outbound) -> String {
     serde_json::to_string(m).unwrap_or_default()
 }
 
+/// Test helper: the messages from a tick other than presence.
+#[cfg(test)]
+fn edits_only(out: Vec<String>) -> Vec<String> {
+    out.into_iter().filter(|m| !m.contains(r#""t":"Presence""#)).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use serde_json::{Value, json};
@@ -270,12 +427,12 @@ mod tests {
         let mut link = CollabLink::new(Some("report.docx".into()));
         let mut s = Session::new(Document::new());
         assert!(link.on_message(&welcome(0, None, "c1"), &mut s).is_empty());
-        assert!(link.tick(&mut s).is_empty(), "waits for the document");
+        assert!(super::edits_only(link.tick(&mut s, 0.0)).is_empty(), "waits for the document");
         // The host opens the file.
         let mut opened = Session::new(Document::new());
         opened.run("text.insert", &json!({"text": "From file"})).unwrap();
         s.set_document(opened.doc.clone());
-        let out = link.tick(&mut s);
+        let out = super::edits_only(link.tick(&mut s, 0.0));
         assert_eq!(out.len(), 1);
         let v = parse(&out[0]);
         assert_eq!((v["t"].as_str(), v["rev"].as_u64()), (Some("Snapshot"), Some(0)));
@@ -305,15 +462,15 @@ mod tests {
         s.run("caret.docEnd", &json!({})).unwrap();
         s.run("text.insert", &json!({"text": " "})).unwrap();
         s.run("text.insert", &json!({"text": "."})).unwrap();
-        let out = link.tick(&mut s);
+        let out = super::edits_only(link.tick(&mut s, 0.0));
         assert_eq!(out.len(), 1);
         assert_eq!(link.pending(), 2);
         let mut op = parse(&out[0]);
         assert_eq!(op["t"], "Op");
-        assert!(link.tick(&mut s).is_empty(), "one in flight");
+        assert!(super::edits_only(link.tick(&mut s, 0.0)).is_empty(), "one in flight");
         op["rev"] = json!(1);
         link.on_message(&op.to_string(), &mut s);
-        let next = link.tick(&mut s);
+        let next = super::edits_only(link.tick(&mut s, 0.0));
         assert_eq!(parse(&next[0])["params"]["text"], ".");
     }
 
@@ -360,7 +517,7 @@ mod tests {
         s.run("caret.docEnd", &json!({})).unwrap();
         s.run("text.insert", &json!({"text": "!"})).unwrap();
         let typed = s.doc.plain_text(StoryRef::Body);
-        assert_eq!(link.tick(&mut s).len(), 1);
+        assert_eq!(super::edits_only(link.tick(&mut s, 0.0)).len(), 1);
         // The connection drops before the echo; the relay never got it.
         let out = link.on_message(&welcome(0, None, "c1"), &mut s);
         assert_eq!(out.len(), 1);
@@ -387,7 +544,7 @@ mod seen_tests {
         link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap(&s0), "ops": [], "you": "c1"}).to_string(), &mut s);
         s.run("caret.docEnd", &json!({})).unwrap();
         s.run("text.insert", &json!({"text": "X"})).unwrap();
-        assert_eq!(link.tick(&mut s).len(), 1);
+        assert_eq!(super::edits_only(link.tick(&mut s, 0.0)).len(), 1);
         // The relay took it into a snapshot (seen = 1) before this replica heard back.
         let mut s1 = Session::new(Document::new());
         s1.run("text.insert", &json!({"text": "abX"})).unwrap();
@@ -449,7 +606,7 @@ mod recovery_tests {
         // someone else's delete of everything arrives.
         let mut rev = 0;
         for _ in 0..2 {
-            let out = link.tick(&mut s);
+            let out = super::edits_only(link.tick(&mut s, 0.0));
             let mut op: serde_json::Value = serde_json::from_str(&out[0]).unwrap();
             rev += 1;
             op["rev"] = json!(rev);
@@ -462,5 +619,110 @@ mod recovery_tests {
         link.on_message(&other.to_string(), &mut s);
         let note = link.take_note().expect("a note");
         assert!(note.contains("couldn't be applied"), "{note}");
+    }
+}
+
+#[cfg(test)]
+mod presence_tests {
+    use serde_json::{Value, json};
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    fn snap(text: &str) -> String {
+        let mut s = Session::new(Document::new());
+        s.run("text.insert", &json!({"text": text})).unwrap();
+        String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap()
+    }
+
+    fn joined(text: &str, peers: Value) -> (CollabLink, Session) {
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap(text), "ops": [], "you": "me", "peers": peers}).to_string(), &mut s);
+        link.tick(&mut s, 0.0);
+        (link, s)
+    }
+
+    fn presence(client: &str, user: &str, anchor: usize) -> String {
+        json!({"t": "Presence", "client": client, "user": user, "color": 3, "sel": {"story": "body", "anchor": anchor, "head": anchor}}).to_string()
+    }
+
+    fn caret_off(link: &CollabLink, s: &Session, client: &str) -> usize {
+        link.peers(s).into_iter().find(|p| p.client == client).and_then(|p| p.sel).map(|sel| sel.focus.off).unwrap()
+    }
+
+    #[test]
+    fn join_presence_leave_update_the_book() {
+        let (mut link, mut s) = joined("Hello world", json!([{"client": "a", "user": "Ann", "color": 0}]));
+        assert_eq!(link.peers(&s).len(), 1);
+        assert_eq!(link.peers(&s)[0].name, "Ann");
+        link.on_message(&json!({"t": "Join", "client": "b", "user": "Bob", "color": 1}).to_string(), &mut s);
+        link.on_message(&presence("b", "Bob", 6), &mut s);
+        assert_eq!(caret_off(&link, &s, "b"), 6);
+        link.on_message(&json!({"t": "Leave", "client": "a"}).to_string(), &mut s);
+        let names: Vec<String> = link.peers(&s).into_iter().map(|p| p.name).collect();
+        assert_eq!(names, ["Bob"]);
+    }
+
+    #[test]
+    fn presence_sent_only_when_selection_changes_and_at_most_ten_per_second() {
+        let (mut link, mut s) = joined("Hello world", json!([]));
+        let sent = |out: &[String]| out.iter().filter(|m| m.contains(r#""t":"Presence""#)).count();
+        s.run("caret.docEnd", &json!({})).unwrap();
+        assert_eq!(sent(&link.tick(&mut s, 1000.0)), 1);
+        assert_eq!(sent(&link.tick(&mut s, 1500.0)), 0, "unchanged: nothing sent");
+        s.run("caret.left", &json!({})).unwrap();
+        assert_eq!(sent(&link.tick(&mut s, 1550.0)), 1, "moved, and the last one was 550 ms ago");
+        s.run("caret.left", &json!({})).unwrap();
+        assert_eq!(sent(&link.tick(&mut s, 1600.0)), 0, "within 100 ms of the last one");
+        assert!(link.presence_pending());
+        assert_eq!(sent(&link.tick(&mut s, 1651.0)), 1);
+        assert!(!link.presence_pending());
+    }
+
+    #[test]
+    fn peer_caret_moves_with_text_typed_before_it() {
+        let (mut link, mut s) =
+            joined("Hello world", json!([{"client": "a", "user": "Ann", "color": 0, "sel": {"story": "body", "anchor": 6, "head": 6}}]));
+        s.run("caret.docStart", &json!({})).unwrap();
+        s.run("text.insert", &json!({"text": "Hi "})).unwrap();
+        link.tick(&mut s, 10.0);
+        assert_eq!(caret_off(&link, &s, "a"), 9);
+    }
+
+    #[test]
+    fn peer_caret_survives_deletion_around_it() {
+        let (mut link, mut s) =
+            joined("Hello big world", json!([{"client": "a", "user": "Ann", "color": 0, "sel": {"story": "body", "anchor": 8, "head": 8}}]));
+        s.run("select.text", &json!({"text": "big "})).unwrap();
+        s.run("text.delete", &json!({})).unwrap();
+        link.tick(&mut s, 10.0);
+        assert_eq!(caret_off(&link, &s, "a"), 6);
+        assert_eq!(s.doc.plain_text(StoryRef::Body), "Hello world");
+    }
+
+    #[test]
+    fn a_peer_typing_is_marked_for_three_seconds() {
+        let (mut link, mut s) = joined("x", json!([{"client": "a", "user": "Ann", "color": 0}]));
+        let op = json!({"t": "Op", "client": "a", "seq": 1, "base": 0, "kind": "cmd", "cmd": "text.insert", "params": {"text": "y"},
+            "sel": {"story": "body", "anchor": 1, "head": 1}, "ctx": {}, "rev": 1});
+        link.tick(&mut s, 5000.0);
+        link.on_message(&op.to_string(), &mut s);
+        link.tick(&mut s, 5001.0);
+        assert!(link.peers(&s)[0].typing(6000.0));
+        assert!(!link.peers(&s)[0].typing(8100.0));
+    }
+
+    #[test]
+    fn peers_survive_a_reconnect_welcome() {
+        let (mut link, mut s) = joined("x", json!([{"client": "a", "user": "Ann", "color": 0}]));
+        link.on_message(
+            &json!({"t": "Welcome", "rev": 0, "snapshot": null, "ops": [], "you": "me", "peers": [{"client": "b", "user": "Bob", "color": 1}]})
+                .to_string(),
+            &mut s,
+        );
+        let names: Vec<String> = link.peers(&s).into_iter().map(|p| p.name).collect();
+        assert_eq!(names, ["Bob"], "the reconnect's list replaces the old one");
     }
 }

@@ -21,7 +21,7 @@ use wordcraft_doc::{Document, Pos, StoryRef};
 use wordcraft_engine::{Selection, Session};
 
 use crate::hash::{HASH_EVERY, doc_hash};
-use crate::mapping::{Span, changed_stories, map, span, span_near};
+use crate::mapping::{Span, changes, map, span};
 use crate::proto::{Anchor, HistEntry, HistSpan, Op, OpKind, Outbound};
 
 /// How many revisions of changes a replica keeps for moving late edits' selections; an edit
@@ -316,7 +316,7 @@ impl Replica {
         let before = self.confirmed.doc.clone();
         // A command that fails here fails on every replica: it is skipped everywhere.
         let _ = run_at(&mut self.confirmed, op, &sel);
-        let spans = spans_between(&before, &self.confirmed.doc, Some((sel.story, sel.anchor.min(sel.head))));
+        let spans = changes(&before, &self.confirmed.doc, Some((sel.story, sel.anchor.min(sel.head))));
         self.rev += 1;
         self.history.push(self.rev, spans.clone());
         Ok(spans)
@@ -374,7 +374,7 @@ impl Replica {
         for (i, mut op) in std::mem::take(&mut self.pending).into_iter().enumerate() {
             let story = op.sel.story;
             let old_text = linear_text(&self.scratch.doc, story);
-            let moved = diff_near(&old_text, &linear_text(&visible.doc, story), story, hint);
+            let moved = crate::mapping::diff_near(&old_text, &linear_text(&visible.doc, story), story, hint);
             let new_sel = move_anchor(&op.sel, moved.as_ref());
             let _ = run_at(&mut self.scratch, &op, &op.sel.clone());
             // The remote change's place moves with this edit on the old chain.
@@ -398,7 +398,7 @@ impl Replica {
         visible.set_recording(true);
         self.pending = kept;
         if let Some(a) = caret {
-            let moved = diff_near(&linear_text(&old_visible, a.story), &linear_text(&visible.doc, a.story), a.story, hint);
+            let moved = crate::mapping::diff_near(&linear_text(&old_visible, a.story), &linear_text(&visible.doc, a.story), a.story, hint);
             visible.sel = selection_at(&visible.doc, &move_anchor(&a, moved.as_ref()));
         }
         visible.clamp_selection();
@@ -474,21 +474,5 @@ fn move_anchor(a: &Anchor, s: Option<&Span>) -> Anchor {
     match s {
         Some(s) => Anchor { story: a.story, anchor: map(s, a.anchor, false), head: map(s, a.head, false) },
         None => a.clone(),
-    }
-}
-
-/// What changed in each story; in the story of `hint` (the edit's selection start), the change is
-/// placed there when it could be (`mapping::span_near`).
-fn spans_between(before: &Document, after: &Document, hint: Option<(StoryRef, usize)>) -> Vec<(StoryRef, Span)> {
-    changed_stories(before, after)
-        .into_iter()
-        .filter_map(|story| diff_near(&linear_text(before, story), &linear_text(after, story), story, hint).map(|s| (story, s)))
-        .collect()
-}
-
-fn diff_near(before: &str, after: &str, story: StoryRef, hint: Option<(StoryRef, usize)>) -> Option<Span> {
-    match hint {
-        Some((hs, h)) if hs == story => span_near(before, after, h),
-        _ => span(before, after),
     }
 }
