@@ -209,6 +209,10 @@ pub enum Outbound {
     /// This replica missed edits after `have`.
     ResyncRequest {
         have: u64,
+        /// Start again from a snapshot the lease holder takes now, not the stored one (this
+        /// replica can't apply an edit from what the stored one holds).
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        fresh: bool,
     },
     /// Where this person's selection is, relative to the confirmed revision `rev` (sent at most
     /// ten times a second, and only with no edits unconfirmed; never logged).
@@ -342,7 +346,7 @@ mod tests {
         assert_eq!(t(&Outbound::Hash { rev: 50, h: "ab".into() }), "Hash");
         assert_eq!(t(&Outbound::Snapshot { rev: 1, doc: "{}".into(), history: vec![] }), "Snapshot");
         assert_eq!(t(&Outbound::Saved { rev: 1 }), "Saved");
-        assert_eq!(serde_json::to_value(Outbound::ResyncRequest { have: 7 }).unwrap(), json!({"t": "ResyncRequest", "have": 7}));
+        assert_eq!(serde_json::to_value(Outbound::ResyncRequest { have: 7, fresh: false }).unwrap(), json!({"t": "ResyncRequest", "have": 7}));
     }
 
     #[test]

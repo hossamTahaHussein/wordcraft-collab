@@ -195,13 +195,16 @@ impl Collab {
                 let (rev, user, command) = (op.rev.unwrap_or(0), op.user.clone().unwrap_or_default(), op.cmd.clone());
                 match self.replica.receive(*op, &mut self.session) {
                     Ok(_) => {
+                        if self.replica.take_needs_fresh() {
+                            self.send(&Outbound::ResyncRequest { have: self.replica.rev(), fresh: true })?;
+                        }
                         self.changes.push(Change { rev, user, command });
                         if self.changes.len() > MAX_CHANGES {
                             self.changes.remove(0);
                         }
                     }
                     Err(CollabError::Gap { have, .. }) | Err(CollabError::TooOld { oldest: have, .. }) => {
-                        self.send(&Outbound::ResyncRequest { have })?
+                        self.send(&Outbound::ResyncRequest { have, fresh: false })?
                     }
                     Err(e) => return Err(e.to_string()),
                 }

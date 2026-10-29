@@ -144,7 +144,9 @@ fn undo_out_of_reach_changes_nothing_and_does_not_panic() {
     a.act("edit.undo", json!({}));
     relay.settle(&mut [&mut a, &mut b]);
     assert_eq!(a.text(), "x");
-    assert_eq!(b.text(), "xy", "out of reach: the fingerprint check resyncs him");
+    assert_eq!(b.text(), "xy", "out of reach: changed nothing here");
+    assert!(b.replica.take_needs_fresh(), "so he asks for a fresh snapshot");
+    assert!(!a.replica.take_needs_fresh());
 }
 
 #[test]

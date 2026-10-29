@@ -135,6 +135,9 @@ pub struct Replica {
     undone: Vec<Vec<u64>>,
     /// Messages for the person ("Nothing of yours to undo").
     notes: Vec<String>,
+    /// An undo or redo named an edit from before this replica's oldest checkpoint: it must start
+    /// again from a fresh snapshot.
+    needs_fresh: bool,
 }
 
 /// One confirmed edit as it moves positions: its revision, who made it, what it changed (in the
@@ -163,6 +166,7 @@ impl Replica {
             undo,
             undone: Vec::new(),
             notes: Vec::new(),
+            needs_fresh: false,
             confirmed: headless(snapshot),
             scratch: headless(Document::new()),
             pending: VecDeque::new(),
@@ -268,6 +272,12 @@ impl Replica {
 
     pub fn can_redo(&self) -> bool {
         !self.undone.is_empty()
+    }
+
+    /// True once after an undo or redo reached past what this replica holds: ask for a fresh
+    /// resync (`ResyncRequest` with `fresh`).
+    pub fn take_needs_fresh(&mut self) -> bool {
+        std::mem::take(&mut self.needs_fresh)
     }
 
     /// Messages for the person since the last call.
@@ -458,6 +468,9 @@ impl Replica {
                 let mut targets: Vec<u64> = op.params.get("target").and_then(Value::as_u64).into_iter().collect();
                 if let Some(more) = op.params.get("more").and_then(Value::as_array) {
                     targets.extend(more.iter().filter_map(Value::as_u64));
+                }
+                if targets.iter().any(|t| *t > 0 && *t <= self.undo.oldest()) {
+                    self.needs_fresh = true;
                 }
                 if let Some(doc) = self.undo.apply(&targets, op.kind == OpKind::Undo) {
                     self.confirmed.doc = doc;

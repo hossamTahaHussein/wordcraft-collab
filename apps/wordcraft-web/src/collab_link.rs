@@ -366,6 +366,9 @@ impl CollabLink {
         if let Some(note) = replica.take_notes().pop() {
             self.note = Some(note);
         }
+        if replica.take_needs_fresh() {
+            out.push(encode(&Outbound::ResyncRequest { have: replica.rev(), fresh: true }));
+        }
         if let Some(h) = replica.hash_due() {
             out.push(encode(&h));
         }
@@ -527,7 +530,7 @@ impl CollabLink {
             Ok(d) => d,
             Err(e) => {
                 log::warn!("co-editing: bad snapshot: {e}");
-                return vec![encode(&Outbound::ResyncRequest { have: rev })];
+                return vec![encode(&Outbound::ResyncRequest { have: rev, fresh: false })];
             }
         };
         match Replica::join_with_history(you, rev, doc, history, ops) {
@@ -542,7 +545,7 @@ impl CollabLink {
             }
             Err(e) => {
                 log::warn!("co-editing: couldn't join: {e}");
-                vec![encode(&Outbound::ResyncRequest { have: rev })]
+                vec![encode(&Outbound::ResyncRequest { have: rev, fresh: false })]
             }
         }
     }
@@ -556,11 +559,11 @@ impl CollabLink {
             }
             Ok(_) => Vec::new(),
             Err(CollabError::Gap { have, .. }) | Err(CollabError::TooOld { oldest: have, .. }) => {
-                vec![encode(&Outbound::ResyncRequest { have })]
+                vec![encode(&Outbound::ResyncRequest { have, fresh: false })]
             }
             Err(e) => {
                 log::warn!("co-editing: {e}");
-                vec![encode(&Outbound::ResyncRequest { have: replica.rev() })]
+                vec![encode(&Outbound::ResyncRequest { have: replica.rev(), fresh: false })]
             }
         }
     }
@@ -586,7 +589,7 @@ impl CollabLink {
             Ok(resend) => resend.into_iter().map(|op| encode(&Outbound::Op(Box::new(op)))).collect(),
             Err(e) => {
                 log::warn!("co-editing: couldn't catch up: {e}");
-                vec![encode(&Outbound::ResyncRequest { have: replica.rev() })]
+                vec![encode(&Outbound::ResyncRequest { have: replica.rev(), fresh: false })]
             }
         }
     }
