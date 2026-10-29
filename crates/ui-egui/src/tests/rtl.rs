@@ -388,6 +388,20 @@ fn dialogs_with_grids_draw_whole() {
     }
 }
 
+/// A dialog's label/field grid reads from the right too: Page Setup's first column ("Top:") is
+/// at the right of its second ("Bottom:") in Arabic, at the left in English.
+#[test]
+fn dialog_grids_read_from_the_right() {
+    for (lang, rtl) in [("ar", true), ("en", false)] {
+        let (mut app, ctx) = app_in(lang);
+        app.run("ui.dialog", serde_json::json!({"name": "pageSetup"})).unwrap();
+        let shapes = frame_sized(&mut app, &ctx, 1280.0, 1400.0);
+        let top = text_rect(&shapes, crate::tl!("Top:")).expect("Top:");
+        let bottom = text_rect(&shapes, crate::tl!("Bottom:")).expect("Bottom:");
+        assert_eq!(top.min.x > bottom.max.x, rtl, "{lang}: Top {top:?}, Bottom {bottom:?}");
+    }
+}
+
 /// A mirrored ribbon too wide for the window opens at its start (the right) and its left chevron
 /// scrolls on to the groups at the far end.
 #[test]

@@ -37,9 +37,9 @@ pub use tooltip::{key_text, shortcut_text};
 const _: () = assert!(BIG_LABEL_Y + LABEL_PITCH + LABEL_LINE_H <= CONTENT_H);
 const _: () = assert!(BIG_ICON_Y + 16.0 <= BIG_LABEL_Y);
 
-/// Content that keeps its left-to-right layout in a mirrored row (an egui `Grid`, whose
-/// arithmetic assumes rows run left to right): placed at the row's cursor at the size it took
-/// last frame, its own rows left to right. Left to right it is `add` as is.
+/// Content laid out in a left-to-right row of its own inside a mirrored row: placed at the row's
+/// cursor at the size it took last frame. An egui `Grid` in it still reads from the right (the
+/// fork's Grid mirrors its columns under `Style::right_to_left`). Left to right it is `add` as is.
 pub(crate) fn ltr_block<R>(ui: &mut Ui, salt: impl std::hash::Hash + std::fmt::Debug, add: impl FnOnce(&mut Ui) -> R) -> R {
     if !craft_ui::direction::is_rtl(ui) {
         return add(ui);
