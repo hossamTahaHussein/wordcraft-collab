@@ -262,12 +262,15 @@ impl Session {
         if !mutates || !person {
             return run(self);
         }
+        // What a viewer may do (inspect, save, export, print) everyone may.
+        let reads = crate::cmd::protect::viewing_allows(id, params);
         if self.collab.role == CollabRole::Suggest
+            && !reads
             && (SUGGESTER_REFUSED.contains(&id) || !(SUGGEST_COMMANDS.contains(&id) || COMMENT_COMMANDS.contains(&id)))
         {
             return Err(CmdError::Disabled(format!("{id}: You can only suggest changes in this document")));
         }
-        if self.collab.role == CollabRole::Comment && !COMMENT_COMMANDS.contains(&id) {
+        if self.collab.role == CollabRole::Comment && !reads && !COMMENT_COMMANDS.contains(&id) {
             return Err(CmdError::Disabled(format!("{id}: You can only comment on this document")));
         }
         let refuse = |why: &str| Err(CmdError::Disabled(format!("{id}: {why} isn't available while co-editing")));

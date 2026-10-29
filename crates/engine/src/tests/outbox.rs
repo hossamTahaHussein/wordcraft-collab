@@ -287,6 +287,19 @@ fn a_suggester_only_suggests() {
     s.run("review.newComment", &json!({"text": "A note"})).unwrap();
 }
 
+/// Suggesters and commenters may still do whatever a viewer may: inspect, save, export, print.
+#[test]
+fn suggesters_and_commenters_may_read_the_document() {
+    use crate::outbox::CollabRole;
+    for role in [CollabRole::Suggest, CollabRole::Comment] {
+        let mut s = collab();
+        s.set_collab_role(role);
+        s.run("file.inspect", &json!({})).unwrap_or_else(|e| panic!("{role:?}: {e}"));
+        s.run("file.info", &json!({})).unwrap_or_else(|e| panic!("{role:?}: {e}"));
+        assert!(s.run("file.inspect", &json!({"remove": ["comments"]})).is_err(), "{role:?}: removing is a change");
+    }
+}
+
 /// Each command a suggester may run is one Reject All takes back whole: a suggestion.
 #[test]
 fn every_suggester_command_is_a_suggestion() {
