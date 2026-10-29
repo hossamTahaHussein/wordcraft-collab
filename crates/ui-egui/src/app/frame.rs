@@ -89,6 +89,7 @@ impl WordApp {
         #[cfg(not(target_arch = "wasm32"))]
         file_browser::show(self, ctx);
         colors::show(self, ctx);
+        crate::collab_ui::show(self, ctx);
         zotero::show_alert(self, ctx);
         read_aloud::show(self, ctx);
         crate::keytips::show(self, ctx, ui);

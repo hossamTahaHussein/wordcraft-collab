@@ -53,6 +53,9 @@ const QAT_MENU: [&str; 10] =
 /// Match the toolbar's enabled state for keyboard activation too.
 pub(crate) fn qat_enabled(app: &WordApp, id: &str) -> bool {
     match id {
+        // While co-editing, undo is the person's own edits for everyone (the host says which).
+        "edit.undo" if app.collab.active => app.collab.can_undo && app.session.collab_role() != wordcraft_engine::CollabRole::View,
+        "edit.redo" if app.collab.active => app.collab.can_redo && app.session.collab_role() != wordcraft_engine::CollabRole::View,
         "edit.undo" => app.session.can_undo(),
         "edit.redo" => app.session.can_redo(),
         "file.save" => app.has_document(),
@@ -624,6 +627,12 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                 }
                 if let Some(people) = crate::canvas::peers::people_label(app.peers.len()) {
                     st(ui, &people);
+                }
+                if let Some(role) = crate::collab_ui::role_label(app) {
+                    st(ui, role);
+                }
+                if app.collab.active && st(ui, tl!("Version history")).clicked() {
+                    app.open_version_history();
                 }
                 if app.session.sel.focus.story != StoryRef::Body && !crate::canvas::in_text_box(app) {
                     let label = match crate::canvas::part_kind(app, app.session.sel.focus.story) {

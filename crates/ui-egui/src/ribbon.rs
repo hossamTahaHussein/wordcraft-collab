@@ -134,7 +134,9 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                 // Share, Editing mode and Comments keep their room; the tabs get what is left of it
                 // (#897, #2026), and the buttons give up their labels before a tab is drawn over them.
                 let share = tl!("Share");
-                let editing_label = if app.session.viewing {
+                let editing_label = if let Some(role) = crate::collab_ui::role_label(app) {
+                    role
+                } else if app.session.viewing {
                     tl!("Viewing")
                 } else if app.session.doc.settings.track_changes {
                     tl!("Reviewing")

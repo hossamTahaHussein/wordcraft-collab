@@ -143,6 +143,7 @@ impl WordApp {
             windows: windows::Windows::new(shown_document),
             print_document: None,
             peers: Vec::new(),
+            collab: Default::default(),
             canvas,
             controls,
             dialog,

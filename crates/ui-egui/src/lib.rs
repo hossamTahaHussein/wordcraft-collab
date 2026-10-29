@@ -21,6 +21,7 @@ pub mod backstage;
 pub mod canvas;
 pub mod caret_glide;
 pub mod chrome;
+pub mod collab_ui;
 pub mod colors;
 pub mod content_controls;
 pub mod control;
@@ -464,6 +465,8 @@ pub struct WordApp {
     pub canvas: canvas::CanvasState,
     /// Co-editing: the other people in the document, where they are (the host fills this).
     pub peers: Vec<RemotePeer>,
+    /// Co-editing: what the host says about the shared document, and what the person asked of it.
+    pub collab: collab_ui::CollabUi,
     /// Content control frames, check boxes and lists on the page.
     pub controls: content_controls::ControlUi,
     pub dialog: Option<dialogs::Dialog>,

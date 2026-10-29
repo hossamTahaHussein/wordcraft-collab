@@ -114,7 +114,7 @@ impl Bridge {
         self.send(&[("type", "wordcraft:failed".into()), ("error", error.into())]);
     }
 
-    fn post_save(&self, path: &str, bytes: &[u8], save_as: bool) -> Result<(), String> {
+    pub fn post_save(&self, path: &str, bytes: &[u8], save_as: bool) -> Result<(), String> {
         let name = std::path::Path::new(path).file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| path.to_string());
         let buffer = js_sys::Uint8Array::from(bytes).buffer();
         let message = message(&[

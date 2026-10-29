@@ -208,6 +208,7 @@ impl WordApp {
             // Per window.
             ui,
             peers: _,
+            collab: _,
             canvas,
             controls,
             dialog,

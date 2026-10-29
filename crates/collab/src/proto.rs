@@ -162,6 +162,10 @@ pub enum Inbound {
         id: String,
         format: String,
     },
+    /// From the page, not the relay: whether it is connected to the relay now.
+    Connection {
+        online: bool,
+    },
     /// The relay's HTTP API runs command `cmd` as an edit by `author`.
     Run {
         id: String,
@@ -383,6 +387,7 @@ mod tests {
             Inbound::Refused { seq: 4, reason: "You can only view this document".into() }
         );
         assert_eq!(decode_inbound(r#"{"t":"VersionRequest","rev":12}"#).unwrap(), Inbound::VersionRequest { rev: 12 });
+        assert_eq!(decode_inbound(r#"{"t":"Connection","online":false}"#).unwrap(), Inbound::Connection { online: false });
         assert_eq!(
             decode_inbound(r#"{"t":"VersionList","versions":[{"rev":9,"at":"2026-10-29T10:00:00Z","users":["Ann"]}]}"#).unwrap(),
             Inbound::VersionList { versions: vec![VersionInfo { rev: 9, at: "2026-10-29T10:00:00Z".into(), users: vec!["Ann".into()] }] }

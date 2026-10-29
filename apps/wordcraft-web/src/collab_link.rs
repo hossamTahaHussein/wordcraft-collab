@@ -15,6 +15,10 @@ use wordcraft_engine::{CollabRole, Selection, Session};
 const PRESENCE_EVERY_MS: f64 = 100.0;
 /// How long a peer counts as typing after its last edit.
 const TYPING_MS: f64 = 3000.0;
+/// Offline this long, or this many edits waiting, and the document goes read only until they
+/// sync (spec §7): past that, a person risks losing much more than they would gain.
+pub const OFFLINE_LIMIT_MS: f64 = 5.0 * 60.0 * 1000.0;
+pub const PENDING_LIMIT: usize = 1000;
 
 /// Someone else in the document, as the UI shows them.
 #[derive(Clone, Debug, PartialEq)]
@@ -83,6 +87,10 @@ pub struct CollabLink {
     /// The version list and a version's document, as the relay last sent them.
     versions: Option<Vec<VersionInfo>>,
     version_doc: Option<(u64, Option<String>)>,
+    /// Since when the page has been disconnected from the relay.
+    offline_since: Option<f64>,
+    /// Read only for being offline too long: Viewing and its lock as they were before.
+    offline_lock: Option<(bool, bool)>,
 }
 
 impl CollabLink {
@@ -105,11 +113,32 @@ impl CollabLink {
             host_requests: Vec::new(),
             versions: None,
             version_doc: None,
+            offline_since: None,
+            offline_lock: None,
         }
     }
 
-    pub fn role(&self) -> CollabRole {
-        self.role
+    /// The document is read only until this person's edits sync (offline too long, or too many
+    /// waiting).
+    pub fn offline_locked(&self) -> bool {
+        self.offline_lock.is_some()
+    }
+
+    /// Go read only past the offline limits; back to editing once online with nothing waiting.
+    fn check_offline(&mut self, visible: &mut Session) {
+        let over = self.offline_since.is_some_and(|t| self.now - t >= OFFLINE_LIMIT_MS) || self.pending() >= PENDING_LIMIT;
+        if over && self.offline_lock.is_none() {
+            self.offline_lock = Some((visible.viewing, visible.viewing_locked));
+            visible.viewing = true;
+            visible.viewing_locked = true;
+            self.note = Some("Reconnecting…".into());
+        } else if self.offline_since.is_none()
+            && self.pending() == 0
+            && let Some((viewing, locked)) = self.offline_lock.take()
+        {
+            visible.viewing = viewing;
+            visible.viewing_locked = locked;
+        }
     }
 
     /// The relay's HTTP API requests since the last call.
@@ -291,6 +320,10 @@ impl CollabLink {
                 self.host_requests.push(HostRequest::Run { id, cmd, params, author });
                 Vec::new()
             }
+            Inbound::Connection { online } => {
+                self.offline_since = if online { None } else { self.offline_since.or(Some(self.now)) };
+                Vec::new()
+            }
         }
     }
 
@@ -319,6 +352,7 @@ impl CollabLink {
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         replica.drain_local(visible);
         self.follow(visible);
+        self.check_offline(visible);
         let Some(replica) = self.replica.as_mut() else { return Vec::new() };
         let mut out = Vec::new();
         if let Some(op) = replica.next_to_send() {
@@ -550,6 +584,17 @@ impl CollabLink {
                 vec![encode(&Outbound::ResyncRequest { have: replica.rev() })]
             }
         }
+    }
+}
+
+/// A kept version's text for its preview (native JSON in; empty when it can't be read).
+pub fn version_text(json: &str) -> String {
+    match wordcraft_engine::io::open_bytes("version.json", json.as_bytes()) {
+        Ok(doc) => {
+            let mut s = Session::new(doc);
+            s.run("document.text", &serde_json::json!({})).ok().and_then(|v| v["text"].as_str().map(str::to_string)).unwrap_or_default()
+        }
+        Err(_) => String::new(),
     }
 }
 
@@ -1298,14 +1343,14 @@ mod protocol_v2_tests {
 
     #[test]
     fn the_welcomes_role_limits_the_person() {
-        let (link, mut s) = joined("Hi", Some("view"));
-        assert_eq!(link.role(), CollabRole::View);
+        let (_, mut s) = joined("Hi", Some("view"));
+        assert_eq!(s.collab_role(), CollabRole::View);
         assert!(s.run("text.insert", &json!({"text": "x"})).is_err());
-        let (link, mut s) = joined("Hi", Some("comment"));
-        assert_eq!(link.role(), CollabRole::Comment);
+        let (_, mut s) = joined("Hi", Some("comment"));
+        assert_eq!(s.collab_role(), CollabRole::Comment);
         assert!(s.run("text.insert", &json!({"text": "x"})).is_err());
-        let (link, _) = joined("Hi", None);
-        assert_eq!(link.role(), CollabRole::Edit, "an older relay sends no role");
+        let (_, s) = joined("Hi", None);
+        assert_eq!(s.collab_role(), CollabRole::Edit, "an older relay sends no role");
     }
 
     #[test]
@@ -1339,7 +1384,9 @@ mod protocol_v2_tests {
         link.on_message(r#"{"t":"VersionList","versions":[{"rev":2,"at":"2026-10-29T10:00:00Z","users":["Ann"]}]}"#, &mut s);
         assert_eq!(link.take_versions().unwrap()[0].users, ["Ann"]);
         link.on_message(&json!({"t": "VersionDoc", "rev": 2, "doc": snap("Then")}).to_string(), &mut s);
-        assert!(link.take_version_doc().unwrap().1.unwrap().contains("Then"));
+        let (_, doc) = link.take_version_doc().unwrap();
+        assert_eq!(super::version_text(&doc.unwrap()).trim_end(), "Then");
+        assert_eq!(super::version_text("not json"), "");
         assert!(link.restore(2));
         let out = super::edits_only(link.tick(&mut s, 0.0));
         let op = parse(&out[0]);
@@ -1381,5 +1428,58 @@ mod protocol_v2_tests {
         let out = super::edits_only(link.tick(&mut s, 0.0));
         let op = parse(&out[0]);
         assert_eq!((op["kind"].as_str(), op["params"]["target"].as_u64()), (Some("undo"), Some(4)));
+    }
+}
+
+#[cfg(test)]
+mod offline_tests {
+    use serde_json::json;
+    use wordcraft_doc::Document;
+    use wordcraft_engine::Session;
+
+    use super::*;
+
+    fn joined() -> (CollabLink, Session) {
+        let mut src = Session::new(Document::new());
+        src.run("text.insert", &json!({"text": "Hi"})).unwrap();
+        let snap = String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &src.doc).unwrap()).unwrap();
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 1, "snapshot": snap, "ops": [], "you": "me"}).to_string(), &mut s);
+        (link, s)
+    }
+
+    #[test]
+    fn five_minutes_offline_is_read_only_until_back_and_synced() {
+        let (mut link, mut s) = joined();
+        link.tick(&mut s, 1000.0);
+        link.on_message(r#"{"t":"Connection","online":false}"#, &mut s);
+        link.tick(&mut s, 1000.0 + OFFLINE_LIMIT_MS - 1.0);
+        assert!(!link.offline_locked());
+        assert!(s.run("text.insert", &json!({"text": "!"})).is_ok(), "editing offline is fine for a while");
+        let out = super::edits_only(link.tick(&mut s, 1000.0 + OFFLINE_LIMIT_MS));
+        assert!(link.offline_locked());
+        assert!(s.run("text.insert", &json!({"text": "?"})).is_err());
+        assert_eq!(link.take_note().as_deref(), Some("Reconnecting…"));
+        link.on_message(r#"{"t":"Connection","online":true}"#, &mut s);
+        link.tick(&mut s, 1000.0 + OFFLINE_LIMIT_MS + 10.0);
+        assert!(link.offline_locked(), "still an edit waiting");
+        let mut echo: serde_json::Value = serde_json::from_str(&out[0]).unwrap();
+        echo["rev"] = json!(2);
+        link.on_message(&echo.to_string(), &mut s);
+        link.tick(&mut s, 1000.0 + OFFLINE_LIMIT_MS + 20.0);
+        assert!(!link.offline_locked());
+        assert!(s.run("text.insert", &json!({"text": "."})).is_ok());
+    }
+
+    #[test]
+    fn a_thousand_edits_waiting_is_read_only_too() {
+        let (mut link, mut s) = joined();
+        s.run("caret.docEnd", &json!({})).unwrap();
+        for _ in 0..PENDING_LIMIT {
+            s.run("text.insert", &json!({"text": " "})).unwrap();
+        }
+        link.tick(&mut s, 0.0);
+        assert!(link.offline_locked());
     }
 }

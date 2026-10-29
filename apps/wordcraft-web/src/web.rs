@@ -238,6 +238,39 @@ impl eframe::App for WebShell {
                     Err(e) => log::warn!("co-editing: autosave failed: {e}"),
                 }
             }
+            // The co-editing UI: undo state, the offline notice and Version history.
+            self.app.collab.active = link.rev().is_some();
+            self.app.collab.can_undo = link.can_undo();
+            self.app.collab.can_redo = link.can_redo();
+            self.app.collab.offline = link.offline_locked();
+            if let (Some(versions), Some(history)) = (link.take_versions(), self.app.collab.history.as_mut()) {
+                history.rows =
+                    Some(versions.into_iter().map(|v| wordcraft_ui_egui::collab_ui::VersionRow { rev: v.rev, at: v.at, users: v.users }).collect());
+            }
+            if let Some((rev, doc)) = link.take_version_doc()
+                && let Some(history) = self.app.collab.history.as_mut()
+                && history.preview.as_ref().is_some_and(|(r, _)| *r == rev)
+            {
+                history.preview = Some((rev, Some(doc.map(|json| crate::collab_link::version_text(&json)).unwrap_or_default())));
+            }
+            for request in self.app.take_collab_requests() {
+                use wordcraft_ui_egui::collab_ui::CollabRequest;
+                match request {
+                    CollabRequest::ListVersions => bridge.post_collab(&link.list_versions()),
+                    CollabRequest::Preview(rev) => bridge.post_collab(&link.get_version(rev)),
+                    CollabRequest::Restore(rev) => {
+                        link.restore(rev);
+                    }
+                    CollabRequest::SaveMyCopy => {
+                        let name = format!("{} (my copy).docx", self.app.title_stem());
+                        let saved = crate::api::document_file(&self.app, "docx").and_then(|(_, bytes)| bridge.post_save(&name, &bytes, true));
+                        match saved {
+                            Ok(()) => self.app.status(format!("Saved {name}")),
+                            Err(e) => self.app.status(e),
+                        }
+                    }
+                }
+            }
             let status = (link.pending(), link.rev(), self.app.peers.len() + 1);
             if status != self.collab_status {
                 self.collab_status = status;
