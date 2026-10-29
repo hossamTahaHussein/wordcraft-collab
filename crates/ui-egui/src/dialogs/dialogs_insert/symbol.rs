@@ -427,25 +427,27 @@ pub(super) fn symbol_ui(app: &mut WordApp, ui: &mut Ui, f: &mut SymbolForm) -> b
 fn special_ui(app: &mut WordApp, ui: &mut Ui, f: &mut SymbolForm, insert: &mut Option<(Value, String, String)>, t: &Tokens) -> bool {
     let mut double = false;
     egui::ScrollArea::vertical().id_salt("special_chars").max_height(CELL * GRID_ROWS as f32 + 60.0).auto_shrink([false, false]).show(ui, |ui| {
-        egui::Grid::new("special_grid").num_columns(3).striped(true).spacing(vec2(14.0, 4.0)).show(ui, |ui| {
-            ui.label(egui::RichText::new(tl!("Character")).font(semibold(12.0)));
-            ui.label("");
-            ui.label(egui::RichText::new(tl!("Shortcut key:")).font(semibold(12.0)));
-            ui.end_row();
-            for (i, (name, c, cmd)) in SPECIAL.iter().enumerate() {
-                let shown = if c.is_whitespace() || matches!(*c, '\u{00AD}' | '\u{200B}' | '\u{2060}') { String::new() } else { c.to_string() };
-                ui.label(egui::RichText::new(shown).font(regular(15.0)).color(t.text));
-                let resp = ui.selectable_label(f.special == i, tl!(name));
-                if resp.clicked() {
-                    f.special = i;
-                }
-                if resp.double_clicked() {
-                    f.special = i;
-                    double = true;
-                }
-                ui.label(cmd.map(|id| crate::widgets::shortcut_text(app, id)).unwrap_or_default());
+        crate::widgets::ltr_block(ui, ("grid", file!(), 430), |ui| {
+            egui::Grid::new("special_grid").num_columns(3).striped(true).spacing(vec2(14.0, 4.0)).show(ui, |ui| {
+                ui.label(egui::RichText::new(tl!("Character")).font(semibold(12.0)));
+                ui.label("");
+                ui.label(egui::RichText::new(tl!("Shortcut key:")).font(semibold(12.0)));
                 ui.end_row();
-            }
+                for (i, (name, c, cmd)) in SPECIAL.iter().enumerate() {
+                    let shown = if c.is_whitespace() || matches!(*c, '\u{00AD}' | '\u{200B}' | '\u{2060}') { String::new() } else { c.to_string() };
+                    ui.label(egui::RichText::new(shown).font(regular(15.0)).color(t.text));
+                    let resp = ui.selectable_label(f.special == i, tl!(name));
+                    if resp.clicked() {
+                        f.special = i;
+                    }
+                    if resp.double_clicked() {
+                        f.special = i;
+                        double = true;
+                    }
+                    ui.label(cmd.map(|id| crate::widgets::shortcut_text(app, id)).unwrap_or_default());
+                    ui.end_row();
+                }
+            })
         });
     });
     let (ok, close) = buttons(ui, "Insert", "Close", true);

@@ -269,32 +269,34 @@ pub fn contributors_ui(ui: &mut egui::Ui) {
 }
 
 fn table(ui: &mut egui::Ui, list: &[&Contributor], v: &mut View) {
-    egui::Grid::new("credits_table").striped(true).num_columns(SortKey::ALL.len()).show(ui, |ui| {
-        for k in SortKey::ALL {
-            let arrow = if v.key == k { if v.ascending { " ▲" } else { " ▼" } } else { "" };
-            if ui.button(RichText::new(format!("{}{arrow}", tl!(k.label().1))).strong()).on_hover_text(tl!(k.label().0)).clicked() {
-                if v.key == k {
-                    v.ascending = !v.ascending;
-                } else {
-                    v.key = k;
-                    v.ascending = k.default_ascending();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 272), |ui| {
+        egui::Grid::new("credits_table").striped(true).num_columns(SortKey::ALL.len()).show(ui, |ui| {
+            for k in SortKey::ALL {
+                let arrow = if v.key == k { if v.ascending { " ▲" } else { " ▼" } } else { "" };
+                if ui.button(RichText::new(format!("{}{arrow}", tl!(k.label().1))).strong()).on_hover_text(tl!(k.label().0)).clicked() {
+                    if v.key == k {
+                        v.ascending = !v.ascending;
+                    } else {
+                        v.key = k;
+                        v.ascending = k.default_ascending();
+                    }
                 }
             }
-        }
-        ui.end_row();
-        for c in list {
-            ui.hyperlink_to(c.name(v.names), format!("https://github.com/{}", c.login)).on_hover_text(c.summary());
-            ui.label(group(c.prs));
-            ui.label(group(c.commits));
-            ui.label(group(c.lines_added));
-            ui.label(group(c.lines_deleted));
-            ui.label(signed(c.lines_delta()));
-            ui.label(group(c.binary_added));
-            ui.label(group(c.binary_deleted));
-            ui.label(day(c.first_commit));
-            ui.label(day(c.last_commit));
             ui.end_row();
-        }
+            for c in list {
+                ui.hyperlink_to(c.name(v.names), format!("https://github.com/{}", c.login)).on_hover_text(c.summary());
+                ui.label(group(c.prs));
+                ui.label(group(c.commits));
+                ui.label(group(c.lines_added));
+                ui.label(group(c.lines_deleted));
+                ui.label(signed(c.lines_delta()));
+                ui.label(group(c.binary_added));
+                ui.label(group(c.binary_deleted));
+                ui.label(day(c.first_commit));
+                ui.label(day(c.last_commit));
+                ui.end_row();
+            }
+        })
     });
 }
 
@@ -306,20 +308,22 @@ pub fn models_ui(ui: &mut egui::Ui) {
     }
     let assisted: u64 = MODELS.iter().map(|m| m.commits).max().unwrap_or(0).max(1);
     egui::ScrollArea::both().auto_shrink([false, true]).max_height(360.0).show(ui, |ui| {
-        egui::Grid::new("credits_models").striped(true).num_columns(6).show(ui, |ui| {
-            for h in ["Company", "Model", "Version", "Commits", "% of all commits", "Lines +/−"] {
-                ui.label(RichText::new(tl!(h)).strong());
-            }
-            ui.end_row();
-            for m in MODELS {
-                ui.label(m.company);
-                ui.label(m.model);
-                ui.label(m.version);
-                ui.label(group(m.commits));
-                ui.label(format!("{:.0}%", 100.0 * m.commits as f64 / TOTAL_COMMITS.max(assisted) as f64));
-                ui.label(format!("+{} / −{}", group(m.lines_added), group(m.lines_deleted)));
+        crate::widgets::ltr_block(ui, ("grid", file!(), 309), |ui| {
+            egui::Grid::new("credits_models").striped(true).num_columns(6).show(ui, |ui| {
+                for h in ["Company", "Model", "Version", "Commits", "% of all commits", "Lines +/−"] {
+                    ui.label(RichText::new(tl!(h)).strong());
+                }
                 ui.end_row();
-            }
+                for m in MODELS {
+                    ui.label(m.company);
+                    ui.label(m.model);
+                    ui.label(m.version);
+                    ui.label(group(m.commits));
+                    ui.label(format!("{:.0}%", 100.0 * m.commits as f64 / TOTAL_COMMITS.max(assisted) as f64));
+                    ui.label(format!("+{} / −{}", group(m.lines_added), group(m.lines_deleted)));
+                    ui.end_row();
+                }
+            })
         });
     });
 }

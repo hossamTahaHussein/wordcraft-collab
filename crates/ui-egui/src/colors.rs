@@ -670,65 +670,67 @@ fn custom(ui: &mut Ui, d: &mut ColorsDialog) {
         ui.add_space(8.0);
     });
     ui.add_space(8.0);
-    egui::Grid::new("colors_custom").num_columns(2).spacing(vec2(10.0, 5.0)).show(ui, |ui| {
-        ui.label(tl!("Color model:"));
-        craft_ui::ComboBox::from_id_salt("colors_model")
-            .selected_text(match d.model {
-                Model::Rgb => "RGB",
-                Model::Hsl => "HSL",
-            })
-            .width(90.0)
-            .show_ui(ui, |ui| {
-                ui.selectable_value(&mut d.model, Model::Rgb, "RGB");
-                ui.selectable_value(&mut d.model, Model::Hsl, "HSL");
+    crate::widgets::ltr_block(ui, ("grid", file!(), 673), |ui| {
+        egui::Grid::new("colors_custom").num_columns(2).spacing(vec2(10.0, 5.0)).show(ui, |ui| {
+            ui.label(tl!("Color model:"));
+            craft_ui::ComboBox::from_id_salt("colors_model")
+                .selected_text(match d.model {
+                    Model::Rgb => "RGB",
+                    Model::Hsl => "HSL",
+                })
+                .width(90.0)
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(&mut d.model, Model::Rgb, "RGB");
+                    ui.selectable_value(&mut d.model, Model::Hsl, "HSL");
+                });
+            ui.end_row();
+            match d.model {
+                Model::Rgb => {
+                    let mut c = [d.color.0, d.color.1, d.color.2];
+                    let mut changed = false;
+                    for (i, label) in ["Red:", "Green:", "Blue:"].into_iter().enumerate() {
+                        ui.label(tl!(label));
+                        if let Some(v) = c.get_mut(i) {
+                            changed |= ui.add(egui::DragValue::new(v).range(0..=255).speed(1.0)).changed();
+                        }
+                        ui.end_row();
+                    }
+                    if changed {
+                        d.set_rgb(Rgb(c[0], c[1], c[2]));
+                    }
+                }
+                Model::Hsl => {
+                    // Word-style 0–255 scales for all three.
+                    let to255 = |v: f32| (v * 255.0).round().clamp(0.0, 255.0) as u8;
+                    let mut v = [to255(d.hsl.0 / 360.0), to255(d.hsl.1), to255(d.hsl.2)];
+                    let mut changed = false;
+                    for (i, label) in ["Hue:", "Sat:", "Lum:"].into_iter().enumerate() {
+                        ui.label(tl!(label));
+                        if let Some(x) = v.get_mut(i) {
+                            changed |= ui.add(egui::DragValue::new(x).range(0..=255).speed(1.0)).changed();
+                        }
+                        ui.end_row();
+                    }
+                    if changed {
+                        d.set_hsl(v[0] as f32 / 255.0 * 360.0, v[1] as f32 / 255.0, v[2] as f32 / 255.0);
+                    }
+                }
+            }
+            ui.label(tl!("Hex:"));
+            ui.horizontal(|ui| {
+                ui.label("#");
+                let mut text = d.hex.clone();
+                let r = ui.add(egui::TextEdit::singleline(&mut text).desired_width(80.0).char_limit(16));
+                if r.changed() {
+                    d.hex = text.clone();
+                    d.set_text(&text);
+                }
+                if r.lost_focus() {
+                    d.hex = d.color.hex();
+                }
             });
-        ui.end_row();
-        match d.model {
-            Model::Rgb => {
-                let mut c = [d.color.0, d.color.1, d.color.2];
-                let mut changed = false;
-                for (i, label) in ["Red:", "Green:", "Blue:"].into_iter().enumerate() {
-                    ui.label(tl!(label));
-                    if let Some(v) = c.get_mut(i) {
-                        changed |= ui.add(egui::DragValue::new(v).range(0..=255).speed(1.0)).changed();
-                    }
-                    ui.end_row();
-                }
-                if changed {
-                    d.set_rgb(Rgb(c[0], c[1], c[2]));
-                }
-            }
-            Model::Hsl => {
-                // Word-style 0–255 scales for all three.
-                let to255 = |v: f32| (v * 255.0).round().clamp(0.0, 255.0) as u8;
-                let mut v = [to255(d.hsl.0 / 360.0), to255(d.hsl.1), to255(d.hsl.2)];
-                let mut changed = false;
-                for (i, label) in ["Hue:", "Sat:", "Lum:"].into_iter().enumerate() {
-                    ui.label(tl!(label));
-                    if let Some(x) = v.get_mut(i) {
-                        changed |= ui.add(egui::DragValue::new(x).range(0..=255).speed(1.0)).changed();
-                    }
-                    ui.end_row();
-                }
-                if changed {
-                    d.set_hsl(v[0] as f32 / 255.0 * 360.0, v[1] as f32 / 255.0, v[2] as f32 / 255.0);
-                }
-            }
-        }
-        ui.label(tl!("Hex:"));
-        ui.horizontal(|ui| {
-            ui.label("#");
-            let mut text = d.hex.clone();
-            let r = ui.add(egui::TextEdit::singleline(&mut text).desired_width(80.0).char_limit(16));
-            if r.changed() {
-                d.hex = text.clone();
-                d.set_text(&text);
-            }
-            if r.lost_focus() {
-                d.hex = d.color.hex();
-            }
-        });
-        ui.end_row();
+            ui.end_row();
+        })
     });
 }
 

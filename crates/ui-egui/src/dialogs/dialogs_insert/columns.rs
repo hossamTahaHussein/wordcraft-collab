@@ -62,20 +62,22 @@ pub(super) fn drop_cap_ui(app: &mut WordApp, ui: &mut Ui, f: &mut DropCapForm) -
     let preview = app.previews.font_preview_fn();
     let unit = crate::options::unit();
     ui.add_enabled_ui(f.position != "none", |ui| {
-        egui::Grid::new("dropcap").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-            ui.label(tl!("Font:"));
-            if let Some(v) = crate::widgets::font_combo(ui, "dropcap_font", 190.0, &f.font, &fams, Some(&*preview))
-                && v != crate::widgets::ADD_FONT
-            {
-                f.font = v;
-            }
-            ui.end_row();
-            ui.label(tl!("Lines to drop:"));
-            ui.add(egui::DragValue::new(&mut f.lines).range(1..=10));
-            ui.end_row();
-            ui.label(tl!("Distance from text:"));
-            ui.add(egui::DragValue::new(&mut f.distance).speed(0.01).range(0.0..=22.0 * 72.0 / unit.pt_per_unit()).measure(unit).max_decimals(2));
-            ui.end_row();
+        crate::widgets::ltr_block(ui, ("grid", file!(), 65), |ui| {
+            egui::Grid::new("dropcap").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+                ui.label(tl!("Font:"));
+                if let Some(v) = crate::widgets::font_combo(ui, "dropcap_font", 190.0, &f.font, &fams, Some(&*preview))
+                    && v != crate::widgets::ADD_FONT
+                {
+                    f.font = v;
+                }
+                ui.end_row();
+                ui.label(tl!("Lines to drop:"));
+                ui.add(egui::DragValue::new(&mut f.lines).range(1..=10));
+                ui.end_row();
+                ui.label(tl!("Distance from text:"));
+                ui.add(egui::DragValue::new(&mut f.distance).speed(0.01).range(0.0..=22.0 * 72.0 / unit.pt_per_unit()).measure(unit).max_decimals(2));
+                ui.end_row();
+            })
         });
     });
     let (ok, cancel) = buttons(ui, "OK", "Cancel", true);
@@ -384,32 +386,34 @@ pub(super) fn columns_ui(app: &mut WordApp, ui: &mut Ui, f: &mut ColumnsForm) ->
         crate::widgets::column(ui, |ui| {
             let mut changed = None;
             egui::ScrollArea::vertical().id_salt("columns_widths").max_height(130.0).show(ui, |ui| {
-                egui::Grid::new("columns_grid").num_columns(3).spacing(vec2(12.0, 4.0)).show(ui, |ui| {
-                    ui.label(tl!("Col #:"));
-                    ui.label(tl!("Width:"));
-                    ui.label(tl!("Spacing:"));
-                    ui.end_row();
-                    let n = f.cols.len();
-                    let max = f.text_width.max(0.1);
-                    for i in 0..n {
-                        let editable = i == 0 || !f.equal;
-                        ui.label(format!("{}:", i + 1));
-                        if let Some(c) = f.cols.get_mut(i) {
-                            let w = egui::DragValue::new(&mut c.0).speed(0.01).range(ColumnsForm::min_w()..=max).measure(unit).max_decimals(2);
-                            if ui.add_enabled(editable, w).changed() {
-                                changed = Some(i);
-                            }
-                            if i + 1 < n {
-                                let s = egui::DragValue::new(&mut c.1).speed(0.01).range(0.0..=max).measure(unit).max_decimals(2);
-                                if ui.add_enabled(editable, s).changed() {
+                crate::widgets::ltr_block(ui, ("grid", file!(), 387), |ui| {
+                    egui::Grid::new("columns_grid").num_columns(3).spacing(vec2(12.0, 4.0)).show(ui, |ui| {
+                        ui.label(tl!("Col #:"));
+                        ui.label(tl!("Width:"));
+                        ui.label(tl!("Spacing:"));
+                        ui.end_row();
+                        let n = f.cols.len();
+                        let max = f.text_width.max(0.1);
+                        for i in 0..n {
+                            let editable = i == 0 || !f.equal;
+                            ui.label(format!("{}:", i + 1));
+                            if let Some(c) = f.cols.get_mut(i) {
+                                let w = egui::DragValue::new(&mut c.0).speed(0.01).range(ColumnsForm::min_w()..=max).measure(unit).max_decimals(2);
+                                if ui.add_enabled(editable, w).changed() {
                                     changed = Some(i);
                                 }
-                            } else {
-                                ui.label("");
+                                if i + 1 < n {
+                                    let s = egui::DragValue::new(&mut c.1).speed(0.01).range(0.0..=max).measure(unit).max_decimals(2);
+                                    if ui.add_enabled(editable, s).changed() {
+                                        changed = Some(i);
+                                    }
+                                } else {
+                                    ui.label("");
+                                }
                             }
+                            ui.end_row();
                         }
-                        ui.end_row();
-                    }
+                    })
                 });
             });
             if let Some(i) = changed {

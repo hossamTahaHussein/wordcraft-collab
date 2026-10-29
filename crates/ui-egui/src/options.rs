@@ -237,27 +237,33 @@ fn general(app: &mut WordApp, ui: &mut Ui) {
     }
     ui.add_space(8.0);
     section(ui, "Personalize");
-    egui::Grid::new("options_user").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
-        let user_label = ui.label(tl!("User name:"));
-        let mut n = app.session.author.clone();
-        let protected = wordcraft_engine::cmd::protect::enforced(&app.session.doc);
-        if ui.add_enabled(!protected, egui::TextEdit::singleline(&mut n).desired_width(260.0)).labelled_by(user_label.id).changed() && !protected {
-            app.session.author = n;
-        }
-        ui.end_row();
-        let initials_label = ui.label(tl!("Initials:"));
-        let mut i = app.session.initials.clone();
-        let hint = app.session.user_initials();
-        if ui
-            .add(
-                egui::TextEdit::singleline(&mut i).desired_width(80.0).char_limit(wordcraft_engine::cmd::options::MAX_INITIALS_CHARS).hint_text(hint),
-            )
-            .labelled_by(initials_label.id)
-            .changed()
-        {
-            set(app, json!({"initials": i}));
-        }
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 240), |ui| {
+        egui::Grid::new("options_user").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
+            let user_label = ui.label(tl!("User name:"));
+            let mut n = app.session.author.clone();
+            let protected = wordcraft_engine::cmd::protect::enforced(&app.session.doc);
+            if ui.add_enabled(!protected, egui::TextEdit::singleline(&mut n).desired_width(260.0)).labelled_by(user_label.id).changed() && !protected
+            {
+                app.session.author = n;
+            }
+            ui.end_row();
+            let initials_label = ui.label(tl!("Initials:"));
+            let mut i = app.session.initials.clone();
+            let hint = app.session.user_initials();
+            if ui
+                .add(
+                    egui::TextEdit::singleline(&mut i)
+                        .desired_width(80.0)
+                        .char_limit(wordcraft_engine::cmd::options::MAX_INITIALS_CHARS)
+                        .hint_text(hint),
+                )
+                .labelled_by(initials_label.id)
+                .changed()
+            {
+                set(app, json!({"initials": i}));
+            }
+            ui.end_row();
+        })
     });
     note(ui, "New comments and tracked changes are recorded under this name and these initials.");
 }
@@ -528,51 +534,53 @@ fn advanced(app: &mut WordApp, ui: &mut Ui) {
     }
     ui.add_space(8.0);
     section(ui, "Display");
-    egui::Grid::new("options_display").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
-        let recent_label = ui.label(tl!("Recent documents to show:"));
-        let mut n = app.ui.recent_shown();
-        if ui.add(egui::DragValue::new(&mut n).range(0..=crate::MAX_RECENT).speed(0.2)).labelled_by(recent_label.id).changed() {
-            app.ui.recent_count = n;
-        }
-        ui.end_row();
-        let units_label = ui.label(tl!("Measurement units:"));
-        // The user's choice, else the region's (#838): Automatic follows the region.
-        let units = app.session.units();
-        let auto = app.session.prefs.units.is_none();
-        let name = UNITS.iter().find(|(u, _)| *u == units).map_or("Inches", |(_, n)| n);
-        let shown = if auto { format!("{} ({})", tl!("Automatic"), tl!(name)) } else { tl!(name).to_string() };
-        let combo = craft_ui::ComboBox::from_id_salt("options_units").selected_text(shown).width(200.0).show_ui(ui, |ui| {
-            if ui.selectable_label(auto, tl!("Automatic")).clicked() {
-                set(app, json!({"units": "auto"}));
+    crate::widgets::ltr_block(ui, ("grid", file!(), 531), |ui| {
+        egui::Grid::new("options_display").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
+            let recent_label = ui.label(tl!("Recent documents to show:"));
+            let mut n = app.ui.recent_shown();
+            if ui.add(egui::DragValue::new(&mut n).range(0..=crate::MAX_RECENT).speed(0.2)).labelled_by(recent_label.id).changed() {
+                app.ui.recent_count = n;
             }
-            for (u, label) in UNITS {
-                if ui.selectable_label(!auto && units == u, tl!(label)).clicked() {
-                    set(app, json!({"units": u}));
+            ui.end_row();
+            let units_label = ui.label(tl!("Measurement units:"));
+            // The user's choice, else the region's (#838): Automatic follows the region.
+            let units = app.session.units();
+            let auto = app.session.prefs.units.is_none();
+            let name = UNITS.iter().find(|(u, _)| *u == units).map_or("Inches", |(_, n)| n);
+            let shown = if auto { format!("{} ({})", tl!("Automatic"), tl!(name)) } else { tl!(name).to_string() };
+            let combo = craft_ui::ComboBox::from_id_salt("options_units").selected_text(shown).width(200.0).show_ui(ui, |ui| {
+                if ui.selectable_label(auto, tl!("Automatic")).clicked() {
+                    set(app, json!({"units": "auto"}));
                 }
-            }
-        });
-        combo.response.labelled_by(units_label.id);
-        ui.end_row();
-        // The region new documents, units and the decimal separator follow; Automatic is the
-        // system's (#838).
-        let region_label = ui.label(tl!("Region:"));
-        let chosen = app.session.prefs.region.clone();
-        let system = &app.session.system_region;
-        let system_tag = if system.territory.is_empty() { system.language.clone() } else { format!("{}-{}", system.language, system.territory) };
-        let automatic = crate::i18n::fmt(tl!("Automatic ({region})"), &[("region", system_tag.as_str())]);
-        let shown = chosen.clone().unwrap_or_else(|| automatic.clone());
-        let combo = craft_ui::ComboBox::from_id_salt("options_region").selected_text(shown).width(200.0).show_ui(ui, |ui| {
-            if ui.selectable_label(chosen.is_none(), automatic.as_str()).clicked() {
-                set(app, json!({"region": "auto"}));
-            }
-            for tag in REGIONS {
-                if ui.selectable_label(chosen.as_deref() == Some(tag), tag).clicked() {
-                    set(app, json!({"region": tag}));
+                for (u, label) in UNITS {
+                    if ui.selectable_label(!auto && units == u, tl!(label)).clicked() {
+                        set(app, json!({"units": u}));
+                    }
                 }
-            }
-        });
-        combo.response.labelled_by(region_label.id);
-        ui.end_row();
+            });
+            combo.response.labelled_by(units_label.id);
+            ui.end_row();
+            // The region new documents, units and the decimal separator follow; Automatic is the
+            // system's (#838).
+            let region_label = ui.label(tl!("Region:"));
+            let chosen = app.session.prefs.region.clone();
+            let system = &app.session.system_region;
+            let system_tag = if system.territory.is_empty() { system.language.clone() } else { format!("{}-{}", system.language, system.territory) };
+            let automatic = crate::i18n::fmt(tl!("Automatic ({region})"), &[("region", system_tag.as_str())]);
+            let shown = chosen.clone().unwrap_or_else(|| automatic.clone());
+            let combo = craft_ui::ComboBox::from_id_salt("options_region").selected_text(shown).width(200.0).show_ui(ui, |ui| {
+                if ui.selectable_label(chosen.is_none(), automatic.as_str()).clicked() {
+                    set(app, json!({"region": "auto"}));
+                }
+                for tag in REGIONS {
+                    if ui.selectable_label(chosen.as_deref() == Some(tag), tag).clicked() {
+                        set(app, json!({"region": tag}));
+                    }
+                }
+            });
+            combo.response.labelled_by(region_label.id);
+            ui.end_row();
+        })
     });
     let mut keytips = app.ui.keytips_enabled;
     if ui.checkbox(&mut keytips, tl!("Show KeyTips (Alt or F10)")).changed() {

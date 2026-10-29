@@ -149,30 +149,32 @@ impl SourceForm {
 /// Draws a source's type and fields, optionally every bibliography field, and adds it as a
 /// bibliography source or inserts a citation on OK.
 pub(super) fn source_ui(app: &mut WordApp, ui: &mut Ui, f: &mut SourceForm) -> Next {
-    egui::Grid::new("src").num_columns(2).spacing(vec2(10.0, 5.0)).show(ui, |ui| {
-        let kind_label = ui.label(tl!("Source type:"));
-        let shown = SOURCE_TYPES.iter().find(|(k, ..)| *k == f.source.kind).map(|(_, l, _)| tl!(l).to_string()).unwrap_or_default();
-        let combo = craft_ui::ComboBox::from_id_salt("src_kind").selected_text(shown).width(200.0).show_ui(ui, |ui| {
-            for (k, l, _) in SOURCE_TYPES {
-                ui.selectable_value(&mut f.source.kind, k.to_string(), tl!(l));
-            }
-        });
-        combo.response.labelled_by(kind_label.id);
-        ui.end_row();
-        let edit = f.edit;
-        for (key, label) in f.fields() {
-            let field_label = ui.label(format!("{}:", tl!(label)));
-            if let Some(v) = field_mut(&mut f.source, key) {
-                let hint = match key {
-                    "author" => tl!("Last, First; Last, First"),
-                    "tag" => tl!("Made from the author and year when empty"),
-                    _ => "",
-                };
-                ui.add_enabled(!(edit && key == "tag"), egui::TextEdit::singleline(v).desired_width(260.0).hint_text(hint))
-                    .labelled_by(field_label.id);
-            }
+    crate::widgets::ltr_block(ui, ("grid", file!(), 152), |ui| {
+        egui::Grid::new("src").num_columns(2).spacing(vec2(10.0, 5.0)).show(ui, |ui| {
+            let kind_label = ui.label(tl!("Source type:"));
+            let shown = SOURCE_TYPES.iter().find(|(k, ..)| *k == f.source.kind).map(|(_, l, _)| tl!(l).to_string()).unwrap_or_default();
+            let combo = craft_ui::ComboBox::from_id_salt("src_kind").selected_text(shown).width(200.0).show_ui(ui, |ui| {
+                for (k, l, _) in SOURCE_TYPES {
+                    ui.selectable_value(&mut f.source.kind, k.to_string(), tl!(l));
+                }
+            });
+            combo.response.labelled_by(kind_label.id);
             ui.end_row();
-        }
+            let edit = f.edit;
+            for (key, label) in f.fields() {
+                let field_label = ui.label(format!("{}:", tl!(label)));
+                if let Some(v) = field_mut(&mut f.source, key) {
+                    let hint = match key {
+                        "author" => tl!("Last, First; Last, First"),
+                        "tag" => tl!("Made from the author and year when empty"),
+                        _ => "",
+                    };
+                    ui.add_enabled(!(edit && key == "tag"), egui::TextEdit::singleline(v).desired_width(260.0).hint_text(hint))
+                        .labelled_by(field_label.id);
+                }
+                ui.end_row();
+            }
+        })
     });
     ui.checkbox(&mut f.show_all, tl!("Show every bibliography field"));
     let (ok, cancel) = buttons(ui, tl!("OK"));

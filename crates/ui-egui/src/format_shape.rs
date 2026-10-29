@@ -216,55 +216,57 @@ fn kind_of(t: usize, focus: [f32; 4], angle: f32, scaled: bool) -> GradientKind 
 /// add and remove, and the selected stop's colour, position, transparency and rotate-with-shape
 /// controls.
 fn gradient(app: &mut WordApp, ui: &mut Ui, theme: &[Rgb], g: &Gradient) {
-    egui::Grid::new("format_shape.gradient").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
-        ui.label(tl!("Preset gradients"));
-        ui.menu_button("▾", |ui| {
-            if let Some(f) = presets_gallery(ui, theme) {
-                apply(app, ui, Some(&f), None);
-                ui.close();
-            }
-        });
-        ui.end_row();
-
-        ui.label(tl!("Type"));
-        let t = type_of(&g.kind);
-        let mut pick = t;
-        craft_ui::ComboBox::from_id_salt("format_shape.type").selected_text(tl!(TYPES[t].0)).show_ui(ui, |ui| {
-            for (i, (label, _)) in TYPES.iter().enumerate() {
-                ui.selectable_value(&mut pick, i, tl!(label));
-            }
-        });
-        if pick != t {
-            let (angle, focus) = match g.kind {
-                GradientKind::Linear { angle, .. } => (angle, [50.0; 4]),
-                GradientKind::Path { focus, .. } => (90.0, focus),
-            };
-            // The tile rectangle stays: only a Direction pick sets a corner's.
-            let kind = kind_of(pick, focus, angle, scaled_of(&g.kind));
-            apply(app, ui, Some(&with(g, |g| g.kind = kind)), None);
-        }
-        ui.end_row();
-
-        if t != 3 {
-            ui.label(tl!("Direction"));
+    crate::widgets::ltr_block(ui, ("grid", file!(), 219), |ui| {
+        egui::Grid::new("format_shape.gradient").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
+            ui.label(tl!("Preset gradients"));
             ui.menu_button("▾", |ui| {
-                if let Some(kind) = directions(ui, g, t) {
-                    apply(app, ui, Some(&with(g, |g| set_kind(g, kind))), None);
+                if let Some(f) = presets_gallery(ui, theme) {
+                    apply(app, ui, Some(&f), None);
                     ui.close();
                 }
             });
             ui.end_row();
-        }
 
-        if let GradientKind::Linear { angle, scaled } = g.kind {
-            ui.label(tl!("Angle"));
-            let mut a = angle;
-            let r = ui.add(egui::DragValue::new(&mut a).range(0.0..=359.9).suffix("°").speed(1.0));
-            if r.changed() {
-                apply(app, ui, Some(&with(g, |g| g.kind = GradientKind::Linear { angle: a, scaled })), Some(&r));
+            ui.label(tl!("Type"));
+            let t = type_of(&g.kind);
+            let mut pick = t;
+            craft_ui::ComboBox::from_id_salt("format_shape.type").selected_text(tl!(TYPES[t].0)).show_ui(ui, |ui| {
+                for (i, (label, _)) in TYPES.iter().enumerate() {
+                    ui.selectable_value(&mut pick, i, tl!(label));
+                }
+            });
+            if pick != t {
+                let (angle, focus) = match g.kind {
+                    GradientKind::Linear { angle, .. } => (angle, [50.0; 4]),
+                    GradientKind::Path { focus, .. } => (90.0, focus),
+                };
+                // The tile rectangle stays: only a Direction pick sets a corner's.
+                let kind = kind_of(pick, focus, angle, scaled_of(&g.kind));
+                apply(app, ui, Some(&with(g, |g| g.kind = kind)), None);
             }
             ui.end_row();
-        }
+
+            if t != 3 {
+                ui.label(tl!("Direction"));
+                ui.menu_button("▾", |ui| {
+                    if let Some(kind) = directions(ui, g, t) {
+                        apply(app, ui, Some(&with(g, |g| set_kind(g, kind))), None);
+                        ui.close();
+                    }
+                });
+                ui.end_row();
+            }
+
+            if let GradientKind::Linear { angle, scaled } = g.kind {
+                ui.label(tl!("Angle"));
+                let mut a = angle;
+                let r = ui.add(egui::DragValue::new(&mut a).range(0.0..=359.9).suffix("°").speed(1.0));
+                if r.changed() {
+                    apply(app, ui, Some(&with(g, |g| g.kind = GradientKind::Linear { angle: a, scaled })), Some(&r));
+                }
+                ui.end_row();
+            }
+        })
     });
     ui.add_space(6.0);
     ui.label(tl!("Gradient stops"));
@@ -394,17 +396,19 @@ fn stops_bar(app: &mut WordApp, ui: &mut Ui, g: &Gradient, sel: usize) {
 fn presets_gallery(ui: &mut Ui, theme: &[Rgb]) -> Option<Fill> {
     let presets = shape_fill::presets(theme);
     let mut out = None;
-    egui::Grid::new("format_shape.presets").spacing(vec2(4.0, 4.0)).show(ui, |ui| {
-        for (i, f) in presets.iter().enumerate() {
-            let style = shape_fill::PRESET_STYLES.get(i / 6).copied().unwrap_or("");
-            let name = format!("{}, {} {}", tl!(style), tl!("Accent"), i % 6 + 1);
-            if swatch(ui, f, &name) {
-                out = Some(f.clone());
+    crate::widgets::ltr_block(ui, ("grid", file!(), 397), |ui| {
+        egui::Grid::new("format_shape.presets").spacing(vec2(4.0, 4.0)).show(ui, |ui| {
+            for (i, f) in presets.iter().enumerate() {
+                let style = shape_fill::PRESET_STYLES.get(i / 6).copied().unwrap_or("");
+                let name = format!("{}, {} {}", tl!(style), tl!("Accent"), i % 6 + 1);
+                if swatch(ui, f, &name) {
+                    out = Some(f.clone());
+                }
+                if i % 6 == 5 {
+                    ui.end_row();
+                }
             }
-            if i % 6 == 5 {
-                ui.end_row();
-            }
-        }
+        })
     });
     out
 }
@@ -418,16 +422,18 @@ fn directions(ui: &mut Ui, g: &Gradient, t: usize) -> Option<GradientKind> {
         PATH_DIRECTIONS.iter().map(|&f| (kind_of(t, f, 90.0, true), shape_fill::path_direction_name(f))).collect()
     };
     let mut out = None;
-    egui::Grid::new("format_shape.directions").spacing(vec2(4.0, 4.0)).show(ui, |ui| {
-        for (i, (k, name)) in kinds.into_iter().enumerate() {
-            let f = with(g, |g| set_kind(g, k));
-            if swatch(ui, &f, &name) {
-                out = Some(k);
+    crate::widgets::ltr_block(ui, ("grid", file!(), 421), |ui| {
+        egui::Grid::new("format_shape.directions").spacing(vec2(4.0, 4.0)).show(ui, |ui| {
+            for (i, (k, name)) in kinds.into_iter().enumerate() {
+                let f = with(g, |g| set_kind(g, k));
+                if swatch(ui, &f, &name) {
+                    out = Some(k);
+                }
+                if i % 5 == 4 {
+                    ui.end_row();
+                }
             }
-            if i % 5 == 4 {
-                ui.end_row();
-            }
-        }
+        })
     });
     out
 }

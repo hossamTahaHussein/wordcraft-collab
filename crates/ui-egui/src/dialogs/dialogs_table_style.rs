@@ -469,32 +469,34 @@ pub fn body(app: &mut WordApp, ui: &mut Ui, f: Form) -> bool {
         .collect();
     let base_name = styles.iter().find(|(i, _)| i == based_on).map(|(_, n)| n.clone()).unwrap_or_else(|| based_on.clone());
     let mut rebased = false;
-    egui::Grid::new("tstyle").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        let name_label = ui.label(tl!("Name:"));
-        ui.text_edit_singleline(name).labelled_by(name_label.id);
-        ui.end_row();
-        let base_label = ui.label(tl!("Style based on:"));
-        let base = craft_ui::ComboBox::from_id_salt("tstyle_base").width(200.0).selected_text(base_name).show_ui(ui, |ui| {
-            for (sid, sname) in &styles {
-                if ui.selectable_label(sid == based_on, sname).clicked() && sid != based_on {
-                    *based_on = sid.clone();
-                    rebased = true;
-                }
-            }
-        });
-        base.response.labelled_by(base_label.id);
-        ui.end_row();
-        let region_label = ui.label(tl!("Apply formatting to:"));
-        let part = craft_ui::ComboBox::from_id_salt("tstyle_region")
-            .width(200.0)
-            .selected_text(tl!(PARTS.get(*region).map_or("Whole Table", |(_, l)| *l)))
-            .show_ui(ui, |ui| {
-                for (i, (_, n)) in PARTS.iter().enumerate() {
-                    ui.selectable_value(region, i, tl!(*n));
+    crate::widgets::ltr_block(ui, ("grid", file!(), 472), |ui| {
+        egui::Grid::new("tstyle").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            let name_label = ui.label(tl!("Name:"));
+            ui.text_edit_singleline(name).labelled_by(name_label.id);
+            ui.end_row();
+            let base_label = ui.label(tl!("Style based on:"));
+            let base = craft_ui::ComboBox::from_id_salt("tstyle_base").width(200.0).selected_text(base_name).show_ui(ui, |ui| {
+                for (sid, sname) in &styles {
+                    if ui.selectable_label(sid == based_on, sname).clicked() && sid != based_on {
+                        *based_on = sid.clone();
+                        rebased = true;
+                    }
                 }
             });
-        part.response.labelled_by(region_label.id);
-        ui.end_row();
+            base.response.labelled_by(base_label.id);
+            ui.end_row();
+            let region_label = ui.label(tl!("Apply formatting to:"));
+            let part = craft_ui::ComboBox::from_id_salt("tstyle_region")
+                .width(200.0)
+                .selected_text(tl!(PARTS.get(*region).map_or("Whole Table", |(_, l)| *l)))
+                .show_ui(ui, |ui| {
+                    for (i, (_, n)) in PARTS.iter().enumerate() {
+                        ui.selectable_value(region, i, tl!(*n));
+                    }
+                });
+            part.response.labelled_by(region_label.id);
+            ui.end_row();
+        })
     });
     // A new style shows its new base's formatting; a modified one keeps its own.
     if rebased && id.is_none() {
@@ -567,16 +569,18 @@ pub fn body(app: &mut WordApp, ui: &mut Ui, f: Form) -> bool {
             });
             ui.add_space(12.0);
             ui.label(tl!("Alignment:"));
-            egui::Grid::new("tstyle_align").spacing(vec2(1.0, 1.0)).show(ui, |ui| {
-                for (i, ((n, v, h), tip)) in CELL_ALIGNS.iter().zip(ALIGN_TIPS).enumerate() {
-                    let on = r.align == *n;
-                    if align_button(ui, (*v, *h), on, tl!(tip)).clicked() {
-                        r.align = if on { String::new() } else { n.to_string() };
+            crate::widgets::ltr_block(ui, "tstyle_align", |ui| {
+                egui::Grid::new("tstyle_align").spacing(vec2(1.0, 1.0)).show(ui, |ui| {
+                    for (i, ((n, v, h), tip)) in CELL_ALIGNS.iter().zip(ALIGN_TIPS).enumerate() {
+                        let on = r.align == *n;
+                        if align_button(ui, (*v, *h), on, tl!(tip)).clicked() {
+                            r.align = if on { String::new() } else { n.to_string() };
+                        }
+                        if i % 3 == 2 {
+                            ui.end_row();
+                        }
                     }
-                    if i % 3 == 2 {
-                        ui.end_row();
-                    }
-                }
+                })
             });
         });
     }

@@ -65,16 +65,18 @@ impl CrossRefForm {
 /// Insert.
 pub(super) fn cross_ref_ui(app: &mut WordApp, ui: &mut Ui, f: &mut CrossRefForm) -> Next {
     let was = f.to.clone();
-    egui::Grid::new("xref_opts").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        let type_label = ui.label(tl!("Reference type:"));
-        let types = ref_types(app);
-        let types: Vec<(String, &str)> = types.iter().map(|(v, l)| (v.clone(), l.as_str())).collect();
-        choice(ui, "xref_type", &mut f.to, &types, &type_label);
-        ui.end_row();
-        let show_label = ui.label(tl!("Insert reference to:"));
-        let shows: Vec<(String, &str)> = f.shows().iter().map(|(v, l)| (v.to_string(), *l)).collect();
-        choice(ui, "xref_show", &mut f.show, &shows, &show_label);
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 68), |ui| {
+        egui::Grid::new("xref_opts").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            let type_label = ui.label(tl!("Reference type:"));
+            let types = ref_types(app);
+            let types: Vec<(String, &str)> = types.iter().map(|(v, l)| (v.clone(), l.as_str())).collect();
+            choice(ui, "xref_type", &mut f.to, &types, &type_label);
+            ui.end_row();
+            let show_label = ui.label(tl!("Insert reference to:"));
+            let shows: Vec<(String, &str)> = f.shows().iter().map(|(v, l)| (v.to_string(), *l)).collect();
+            choice(ui, "xref_show", &mut f.show, &shows, &show_label);
+            ui.end_row();
+        })
     });
     if f.to != was {
         *f = CrossRefForm::read(app, &f.to);

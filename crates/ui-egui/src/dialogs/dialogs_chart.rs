@@ -198,43 +198,45 @@ pub fn type_ui(app: &mut WordApp, ui: &mut Ui, f: &mut ChartTypeForm) -> bool {
     let t = Tokens::get(ui.ctx());
     let col = accents(app);
     let mut chosen = None;
-    egui::Grid::new("chart_types").spacing(vec2(8.0, 8.0)).show(ui, |ui| {
-        for (k, kind) in ChartType::ALL.into_iter().enumerate() {
-            let (rect, resp) = ui.allocate_exact_size(vec2(112.0, 92.0), Sense::click());
-            let on = f.kind == kind;
-            ui.painter().rect(
-                rect,
-                4.0,
-                if on {
-                    t.checked
-                } else if resp.hovered() {
-                    t.hover
-                } else {
-                    t.input
-                },
-                Stroke::new(1.0, if on { t.accent } else { t.border }),
-                egui::StrokeKind::Inside,
-            );
-            let pic = Rect::from_min_size(rect.min + vec2(18.0, 6.0), vec2(76.0, 60.0));
-            preview(ui.painter(), pic, kind, col, t.text_dim);
-            ui.painter().text(
-                pos2(rect.center().x, rect.bottom() - 13.0),
-                egui::Align2::CENTER_CENTER,
-                tl!(kind.label()),
-                crate::theme::regular(11.0),
-                t.text,
-            );
-            let resp = resp.on_hover_text(tl!(kind.label()));
-            if resp.clicked() {
-                f.kind = kind;
+    crate::widgets::ltr_block(ui, ("grid", file!(), 201), |ui| {
+        egui::Grid::new("chart_types").spacing(vec2(8.0, 8.0)).show(ui, |ui| {
+            for (k, kind) in ChartType::ALL.into_iter().enumerate() {
+                let (rect, resp) = ui.allocate_exact_size(vec2(112.0, 92.0), Sense::click());
+                let on = f.kind == kind;
+                ui.painter().rect(
+                    rect,
+                    4.0,
+                    if on {
+                        t.checked
+                    } else if resp.hovered() {
+                        t.hover
+                    } else {
+                        t.input
+                    },
+                    Stroke::new(1.0, if on { t.accent } else { t.border }),
+                    egui::StrokeKind::Inside,
+                );
+                let pic = Rect::from_min_size(rect.min + vec2(18.0, 6.0), vec2(76.0, 60.0));
+                preview(ui.painter(), pic, kind, col, t.text_dim);
+                ui.painter().text(
+                    pos2(rect.center().x, rect.bottom() - 13.0),
+                    egui::Align2::CENTER_CENTER,
+                    tl!(kind.label()),
+                    crate::theme::regular(11.0),
+                    t.text,
+                );
+                let resp = resp.on_hover_text(tl!(kind.label()));
+                if resp.clicked() {
+                    f.kind = kind;
+                }
+                if resp.double_clicked() {
+                    chosen = Some(kind);
+                }
+                if k % 3 == 2 {
+                    ui.end_row();
+                }
             }
-            if resp.double_clicked() {
-                chosen = Some(kind);
-            }
-            if k % 3 == 2 {
-                ui.end_row();
-            }
-        }
+        })
     });
     let (ok, cancel) = crate::dialogs::buttons(ui, tl!("OK"));
     let Some(kind) = chosen.or(ok.then_some(f.kind)) else { return cancel };

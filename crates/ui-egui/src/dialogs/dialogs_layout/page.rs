@@ -164,25 +164,29 @@ pub(super) fn size_ui(app: &mut WordApp, ui: &mut Ui, f: &mut SizeForm) -> bool 
         (changed && v != was).then_some(v)
     };
     heading(ui, "Size");
-    egui::Grid::new("size_lengths").num_columns(4).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        if let Some(h) = length(ui, "Height:", f.height) {
-            f.set_height(h);
-        }
-        if let Some(w) = length(ui, "Width:", f.width) {
-            f.set_width(w);
-        }
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 167), |ui| {
+        egui::Grid::new("size_lengths").num_columns(4).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            if let Some(h) = length(ui, "Height:", f.height) {
+                f.set_height(h);
+            }
+            if let Some(w) = length(ui, "Width:", f.width) {
+                f.set_width(w);
+            }
+            ui.end_row();
+        })
     });
     heading(ui, "Scale");
     let (sw, sh) = f.scale();
-    egui::Grid::new("size_scale").num_columns(4).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        if let Some(p) = percent(ui, "Height:", sh) {
-            f.set_scale_height(p);
-        }
-        if let Some(p) = percent(ui, "Width:", sw) {
-            f.set_scale_width(p);
-        }
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 178), |ui| {
+        egui::Grid::new("size_scale").num_columns(4).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            if let Some(p) = percent(ui, "Height:", sh) {
+                f.set_scale_height(p);
+            }
+            if let Some(p) = percent(ui, "Width:", sw) {
+                f.set_scale_width(p);
+            }
+            ui.end_row();
+        })
     });
     ui.checkbox(&mut f.lock, tl!("Lock aspect ratio"));
     ui.add_enabled(f.original.is_some(), egui::Checkbox::new(&mut f.relative, tl!("Relative to original picture size")));

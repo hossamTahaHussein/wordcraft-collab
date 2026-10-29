@@ -318,27 +318,29 @@ pub fn table_grid_picker(ui: &mut Ui, app: &mut WordApp) {
     });
     let mut new_hover = (0, 0);
     let mut clicked = None;
-    egui::Grid::new("tgp").spacing(vec2(2.0, 2.0)).show(ui, |ui| {
-        for r in 1..=8 {
-            for c in 1..=10 {
-                let (rect, resp) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::click());
-                let on = r <= hover.0 && c <= hover.1;
-                ui.painter().rect(
-                    rect,
-                    1.0,
-                    if on { t.checked } else { t.input },
-                    egui::Stroke::new(1.0, if on { t.accent } else { t.border_strong }),
-                    egui::StrokeKind::Inside,
-                );
-                if resp.hovered() {
-                    new_hover = (r, c);
+    crate::widgets::ltr_block(ui, ("grid", file!(), 321), |ui| {
+        egui::Grid::new("tgp").spacing(vec2(2.0, 2.0)).show(ui, |ui| {
+            for r in 1..=8 {
+                for c in 1..=10 {
+                    let (rect, resp) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::click());
+                    let on = r <= hover.0 && c <= hover.1;
+                    ui.painter().rect(
+                        rect,
+                        1.0,
+                        if on { t.checked } else { t.input },
+                        egui::Stroke::new(1.0, if on { t.accent } else { t.border_strong }),
+                        egui::StrokeKind::Inside,
+                    );
+                    if resp.hovered() {
+                        new_hover = (r, c);
+                    }
+                    if resp.clicked() {
+                        clicked = Some((r, c));
+                    }
                 }
-                if resp.clicked() {
-                    clicked = Some((r, c));
-                }
+                ui.end_row();
             }
-            ui.end_row();
-        }
+        })
     });
     ui.data_mut(|d| d.insert_temp(id, new_hover));
     if new_hover != hover {
@@ -365,73 +367,86 @@ pub(super) fn table_properties(ui: &mut Ui, f: &mut TableForm) {
         ui.label(egui::RichText::new(tl!(s)).font(semibold(12.5)));
     };
     heading(ui, "Table");
-    egui::Grid::new("tp_table").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        ui.checkbox(&mut f.width_on, tl!("Preferred width:"));
-        ui.add_enabled(f.width_on, len(&mut f.width, 0.1, unit));
-        ui.end_row();
-        ui.label(tl!("Alignment:"));
-        ui.horizontal(|ui| {
-            for (v, l) in [("left", "Left"), ("center", "Center"), ("right", "Right")] {
-                ui.radio_value(&mut f.align, v.to_string(), tl!(l));
-            }
-        });
-        ui.end_row();
-        ui.label(tl!("Indent from left:"));
-        ui.add_enabled(f.align == "left", egui::DragValue::new(&mut f.indent).speed(0.01).range(-11.0..=22.0).measure(unit).max_decimals(2));
-        ui.end_row();
-        ui.label(tl!("Table direction:"));
-        ui.horizontal(|ui| {
-            ui.radio_value(&mut f.rtl, false, tl!("Left-to-right"));
-            ui.radio_value(&mut f.rtl, true, tl!("Right-to-left"));
-        });
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 368), |ui| {
+        egui::Grid::new("tp_table").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            ui.checkbox(&mut f.width_on, tl!("Preferred width:"));
+            ui.add_enabled(f.width_on, len(&mut f.width, 0.1, unit));
+            ui.end_row();
+            ui.label(tl!("Alignment:"));
+            ui.horizontal(|ui| {
+                for (v, l) in [("left", "Left"), ("center", "Center"), ("right", "Right")] {
+                    ui.radio_value(&mut f.align, v.to_string(), tl!(l));
+                }
+            });
+            ui.end_row();
+            ui.label(tl!("Indent from left:"));
+            ui.add_enabled(f.align == "left", egui::DragValue::new(&mut f.indent).speed(0.01).range(-11.0..=22.0).measure(unit).max_decimals(2));
+            ui.end_row();
+            ui.label(tl!("Table direction:"));
+            ui.horizontal(|ui| {
+                ui.radio_value(&mut f.rtl, false, tl!("Left-to-right"));
+                ui.radio_value(&mut f.rtl, true, tl!("Right-to-left"));
+            });
+            ui.end_row();
+        })
     });
     heading(ui, "Row");
-    egui::Grid::new("tp_row").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        ui.checkbox(&mut f.row_height_on, tl!("Specify height:"));
-        ui.horizontal(|ui| {
-            ui.add_enabled(f.row_height_on, len(&mut f.row_height, 0.02, unit));
-            ui.add_enabled_ui(f.row_height_on, |ui| {
-                craft_ui::ComboBox::from_id_salt("tp_rule").selected_text(tl!(if f.row_exact { "Exactly" } else { "At least" })).show_ui(ui, |ui| {
-                    ui.selectable_value(&mut f.row_exact, false, tl!("At least"));
-                    ui.selectable_value(&mut f.row_exact, true, tl!("Exactly"));
+    crate::widgets::ltr_block(ui, ("grid", file!(), 390), |ui| {
+        egui::Grid::new("tp_row").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            ui.checkbox(&mut f.row_height_on, tl!("Specify height:"));
+            ui.horizontal(|ui| {
+                ui.add_enabled(f.row_height_on, len(&mut f.row_height, 0.02, unit));
+                ui.add_enabled_ui(f.row_height_on, |ui| {
+                    craft_ui::ComboBox::from_id_salt("tp_rule").selected_text(tl!(if f.row_exact { "Exactly" } else { "At least" })).show_ui(
+                        ui,
+                        |ui| {
+                            ui.selectable_value(&mut f.row_exact, false, tl!("At least"));
+                            ui.selectable_value(&mut f.row_exact, true, tl!("Exactly"));
+                        },
+                    );
                 });
             });
-        });
-        ui.end_row();
+            ui.end_row();
+        })
     });
     ui.checkbox(&mut f.allow_break, tl!("Allow row to break across pages"));
     ui.checkbox(&mut f.header_row, tl!("Repeat as header row on each page"));
     heading(ui, "Column");
-    egui::Grid::new("tp_col").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        ui.label(tl!("Preferred width:"));
-        ui.add(len(&mut f.column_width, 0.1, unit));
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 406), |ui| {
+        egui::Grid::new("tp_col").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            ui.label(tl!("Preferred width:"));
+            ui.add(len(&mut f.column_width, 0.1, unit));
+            ui.end_row();
+        })
     });
     heading(ui, "Cell");
-    egui::Grid::new("tp_cell").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        ui.checkbox(&mut f.cell_width_on, tl!("Preferred width:"));
-        ui.add_enabled(f.cell_width_on, len(&mut f.cell_width, 0.1, unit));
-        ui.end_row();
-        ui.label(tl!("Vertical alignment:"));
-        ui.horizontal(|ui| {
-            for (v, l) in [("top", "Top"), ("center", "Center"), ("bottom", "Bottom")] {
-                ui.radio_value(&mut f.valign, v.to_string(), tl!(l));
-            }
-        });
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 412), |ui| {
+        egui::Grid::new("tp_cell").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            ui.checkbox(&mut f.cell_width_on, tl!("Preferred width:"));
+            ui.add_enabled(f.cell_width_on, len(&mut f.cell_width, 0.1, unit));
+            ui.end_row();
+            ui.label(tl!("Vertical alignment:"));
+            ui.horizontal(|ui| {
+                for (v, l) in [("top", "Top"), ("center", "Center"), ("bottom", "Bottom")] {
+                    ui.radio_value(&mut f.valign, v.to_string(), tl!(l));
+                }
+            });
+            ui.end_row();
+        })
     });
 }
 
 pub(super) fn cell_margins_dialog(ui: &mut Ui, f: &mut CellMarginsForm) {
     let unit = crate::options::unit();
     let max = 144.0 / unit.pt_per_unit();
-    egui::Grid::new("cell_margins").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        for (label, value) in [("Top:", &mut f.top), ("Left:", &mut f.left), ("Bottom:", &mut f.bottom), ("Right:", &mut f.right)] {
-            ui.label(tl!(label));
-            ui.add(egui::DragValue::new(value).speed(0.01).range(0.0..=max).measure(unit).max_decimals(2));
-            ui.end_row();
-        }
+    crate::widgets::ltr_block(ui, ("grid", file!(), 429), |ui| {
+        egui::Grid::new("cell_margins").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            for (label, value) in [("Top:", &mut f.top), ("Left:", &mut f.left), ("Bottom:", &mut f.bottom), ("Right:", &mut f.right)] {
+                ui.label(tl!(label));
+                ui.add(egui::DragValue::new(value).speed(0.01).range(0.0..=max).measure(unit).max_decimals(2));
+                ui.end_row();
+            }
+        })
     });
 }
 
@@ -482,14 +497,16 @@ pub(super) fn custom_properties(app: &mut WordApp, ui: &mut Ui, f: &mut CustomPr
         }
     });
     ui.separator();
-    egui::Grid::new("custom_props_form").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        let name = ui.label(tl!("Name:"));
-        ui.add(egui::TextEdit::singleline(&mut f.name).desired_width(300.0).char_limit(wordcraft_engine::cmd::file::MAX_CUSTOM_NAME))
-            .labelled_by(name.id);
-        ui.end_row();
-        let value = ui.label(tl!("Value:"));
-        ui.add(egui::TextEdit::singleline(&mut f.value).desired_width(300.0)).labelled_by(value.id);
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 485), |ui| {
+        egui::Grid::new("custom_props_form").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            let name = ui.label(tl!("Name:"));
+            ui.add(egui::TextEdit::singleline(&mut f.name).desired_width(300.0).char_limit(wordcraft_engine::cmd::file::MAX_CUSTOM_NAME))
+                .labelled_by(name.id);
+            ui.end_row();
+            let value = ui.label(tl!("Value:"));
+            ui.add(egui::TextEdit::singleline(&mut f.value).desired_width(300.0)).labelled_by(value.id);
+            ui.end_row();
+        })
     });
     if !f.message.is_empty() {
         ui.colored_label(ui.visuals().error_fg_color, f.message.as_str());

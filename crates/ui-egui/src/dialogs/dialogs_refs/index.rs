@@ -68,28 +68,30 @@ pub(super) fn index_ui(app: &mut WordApp, ui: &mut Ui, f: &mut IndexForm) -> Nex
     };
     sample(ui, &lines, f.right_align, leader_char(&f.leader));
     ui.add_space(6.0);
-    egui::Grid::new("idx").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        ui.label(tl!("Type:"));
-        ui.horizontal(|ui| {
-            ui.radio_value(&mut f.kind, "indented".to_string(), tl!("Indented"));
-            ui.radio_value(&mut f.kind, "runIn".to_string(), tl!("Run-in"));
-        });
-        ui.end_row();
-        let columns_label = ui.label(tl!("Columns:"));
-        ui.add(egui::DragValue::new(&mut f.columns).range(1..=4)).labelled_by(columns_label.id);
-        ui.end_row();
-        ui.label("");
-        ui.checkbox(&mut f.right_align, tl!("Page numbers at the right margin"));
-        ui.end_row();
-        let leader_label = ui.label(tl!("Tab leader:"));
-        ui.add_enabled_ui(f.right_align, |ui| {
-            let opts: Vec<(String, &str)> = LEADERS.iter().map(|(v, l)| (v.to_string(), *l)).collect();
-            choice(ui, "idx_leader", &mut f.leader, &opts, &leader_label);
-        });
-        ui.end_row();
-        ui.label("");
-        ui.checkbox(&mut f.headings, tl!("Letter headings"));
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 71), |ui| {
+        egui::Grid::new("idx").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            ui.label(tl!("Type:"));
+            ui.horizontal(|ui| {
+                ui.radio_value(&mut f.kind, "indented".to_string(), tl!("Indented"));
+                ui.radio_value(&mut f.kind, "runIn".to_string(), tl!("Run-in"));
+            });
+            ui.end_row();
+            let columns_label = ui.label(tl!("Columns:"));
+            ui.add(egui::DragValue::new(&mut f.columns).range(1..=4)).labelled_by(columns_label.id);
+            ui.end_row();
+            ui.label("");
+            ui.checkbox(&mut f.right_align, tl!("Page numbers at the right margin"));
+            ui.end_row();
+            let leader_label = ui.label(tl!("Tab leader:"));
+            ui.add_enabled_ui(f.right_align, |ui| {
+                let opts: Vec<(String, &str)> = LEADERS.iter().map(|(v, l)| (v.to_string(), *l)).collect();
+                choice(ui, "idx_leader", &mut f.leader, &opts, &leader_label);
+            });
+            ui.end_row();
+            ui.label("");
+            ui.checkbox(&mut f.headings, tl!("Letter headings"));
+            ui.end_row();
+        })
     });
     ui.add_space(4.0);
     if ui.button(tl!("Mark Entry…")).clicked() {
@@ -153,13 +155,15 @@ impl MarkForm {
 /// and Mark All running `references.markEntry`.
 pub(super) fn mark_ui(app: &mut WordApp, ui: &mut Ui, f: &mut MarkForm) -> Next {
     heading(ui, "Index");
-    egui::Grid::new("xe").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
-        let entry_label = ui.label(tl!("Main entry:"));
-        ui.add(egui::TextEdit::singleline(&mut f.entry).desired_width(220.0)).labelled_by(entry_label.id);
-        ui.end_row();
-        let subentry_label = ui.label(tl!("Subentry:"));
-        ui.add(egui::TextEdit::singleline(&mut f.subentry).desired_width(220.0)).labelled_by(subentry_label.id);
-        ui.end_row();
+    crate::widgets::ltr_block(ui, ("grid", file!(), 156), |ui| {
+        egui::Grid::new("xe").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
+            let entry_label = ui.label(tl!("Main entry:"));
+            ui.add(egui::TextEdit::singleline(&mut f.entry).desired_width(220.0)).labelled_by(entry_label.id);
+            ui.end_row();
+            let subentry_label = ui.label(tl!("Subentry:"));
+            ui.add(egui::TextEdit::singleline(&mut f.subentry).desired_width(220.0)).labelled_by(subentry_label.id);
+            ui.end_row();
+        })
     });
     heading(ui, "Options");
     ui.horizontal(|ui| {

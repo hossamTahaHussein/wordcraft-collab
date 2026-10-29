@@ -199,27 +199,29 @@ fn recovery_page(app: &mut WordApp, ui: &mut Ui) {
         ui.label(tl!("No recovery copies."));
     }
     let busy = app.session.recovery_busy();
-    egui::Grid::new("recovery_documents").min_col_width(180.0).spacing(vec2(24.0, 16.0)).show(ui, |ui| {
-        if !documents.is_empty() {
-            ui.strong(tl!("Document"));
-            ui.strong(tl!("Recovery copy"));
-            ui.end_row();
-        }
-        for doc in documents {
-            ui.label(&doc.name);
-            ui.label(&doc.saved_at);
-            ui.add_enabled_ui(!busy, |ui| {
-                ui.horizontal(|ui| {
-                    if ui.button(tl!("Restore")).clicked() {
-                        let _ = app.run("file.recover", json!({"restore": doc.id}));
-                    }
-                    if ui.button(tl!("Discard…")).clicked() {
-                        let _ = app.run("ui.recoveryDiscard", json!({"id": doc.id}));
-                    }
+    crate::widgets::ltr_block(ui, ("grid", file!(), 202), |ui| {
+        egui::Grid::new("recovery_documents").min_col_width(180.0).spacing(vec2(24.0, 16.0)).show(ui, |ui| {
+            if !documents.is_empty() {
+                ui.strong(tl!("Document"));
+                ui.strong(tl!("Recovery copy"));
+                ui.end_row();
+            }
+            for doc in documents {
+                ui.label(&doc.name);
+                ui.label(&doc.saved_at);
+                ui.add_enabled_ui(!busy, |ui| {
+                    ui.horizontal(|ui| {
+                        if ui.button(tl!("Restore")).clicked() {
+                            let _ = app.run("file.recover", json!({"restore": doc.id}));
+                        }
+                        if ui.button(tl!("Discard…")).clicked() {
+                            let _ = app.run("ui.recoveryDiscard", json!({"id": doc.id}));
+                        }
+                    });
                 });
-            });
-            ui.end_row();
-        }
+                ui.end_row();
+            }
+        })
     });
     ui.add_space(20.0);
     ui.horizontal(|ui| {
@@ -652,7 +654,7 @@ fn info_page(app: &mut WordApp, ui: &mut Ui) {
         let mut props = app.session.doc.core.clone();
         let mut edited = None;
         let mut focused = None;
-        egui::Grid::new("props").num_columns(2).spacing(vec2(12.0, 6.0)).show(ui, |ui| {
+        crate::widgets::ltr_block(ui, ("grid", file!(), 655), |ui| egui::Grid::new("props").num_columns(2).spacing(vec2(12.0, 6.0)).show(ui, |ui| {
             for (l, v) in [("Title", &mut props.title), ("Subject", &mut props.subject), ("Author", &mut props.creator), ("Keywords", &mut props.keywords), ("Category", &mut props.category)] {
                 let label = ui.label(tl!(l));
                 let r = ui.add(egui::TextEdit::singleline(v).id_salt(("info-prop", l))).labelled_by(label.id);
@@ -664,7 +666,7 @@ fn info_page(app: &mut WordApp, ui: &mut Ui) {
                 }
                 ui.end_row();
             }
-        });
+        }));
         if let Some(field) = edited {
             if app.info_editing == Some((field, app.session.rev())) {
                 app.session.join_next_undo();

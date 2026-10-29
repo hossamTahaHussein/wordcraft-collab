@@ -113,18 +113,20 @@ impl ControlForm {
 /// Draws the dialog; returns true to close it.
 pub fn body(app: &mut WordApp, ui: &mut Ui, f: &mut ControlForm) -> bool {
     ui.set_width(420.0);
-    egui::Grid::new("cc_props").num_columns(2).spacing([10.0, 6.0]).show(ui, |ui| {
-        ui.label(tl!("Title"));
-        ui.add(egui::TextEdit::singleline(&mut f.title).desired_width(280.0));
-        ui.end_row();
-        ui.label(tl!("Tag"));
-        ui.add(egui::TextEdit::singleline(&mut f.tag).desired_width(280.0));
-        ui.end_row();
-        if !matches!(f.kind.as_str(), "checkBox" | "picture" | "repeatingSection" | "repeatingSectionItem") {
-            ui.label(tl!("Placeholder text"));
-            ui.add(egui::TextEdit::singleline(&mut f.placeholder).desired_width(280.0));
+    crate::widgets::ltr_block(ui, ("grid", file!(), 116), |ui| {
+        egui::Grid::new("cc_props").num_columns(2).spacing([10.0, 6.0]).show(ui, |ui| {
+            ui.label(tl!("Title"));
+            ui.add(egui::TextEdit::singleline(&mut f.title).desired_width(280.0));
             ui.end_row();
-        }
+            ui.label(tl!("Tag"));
+            ui.add(egui::TextEdit::singleline(&mut f.tag).desired_width(280.0));
+            ui.end_row();
+            if !matches!(f.kind.as_str(), "checkBox" | "picture" | "repeatingSection" | "repeatingSectionItem") {
+                ui.label(tl!("Placeholder text"));
+                ui.add(egui::TextEdit::singleline(&mut f.placeholder).desired_width(280.0));
+                ui.end_row();
+            }
+        })
     });
     ui.add_space(6.0);
     ui.checkbox(&mut f.lock_delete, tl!("Can't be deleted"));
@@ -184,18 +186,20 @@ fn entries(ui: &mut Ui, f: &mut ControlForm) {
     ui.add_space(6.0);
     ui.label(egui::RichText::new(tl!("List entries")).font(semibold(12.0)));
     let mut remove = None;
-    egui::Grid::new("cc_entries").num_columns(3).spacing([6.0, 4.0]).show(ui, |ui| {
-        ui.label(egui::RichText::new(tl!("Display text")).small());
-        ui.label(egui::RichText::new(tl!("Value")).small());
-        ui.end_row();
-        for (i, e) in f.items.iter_mut().enumerate() {
-            ui.add(egui::TextEdit::singleline(&mut e.display).desired_width(170.0));
-            ui.add(egui::TextEdit::singleline(&mut e.value).desired_width(140.0));
-            if ui.small_button(tl!("Remove")).clicked() {
-                remove = Some(i);
-            }
+    crate::widgets::ltr_block(ui, ("grid", file!(), 187), |ui| {
+        egui::Grid::new("cc_entries").num_columns(3).spacing([6.0, 4.0]).show(ui, |ui| {
+            ui.label(egui::RichText::new(tl!("Display text")).small());
+            ui.label(egui::RichText::new(tl!("Value")).small());
             ui.end_row();
-        }
+            for (i, e) in f.items.iter_mut().enumerate() {
+                ui.add(egui::TextEdit::singleline(&mut e.display).desired_width(170.0));
+                ui.add(egui::TextEdit::singleline(&mut e.value).desired_width(140.0));
+                if ui.small_button(tl!("Remove")).clicked() {
+                    remove = Some(i);
+                }
+                ui.end_row();
+            }
+        })
     });
     if let Some(i) = remove
         && i < f.items.len()

@@ -230,21 +230,23 @@ fn calendar(ui: &mut Ui, t: &Tokens, month: &mut (i64, u32)) -> Option<u32> {
     // 1970-01-01 was a Thursday: Monday-first column of the 1st.
     let lead = (first + 3).rem_euclid(7) as u32;
     let days = wordcraft_engine::cmd::controls::days_in_month(y, m);
-    egui::Grid::new("cc_calendar").spacing(vec2(2.0, 2.0)).show(ui, |ui| {
-        for cell in 0..(lead + days) {
-            if cell < lead {
-                ui.label("");
-            } else {
-                let d = cell - lead + 1;
-                let b = egui::Button::new(egui::RichText::new(d.to_string()).color(t.text)).min_size(vec2(22.0, 18.0));
-                if ui.add(b).clicked() {
-                    picked = Some(d);
+    crate::widgets::ltr_block(ui, ("grid", file!(), 233), |ui| {
+        egui::Grid::new("cc_calendar").spacing(vec2(2.0, 2.0)).show(ui, |ui| {
+            for cell in 0..(lead + days) {
+                if cell < lead {
+                    ui.label("");
+                } else {
+                    let d = cell - lead + 1;
+                    let b = egui::Button::new(egui::RichText::new(d.to_string()).color(t.text)).min_size(vec2(22.0, 18.0));
+                    if ui.add(b).clicked() {
+                        picked = Some(d);
+                    }
+                }
+                if (cell + 1) % 7 == 0 {
+                    ui.end_row();
                 }
             }
-            if (cell + 1) % 7 == 0 {
-                ui.end_row();
-            }
-        }
+        })
     });
     picked
 }

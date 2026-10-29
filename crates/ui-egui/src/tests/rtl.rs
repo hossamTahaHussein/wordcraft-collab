@@ -17,7 +17,12 @@ fn app_in(lang: &str) -> (WordApp, egui::Context) {
 
 /// Run a few frames `width` × 800 and return what the last one painted.
 fn frame(app: &mut WordApp, ctx: &egui::Context, width: f32) -> Vec<ClippedShape> {
-    let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, 800.0));
+    frame_sized(app, ctx, width, 800.0)
+}
+
+/// [`frame`] with a window `height` tall.
+fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) -> Vec<ClippedShape> {
+    let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, height));
     let mut shapes = Vec::new();
     for i in 0..4 {
         let input = egui::RawInput { screen_rect: Some(screen), time: Some(f64::from(i) / 60.0), ..Default::default() };
@@ -324,5 +329,40 @@ fn a_narrow_window_hides_the_title_rather_than_overlapping() {
         if let (Some(title), Some(save)) = (title, save) {
             assert!(!title.intersects(save), "{lang} at {width}: the title over AutoSave: {title:?} {save:?}");
         }
+    }
+}
+
+/// The table style dialog's alignment grid sits in a row of the mirrored dialog: it lays out
+/// (finite positions) and stays inside the dialog.
+#[test]
+fn the_table_style_dialog_lays_out_right_to_left() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("ui.dialog", serde_json::json!({"name": "newTableStyle"})).unwrap();
+    let shapes = frame_sized(&mut app, &ctx, 1280.0, 1400.0);
+    let texts: Vec<String> =
+        shapes.iter().filter_map(|c| if let Shape::Text(t) = &c.shape { Some(t.galley.text().to_string()) } else { None }).collect();
+    let label = text_rect(&shapes, crate::tl!("Alignment:")).unwrap_or_else(|| panic!("Alignment label in {texts:?}"));
+    assert!(label.is_finite());
+    let ok = text_rect(&shapes, crate::tl!("OK")).expect("OK");
+    assert!(ok.is_finite() && ok.min.x > 0.0 && ok.max.x < 1280.0, "{ok:?}");
+    // Every text the dialog drew has a finite place.
+    for c in &shapes {
+        if let Shape::Text(t) = &c.shape
+            && !t.galley.text().is_empty()
+        {
+            assert!(t.visual_bounding_rect().is_finite(), "{:?} at {:?}", t.galley.text(), t.visual_bounding_rect());
+        }
+    }
+}
+
+/// Dialogs with label/field grids (their rows kept left to right) draw whole right to left.
+#[test]
+fn dialogs_with_grids_draw_whole() {
+    for name in ["paragraph", "font", "pageSetup"] {
+        let (mut app, ctx) = app_in("ar");
+        app.run("ui.dialog", serde_json::json!({"name": name})).unwrap();
+        let shapes = frame_sized(&mut app, &ctx, 1280.0, 1400.0);
+        assert!(text_rect(&shapes, crate::tl!("OK")).is_some_and(|r| r.is_finite()), "{name}: OK drawn");
+        assert!(text_rect(&shapes, crate::tl!("Cancel")).is_some_and(|r| r.is_finite()), "{name}: Cancel drawn");
     }
 }
