@@ -206,6 +206,9 @@ pub struct Session {
     /// Viewing (Editing › Viewing, the page API's read-only mode): this person can read, select,
     /// view and save, but not change the document ([`crate::cmd::protect::viewing_refuses`]).
     pub viewing: bool,
+    /// Viewing was set by the page that embeds the editor (`view.viewing {"lock": true}`): the
+    /// person can't leave it; only the page lifts it.
+    pub viewing_locked: bool,
     /// Editing inside an equation: which one and the caret in it.
     pub math: Option<MathEdit>,
     /// Equations are typed in LaTeX rather than the linear format.

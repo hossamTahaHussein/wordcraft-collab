@@ -11171,3 +11171,17 @@ fn viewing_refuses_file_commands_that_change_the_document() {
     assert!(s.run("file.info", &json!({})).is_ok());
     assert!(s.run("file.versions", &json!({})).is_ok(), "listing versions reads");
 }
+
+/// The page's read-only lock (`view.viewing {"lock": true}`): the person can't leave Viewing;
+/// only the page lifts it.
+#[test]
+fn a_locked_viewing_mode_stays_until_the_page_lifts_it() {
+    let mut s = s();
+    run(&mut s, "view.viewing", json!({"value": true, "lock": true}));
+    assert!(s.viewing && s.viewing_locked);
+    let e = s.run("view.viewing", &json!({"value": false})).unwrap_err().to_string();
+    assert!(e.contains("read only"), "{e}");
+    assert!(s.viewing);
+    run(&mut s, "view.viewing", json!({"value": false, "lock": false}));
+    assert!(!s.viewing && !s.viewing_locked);
+}

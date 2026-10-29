@@ -143,6 +143,7 @@ impl Session {
         copy.editing_lang = self.editing_lang.clone();
         copy.editing_lang_bidi = self.editing_lang_bidi.clone();
         copy.viewing = self.viewing;
+        copy.viewing_locked = self.viewing_locked;
         // The copy shares the paragraph layouts, so only what the command changed is laid out.
         std::mem::swap(&mut copy.cache, &mut self.cache);
         let layout = copy.run(id, params).is_ok().then(|| {

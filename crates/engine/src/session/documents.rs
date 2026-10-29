@@ -265,6 +265,7 @@ impl Session {
             editing_lang: _,
             editing_lang_bidi: _,
             viewing: _,
+            viewing_locked: _,
             math_latex: _,
             math_normal_text: _,
             last_highlight: _,

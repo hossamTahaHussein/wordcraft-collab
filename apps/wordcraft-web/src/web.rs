@@ -192,6 +192,13 @@ impl eframe::App for WebShell {
             }
         }
         self.app.logic(ctx);
+        // The page's JavaScript API: its calls run before the co-editing tick, so their edits
+        // go to the relay this frame.
+        if let Some(bridge) = self.bridge.as_ref() {
+            for (id, method, params) in bridge.take_calls() {
+                bridge.post_result(id, crate::api::call(&mut self.app, &method, &params));
+            }
+        }
         if let (Some(link), Some(bridge)) = (self.collab.as_mut(), self.bridge.as_ref()) {
             let now = js_sys::Date::now();
             for out in link.tick(&mut self.app.session, now) {
@@ -223,11 +230,8 @@ impl eframe::App for WebShell {
                 bridge.post_collab_status(status.0, status.1, status.2);
             }
         }
-        // The page's JavaScript API: run its calls, then tell it what changed this frame.
+        // Tell the page what changed this frame.
         if let Some(bridge) = self.bridge.as_ref() {
-            for (id, method, params) in bridge.take_calls() {
-                bridge.post_result(id, crate::api::call(&mut self.app, &method, &params));
-            }
             let (rev, edited_by) = match self.collab.as_mut() {
                 Some(link) => (link.rev().unwrap_or(0), link.take_edited_by()),
                 None => (self.app.session.rev(), Vec::new()),

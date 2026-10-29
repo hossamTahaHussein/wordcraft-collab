@@ -30,7 +30,11 @@ pub fn call(app: &mut WordApp, method: &str, params: &Value) -> Result<Reply, St
         "inspect" => app.execute("document.inspect", json!({}))?,
         "insertText" => app.execute("text.insert", json!({"text": text("text")?}))?,
         "select" => app.execute("select.text", json!({"text": text("text")?}))?,
-        "setReadOnly" => app.execute("view.viewing", json!({"value": params.get("on").and_then(Value::as_bool).unwrap_or(true)}))?,
+        // The page's read only is a lock: the person can't leave it from the Editing menu.
+        "setReadOnly" => {
+            let on = params.get("on").and_then(Value::as_bool).unwrap_or(true);
+            app.execute("view.viewing", json!({"value": on, "lock": on}))?
+        }
         "getDocument" => {
             let format = params.get("format").and_then(Value::as_str).unwrap_or("docx").to_ascii_lowercase();
             if !FORMATS.contains(&format.as_str()) {
@@ -218,5 +222,24 @@ mod tests {
         let presence = ev.iter().find(|e| e.0 == "presence").expect("presence");
         assert_eq!(presence.1, json!({"people": [{"name": "Ann", "color": wordcraft_ui_egui::peer_css_color(2)}]}));
         assert!(!names(&w.events(&a, a.session.rev(), &[], &[("Ann".to_string(), 2)])).contains(&"presence"));
+    }
+}
+
+#[cfg(test)]
+mod lock_tests {
+    use serde_json::json;
+    use wordcraft_ui_egui::{Services, WordApp};
+
+    use super::call;
+
+    /// setReadOnly(true) holds: the Editing menu (view.viewing) can't turn it off.
+    #[test]
+    fn read_only_from_the_page_cannot_be_turned_off_by_the_person() {
+        let mut a = WordApp::new(wordcraft_engine::Session::new(wordcraft_doc::Document::new()), Services::default());
+        call(&mut a, "setReadOnly", &json!({"on": true})).unwrap();
+        assert!(a.run("view.viewing", json!({"value": false})).is_err());
+        assert!(call(&mut a, "insertText", &json!({"text": "x"})).is_err());
+        call(&mut a, "setReadOnly", &json!({"on": false})).unwrap();
+        call(&mut a, "insertText", &json!({"text": "x"})).unwrap();
     }
 }

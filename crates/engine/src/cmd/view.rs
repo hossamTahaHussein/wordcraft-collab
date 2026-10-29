@@ -74,12 +74,20 @@ pub fn specs() -> Vec<CommandSpec> {
             .params(r#"{"value": percent (10-500) | "pageWidth" | "onePage" | "multiplePages"}"#)
             .pure(),
         CommandSpec::new("view.viewing", "Viewing", "Editing mode", |s, v| {
-            if let Some(on) = v.get("value").and_then(Value::as_bool) {
+            let lock = v.get("lock").and_then(Value::as_bool);
+            let on = v.get("value").and_then(Value::as_bool);
+            if s.viewing_locked && on == Some(false) && lock != Some(false) {
+                return Err(CmdError::Disabled("view.viewing: the page this document is in made it read only".into()));
+            }
+            if let Some(lock) = lock {
+                s.viewing_locked = lock;
+            }
+            if let Some(on) = on {
                 s.viewing = on;
             }
-            Ok(json!({"viewing": s.viewing}))
+            Ok(json!({"viewing": s.viewing, "locked": s.viewing_locked}))
         })
-        .params(r#"{"value"?: bool} → {"viewing": bool} (read only for this person: edits are refused)"#)
+        .params(r#"{"value"?: bool, "lock"?: bool (the embedding page's lock: while locked, only "lock": false leaves Viewing)} → {"viewing": bool, "locked": bool} (read only for this person: edits are refused)"#)
         .pure(),
         CommandSpec::new("view.zoom100", "100%", "View › Zoom", |s, _| zoom(s, &json!({"value": 100}))).pure(),
         CommandSpec::new("view.zoomIn", "Zoom In", "View › Zoom", |s, _| {

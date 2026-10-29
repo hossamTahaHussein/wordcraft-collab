@@ -146,6 +146,7 @@ impl Session {
             editing_lang: _,
             editing_lang_bidi: _,
             viewing: _,
+            viewing_locked: _,
             // Equation editing mode, like `view`: not part of the document or its history.
             math: _,
             math_latex: _,

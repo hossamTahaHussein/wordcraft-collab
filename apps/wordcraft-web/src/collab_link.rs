@@ -1135,7 +1135,11 @@ mod viewing_replay_tests {
         let snap = String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &base.doc).unwrap()).unwrap();
         let mut link = CollabLink::new(None);
         let mut s = Session::new(Document::new());
-        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap, "ops": [], "you": "me", "peers": [{"client": "a", "user": "Ann", "color": 1}]}).to_string(), &mut s);
+        link.on_message(
+            &json!({"t": "Welcome", "rev": 0, "snapshot": snap, "ops": [], "you": "me", "peers": [{"client": "a", "user": "Ann", "color": 1}]})
+                .to_string(),
+            &mut s,
+        );
         link.tick(&mut s, 0.0);
         s.run("caret.docEnd", &json!({})).unwrap();
         for t in [" a", " b", " c"] {

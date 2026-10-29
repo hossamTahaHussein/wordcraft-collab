@@ -199,7 +199,12 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             crate::widgets::icon_only_button(ui, "pencil", editing_label, regular(12.0), true)
                         };
                         let viewing = app.session.viewing;
+                        // Read only set by the page that embeds the editor: only it lifts it.
+                        let locked = app.session.viewing_locked;
                         egui::Popup::menu(&mode).show(|ui| {
+                            if locked {
+                                ui.disable();
+                            }
                             // Editing and Reviewing end Viewing first: tracking is a change Viewing refuses.
                             if ui.selectable_label(!track && !viewing, tl!(tl!("Editing — edit the document directly"))).clicked() {
                                 let _ = app.run("view.viewing", json!({"value": false}));
