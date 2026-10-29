@@ -11148,3 +11148,26 @@ fn co_editing_refuses_replacing_the_shared_document() {
         assert!(e.contains("replace the shared document"), "{id}: {e}");
     }
 }
+
+/// Viewing lets the file commands that read the document through, not those that change it:
+/// restoring a version or a recovered copy, its properties, protection or password.
+#[test]
+fn viewing_refuses_file_commands_that_change_the_document() {
+    let mut s = s();
+    run(&mut s, "text.insert", json!({"text": "Hello"}));
+    run(&mut s, "view.viewing", json!({"value": true}));
+    for (id, params) in [
+        ("file.versions", json!({"restore": 0})),
+        ("file.recover", json!({"restore": 0})),
+        ("file.properties", json!({"title": "New title"})),
+        ("file.protect", json!({"mode": "readOnly"})),
+        ("file.encrypt", json!({"password": "x"})),
+        ("file.setAuthor", json!({"name": "Someone"})),
+    ] {
+        let r = s.run(id, &params);
+        assert!(r.as_ref().is_err_and(|e| e.to_string().contains("open for viewing")), "{id}: {r:?}");
+    }
+    assert_eq!(run(&mut s, "document.text", json!({}))["text"], "Hello");
+    assert!(s.run("file.info", &json!({})).is_ok());
+    assert!(s.run("file.versions", &json!({})).is_ok(), "listing versions reads");
+}

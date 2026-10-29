@@ -250,13 +250,48 @@ fn always_allowed(id: &str, params: &Value) -> bool {
 /// read the document (save, export, print), as Restrict Editing allows them; not undo and redo,
 /// which would change it.
 pub(crate) fn viewing_allows(id: &str, params: &Value) -> bool {
-    id.starts_with("view.") || (id.starts_with("file.") && always_allowed(id, params))
+    if id.starts_with("view.") {
+        return true;
+    }
+    match id {
+        // Listing versions or recovered copies reads; restoring one replaces the document.
+        "file.versions" | "file.recover" => params.get("restore").is_none(),
+        "file.inspect" => always_allowed(id, params),
+        // Reading, saving, printing and sharing it, and switching to another document.
+        "file.accessibility"
+        | "file.autosave"
+        | "file.close"
+        | "file.closeDocument"
+        | "file.exportPdf"
+        | "file.exportPng"
+        | "file.info"
+        | "file.listTemplates"
+        | "file.new"
+        | "file.newFromTemplate"
+        | "file.open"
+        | "file.options"
+        | "file.print"
+        | "file.printMarkup"
+        | "file.printPdf"
+        | "file.privacy"
+        | "file.rename"
+        | "file.save"
+        | "file.saveAs"
+        | "file.saveTemplate"
+        | "file.share" => true,
+        _ => false,
+    }
 }
 
 /// Does Viewing refuse command `id` (`mutates`: whether its spec changes the document)? Undo,
-/// redo and repeat change it whatever their specs say.
+/// redo and repeat change it whatever their specs say, and so do the restores of the version and
+/// recovery commands.
 pub(crate) fn viewing_refuses(id: &str, mutates: bool, params: &Value) -> bool {
-    (mutates || matches!(id, "edit.undo" | "edit.redo" | "edit.repeat")) && !viewing_allows(id, params)
+    let changes = mutates
+        || matches!(id, "edit.undo" | "edit.redo" | "edit.repeat")
+        || (matches!(id, "file.versions" | "file.recover") && params.get("restore").is_some())
+        || matches!(id, "file.properties" | "file.protect" | "file.encrypt" | "file.setAuthor" | "file.privacyOptions" | "file.compatibility");
+    changes && !viewing_allows(id, params)
 }
 
 /// Why a command is refused while viewing.
