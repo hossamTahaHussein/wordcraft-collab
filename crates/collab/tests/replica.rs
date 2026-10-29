@@ -282,7 +282,7 @@ fn resync_from_snapshot_drops_pending_edits_the_relay_has_seen() {
     assert_eq!(a.text(), typed);
 }
 
-/// Review C2: a late joiner starts from a snapshot taken mid-stream; the tail holds an edit
+/// A late joiner starts from a snapshot taken mid-stream; the tail holds an edit
 /// based on a revision before the snapshot. The snapshot's history lets it place that edit.
 #[test]
 fn late_join_from_a_mid_stream_snapshot_with_an_older_based_tail() {
@@ -306,7 +306,7 @@ fn late_join_from_a_mid_stream_snapshot_with_an_older_based_tail() {
     assert_eq!(late.confirmed().plain_text(wordcraft_doc::StoryRef::Body), a.confirmed_text());
 }
 
-/// Review I3: a relay edit this replica already has is ignored, not reported as a gap.
+/// A relay edit this replica already has is ignored, not reported as a gap.
 #[test]
 fn an_edit_already_applied_is_ignored() {
     let mut relay = Relay::new(doc_with("x"));
@@ -319,7 +319,7 @@ fn an_edit_already_applied_is_ignored() {
     assert_eq!(a.replica.rev(), 1);
 }
 
-/// Review I1: in "Hello", Bob types "o" before the last "o" while Ann's caret is at the end.
+/// In "Hello", Bob types "o" before the last "o" while Ann's caret is at the end.
 /// Ann's caret and Ann's own "!" stay after the whole word.
 #[test]
 fn repeated_letters_do_not_pull_text_into_the_other_word() {
@@ -344,7 +344,7 @@ fn repeated_letters_do_not_pull_text_into_the_other_word() {
     }
 }
 
-/// Review I5: a revision no replica can decode is skipped the same way everywhere.
+/// A revision no replica can decode is skipped the same way everywhere.
 #[test]
 fn a_skipped_revision_advances_every_replica() {
     let mut relay = Relay::new(doc_with("x"));

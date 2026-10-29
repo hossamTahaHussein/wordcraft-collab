@@ -111,7 +111,7 @@ fn a_rolled_back_preview_records_nothing() {
     assert_eq!(ids, ["text.insert"]);
 }
 
-/// Review C3: paste reads the person's own clipboard; the recorded context carries it, so every
+/// Paste reads the person's own clipboard; the recorded context carries it, so every
 /// replica pastes the same thing.
 #[test]
 fn paste_carries_the_clipboard_it_pasted() {

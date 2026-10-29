@@ -397,7 +397,7 @@ mod seen_tests {
 }
 
 #[cfg(test)]
-mod review_tests {
+mod recovery_tests {
     use serde_json::json;
     use wordcraft_doc::{Document, StoryRef};
     use wordcraft_engine::Session;
@@ -410,7 +410,7 @@ mod review_tests {
         String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &s.doc).unwrap()).unwrap()
     }
 
-    /// Review C2: a joiner whose Welcome couldn't be used asks for a Resync, and the Resync then
+    /// A joiner whose Welcome couldn't be used asks for a Resync, and the Resync then
     /// starts it (there's no replica yet).
     #[test]
     fn a_resync_starts_a_replica_that_could_not_join() {
@@ -424,7 +424,7 @@ mod review_tests {
         assert!(link.take_document_ready());
     }
 
-    /// Review I5: an op no replica can decode, at the next revision, is skipped.
+    /// An op no replica can decode, at the next revision, is skipped.
     #[test]
     fn an_unreadable_op_at_the_next_revision_is_skipped() {
         let mut link = CollabLink::new(None);
@@ -435,7 +435,7 @@ mod review_tests {
         assert_eq!(link.rev(), Some(1));
     }
 
-    /// Review I6: an edit dropped after someone else's change is reported.
+    /// An edit dropped after someone else's change is reported.
     #[test]
     fn a_dropped_edit_leaves_a_note() {
         let mut link = CollabLink::new(None);
