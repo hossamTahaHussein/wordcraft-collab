@@ -168,8 +168,10 @@ pub(super) fn nav_heading(ui: &mut Ui, level: u8, text: &str, selected: bool, co
         if let Some(c) = collapsed {
             let ctr = rect.center();
             let col = ui.visuals().text_color();
+            // Collapsed, it points along the reading direction (left, right to left).
+            let f = craft_ui::direction::forward(ui);
             let pts = if c {
-                vec![ctr + vec2(-2.5, -4.0), ctr + vec2(-2.5, 4.0), ctr + vec2(3.0, 0.0)]
+                vec![ctr + vec2(-2.5 * f, -4.0), ctr + vec2(-2.5 * f, 4.0), ctr + vec2(3.0 * f, 0.0)]
             } else {
                 vec![ctr + vec2(-4.0, -2.5), ctr + vec2(4.0, -2.5), ctr + vec2(0.0, 3.0)]
             };
@@ -178,6 +180,12 @@ pub(super) fn nav_heading(ui: &mut Ui, level: u8, text: &str, selected: bool, co
         }
         let label = egui::RichText::new(text).font(if level == 0 { semibold(12.5) } else { regular(12.5) });
         let width = ui.available_width();
+        // Right to left the spare width goes first, so the text ends against its indent.
+        if craft_ui::direction::is_rtl(ui) {
+            let r =
+                ui.add(egui::Button::selectable(selected, (egui::Atom::grow(), label)).wrap().min_size(vec2(width, ui.spacing().interact_size.y)));
+            return (toggled, r);
+        }
         let r = ui.add(
             // The trailing grow atom takes the spare width, so the text starts flush left
             // under its parent instead of centred, as in Word (#1199). A minimum height

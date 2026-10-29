@@ -281,3 +281,20 @@ fn pane_contents_read_from_the_right() {
     let results = text_rect(&shapes, crate::tl!("Results")).expect("Results tab");
     assert!(headings.min.x > results.max.x, "the first tab is the rightmost: {headings:?} {results:?}");
 }
+
+/// Navigation headings keep their outline indent, from the right.
+#[test]
+fn navigation_headings_indent_from_the_right() {
+    let mut doc = wordcraft_doc::Document::from_text("Top\nSub\nBody");
+    let at = |i: usize| wordcraft_doc::Pos::body(i, 0);
+    doc.format_paragraphs(&at(0), &at(0), &|p: &mut wordcraft_doc::props::ParaProps| p.style = Some("Heading1".into())).unwrap();
+    doc.format_paragraphs(&at(1), &at(1), &|p: &mut wordcraft_doc::props::ParaProps| p.style = Some("Heading2".into())).unwrap();
+    let mut app = WordApp::new(wordcraft_engine::Session::new(doc), Services::default());
+    app.run("ui.language", serde_json::json!({"value": "ar"})).unwrap();
+    app.run("view.navigationPane", serde_json::json!({"value": true})).unwrap();
+    let ctx = egui::Context::default();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let top = text_rect(&shapes, "Top").expect("Top heading");
+    let sub = text_rect(&shapes, "Sub").expect("Sub heading");
+    assert!(top.max.x - sub.max.x > 8.0, "the sub-heading ends further from the right edge: {top:?} {sub:?}");
+}
