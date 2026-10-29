@@ -528,6 +528,10 @@ pub fn iso_from_unix_secs(secs: u64) -> String {
 
 /// Seconds since the Unix epoch (UTC): the system clock, or the browser's on the web.
 pub fn now_unix() -> u64 {
+    // A command replayed for co-editing reads the time it first ran at (`run_ctx`).
+    if let Some(time) = crate::run_ctx::clock_override() {
+        return time;
+    }
     #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
     {
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)

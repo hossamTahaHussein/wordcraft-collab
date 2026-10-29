@@ -20,6 +20,7 @@ pub(crate) mod prefs;
 pub mod print;
 pub mod recovery;
 pub mod ribbon;
+pub mod run_ctx;
 pub mod sample;
 mod session;
 pub(crate) mod snapshot;
@@ -33,6 +34,7 @@ use serde_json::Value;
 pub use io::Password;
 pub use keymap::KeyMap;
 pub use ribbon::RibbonLayout;
+pub use run_ctx::{EditingPrefs, RunCtx, with_clock};
 pub use session::{
     CellRange, ColumnBlock, DocInfo, DocState, EditSnapshot, FindState, MathEdit, Prefs, Selection, Session, StylesPaneDock, UNDO_LIST_MAX,
     ViewState, WindowView, blank_document, next_math_session, set_system_locale,
