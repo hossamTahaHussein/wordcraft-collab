@@ -452,7 +452,7 @@ fn migrate_units(v: &mut Value) {
 }
 
 /// Co-editing: someone else in the document, as the host gives them to [`WordApp::peers`].
-pub use canvas::peers::RemotePeer;
+pub use canvas::peers::{RemotePeer, peer_css_color};
 
 /// The application.
 pub struct WordApp {

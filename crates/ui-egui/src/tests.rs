@@ -7002,3 +7002,37 @@ fn focus_hides_the_ribbon_and_escape_brings_it_back() {
     h.step();
     assert!(h.state().session.view.read_mode && shown(&h, "Focus"), "Immersive Reader keeps the status bar");
 }
+
+/// Editing › Viewing: the page API's read-only mode shows in the Editing menu's button.
+#[test]
+fn the_editing_menu_offers_viewing() {
+    let mut a = app();
+    a.execute("view.viewing", serde_json::json!({"value": true})).unwrap();
+    assert!(a.session.viewing);
+    let ctx = egui::Context::default();
+    let mut shown = Vec::new();
+    for i in 0..3 {
+        let input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(1280.0, 800.0))),
+            time: Some(f64::from(i)),
+            ..Default::default()
+        };
+        let mut out = ctx.run_ui(input, |ui| {
+            a.logic(ui.ctx());
+            a.ui(ui);
+        });
+        out.textures_delta.clear();
+        shown =
+            out.shapes.iter().filter_map(|c| if let egui::Shape::Text(t) = &c.shape { Some(t.galley.text().to_string()) } else { None }).collect();
+    }
+    assert!(shown.iter().any(|t| t == crate::tl!("Viewing")), "{shown:?}");
+}
+
+#[test]
+fn peer_colors_for_the_page() {
+    let c = crate::peer_css_color(0);
+    assert!(c.len() == 7 && c.starts_with('#') && c[1..].chars().all(|ch| ch.is_ascii_hexdigit() && !ch.is_ascii_uppercase()), "{c}");
+    let t = crate::theme::Tokens::light().peer_colors[0];
+    assert_eq!(c, format!("#{:02x}{:02x}{:02x}", t.r(), t.g(), t.b()));
+    assert_eq!(crate::peer_css_color(12), c);
+}

@@ -126,6 +126,14 @@ pub(crate) fn paint_peers(painter: &Painter, marks: &[PeerMark], colors: &[Color
     }
 }
 
+/// A person's colour (an index into the palette) as CSS (`#rrggbb`, the light palette), for the
+/// page that embeds the editor.
+pub fn peer_css_color(index: u8) -> String {
+    let palette = crate::theme::Tokens::light().peer_colors;
+    let c = palette[usize::from(index) % palette.len()];
+    format!("#{:02x}{:02x}{:02x}", c.r(), c.g(), c.b())
+}
+
 #[cfg(test)]
 mod tests {
     use egui::{Rect, pos2, vec2};
