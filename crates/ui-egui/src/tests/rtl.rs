@@ -20,6 +20,24 @@ fn frame(app: &mut WordApp, ctx: &egui::Context, width: f32) -> Vec<ClippedShape
     frame_sized(app, ctx, width, 800.0)
 }
 
+/// One frame with a click at `at`, then [`frame`]'s frames.
+fn click(app: &mut WordApp, ctx: &egui::Context, width: f32, at: egui::Pos2) -> Vec<ClippedShape> {
+    let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, 800.0));
+    for (i, pressed) in [true, false].into_iter().enumerate() {
+        let events = vec![
+            egui::Event::PointerMoved(at),
+            egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed, modifiers: Default::default() },
+        ];
+        let input = egui::RawInput { screen_rect: Some(screen), time: Some(10.0 + i as f64 / 60.0), events, ..Default::default() };
+        let mut out = ctx.run_ui(input, |ui| {
+            app.logic(ui.ctx());
+            app.ui(ui);
+        });
+        out.textures_delta.clear();
+    }
+    frame(app, ctx, width)
+}
+
 /// [`frame`] with a window `height` tall.
 fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) -> Vec<ClippedShape> {
     let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, height));
@@ -365,4 +383,36 @@ fn dialogs_with_grids_draw_whole() {
         assert!(text_rect(&shapes, crate::tl!("OK")).is_some_and(|r| r.is_finite()), "{name}: OK drawn");
         assert!(text_rect(&shapes, crate::tl!("Cancel")).is_some_and(|r| r.is_finite()), "{name}: Cancel drawn");
     }
+}
+
+/// A mirrored ribbon too wide for the window opens at its start (the right) and its left chevron
+/// scrolls on to the groups at the far end.
+#[test]
+fn a_mirrored_ribbon_scrolls_to_its_far_end() {
+    let (mut app, ctx) = app_in("ar");
+    let width = 300.0;
+    let shapes = frame(&mut app, &ctx, width);
+    let visible = |shapes: &[ClippedShape], text: &str| {
+        shapes.iter().any(|c| match &c.shape {
+            Shape::Text(t) if t.galley.text() == text => {
+                let r = t.visual_bounding_rect();
+                r.min.x >= 0.0 && r.max.x <= width && c.clip_rect.intersects(r)
+            }
+            _ => false,
+        })
+    };
+    let first = crate::tl!("Clipboard");
+    let last = crate::tl!("Editor");
+    assert!(visible(&shapes, first), "the first group shows");
+    assert!(!visible(&shapes, last), "the last group is past the left end");
+    // The ribbon's left chevron (‹), at the left edge of the group row.
+    let ribbon_y = text_rect(&shapes, first).map_or(110.0, |r| r.min.y - 30.0);
+    let mut shapes = shapes;
+    for _ in 0..12 {
+        if visible(&shapes, last) {
+            break;
+        }
+        shapes = click(&mut app, &ctx, width, egui::pos2(14.0, ribbon_y));
+    }
+    assert!(visible(&shapes, last), "the left chevron reaches the last group");
 }

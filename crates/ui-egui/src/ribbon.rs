@@ -332,14 +332,24 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
             let pending_id = ui.scope_id().with("ribbon_scroll_pending");
             let pending = ui.data(|d| d.get_temp::<f32>(pending_id));
             let mut area = egui::ScrollArea::horizontal().scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysHidden);
+            // Right to left the groups start at the right edge of a row as wide as they took last
+            // frame (egui scrolls only to content past the right), and the tab opens at that
+            // start: its scroll position is kept as the distance from the start.
+            let rtl = craft_ui::direction::is_rtl(ui);
+            let rtl_ids = (ui.scope_id().with(("ribbon_rtl_width", &app.ui.tab)), ui.scope_id().with(("ribbon_rtl_from", &app.ui.tab)));
+            let (rtl_width, rtl_from, rtl_overflow) = ui.data(|d| {
+                let (w, from) = (d.get_temp::<f32>(rtl_ids.0).unwrap_or(0.0), d.get_temp::<(f32, f32)>(rtl_ids.1).unwrap_or((0.0, 0.0)));
+                (w, from.0, from.1)
+            });
             if let Some(x) = pending {
                 area = area.horizontal_scroll_offset(x);
+            } else if rtl {
+                area = area.horizontal_scroll_offset((rtl_overflow - rtl_from).max(0.0));
             }
-            // Right to left the groups start at the right; the row is as wide as the ribbon so
-            // they do, and grows past it only when they don't fit.
             let row = crate::widgets::row_top(ui);
             let scroll = area.show(ui, |ui| {
-                ui.with_layout(row, |ui| {
+                let size = if rtl { vec2(rtl_width.max(ui.available_width()), ui.available_height()) } else { ui.available_size_before_wrap() };
+                ui.allocate_ui_with_layout(size, row, |ui| {
                     ui.spacing_mut().item_spacing = vec2(2.0, 2.0);
                     match entry {
                         // Every tab hidden: nothing to show.
@@ -373,12 +383,21 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     if let Some(e) = entry {
                         custom_groups(app, ui, &e.groups);
                     }
-                });
+                })
+                .response
+                .rect
             });
             if pending.is_some() {
                 let _ = ui.data_mut(|d| d.remove_temp::<f32>(pending_id));
             }
             crate::ribbon_fit::end(ui.ctx());
+            if rtl {
+                let used = scroll.inner.width();
+                if (used - rtl_width).abs() > 0.5 {
+                    ui.data_mut(|d| d.insert_temp(rtl_ids.0, used));
+                    ui.ctx().request_discard("the mirrored ribbon row changed width");
+                }
+            }
             // The bar is hidden, so a row wider than the window would be clipped with no sign. Edge chevrons show
             // where more is and scroll it on click. Every command also stays reachable through Search Commands.
             let r = scroll.inner_rect;
@@ -398,7 +417,18 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     next = Some(offset + step);
                 }
             }
-            if let Some(x) = next {
+            if rtl {
+                // Right to left: a chevron moves the distance from the start (the next frames
+                // scroll there); every frame records the overflow it is measured against.
+                let from = match next {
+                    Some(x) => (overflow - x.clamp(0.0, overflow.max(0.0))).max(0.0),
+                    None => rtl_from.min(overflow.max(0.0)),
+                };
+                ui.data_mut(|d| d.insert_temp(rtl_ids.1, (from, overflow.max(0.0))));
+                if next.is_some() || (overflow - rtl_overflow).abs() > 0.5 {
+                    ui.ctx().request_repaint();
+                }
+            } else if let Some(x) = next {
                 ui.data_mut(|d| d.insert_temp(pending_id, x.clamp(0.0, overflow.max(0.0))));
                 ui.ctx().request_repaint();
             }
