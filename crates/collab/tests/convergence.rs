@@ -11,6 +11,8 @@ use wordcraft_collab::replica::Replica;
 #[derive(Clone, Debug)]
 enum Action {
     Type(usize, &'static str),
+    /// Typed, but not collected before the next delivery (the browser's frame order).
+    TypeUndrained(usize, &'static str),
     Enter(usize),
     Backspace(usize),
     Delete(usize),
@@ -29,6 +31,7 @@ fn action(peers: usize) -> impl Strategy<Value = Action> {
     let p = 0..peers;
     prop_oneof![
         4 => (p.clone(), prop::sample::select(TEXTS)).prop_map(|(i, t)| Action::Type(i, t)),
+        2 => (p.clone(), prop::sample::select(TEXTS)).prop_map(|(i, t)| Action::TypeUndrained(i, t)),
         1 => p.clone().prop_map(Action::Enter),
         1 => p.clone().prop_map(Action::Backspace),
         1 => p.clone().prop_map(Action::Delete),
@@ -45,6 +48,9 @@ fn action(peers: usize) -> impl Strategy<Value = Action> {
 fn play(peers: &mut [Peer], relay: &mut Relay, a: &Action) {
     match a {
         Action::Type(i, t) => peers[*i].type_text(t),
+        Action::TypeUndrained(i, t) => {
+            let _ = peers[*i].visible.run("text.insert", &json!({ "text": t }));
+        }
         Action::Enter(i) => peers[*i].act("text.newParagraph", json!({})),
         Action::Backspace(i) => peers[*i].act("text.backspace", json!({})),
         Action::Delete(i) => peers[*i].act("text.delete", json!({})),

@@ -205,6 +205,9 @@ impl Replica {
     /// Apply an op from the relay.
     pub fn receive(&mut self, op: Op, visible: &mut Session) -> Result<Applied, CollabError> {
         self.check_next(&op)?;
+        // Edits the person made since the host last collected them were made on the visible
+        // document as it is now: take them before it is rebuilt.
+        self.drain_local(visible);
         let own = self.in_flight && op.client == self.client && self.pending.front().is_some_and(|p| p.seq == op.seq);
         if own {
             self.apply_confirmed(&op)?;
@@ -223,6 +226,7 @@ impl Replica {
     /// are confirmed; the rest of the pending edits are returned to send again (one at a time:
     /// the first is returned, marked in flight).
     pub fn resume(&mut self, rev: u64, snapshot: Option<Document>, tail: Vec<Op>, visible: &mut Session) -> Result<Vec<Op>, CollabError> {
+        self.drain_local(visible);
         let before = self.confirmed.doc.clone();
         if let Some(doc) = snapshot {
             self.confirmed = headless(doc);

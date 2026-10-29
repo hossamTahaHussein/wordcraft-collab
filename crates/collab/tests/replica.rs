@@ -202,3 +202,24 @@ fn an_edit_in_flight_that_fails_after_a_remote_change_fails_everywhere() {
     assert_eq!(a.replica.confirmed().body.len(), b.replica.confirmed().body.len());
     assert_eq!(a.replica.pending_len(), 0);
 }
+
+/// The browser records a keystroke in one frame and collects edits in the next, after remote
+/// edits for that frame were applied: an edit still in the outbox must not be lost or misplaced.
+#[test]
+fn an_edit_not_yet_drained_survives_a_remote_edit() {
+    let mut relay = Relay::new(doc_with("0123456789"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    b.act("caret.docStart", json!({}));
+    b.type_text("B");
+    relay.collect(&mut [&mut a, &mut b], &[1]);
+    // Ann types at the end, but the frame hasn't collected it yet when Bob's edit arrives.
+    a.visible.run("caret.docEnd", &json!({})).unwrap();
+    a.replica.drain_local(&mut a.visible);
+    a.visible.run("text.insert", &json!({"text": "A"})).unwrap();
+    a.deliver(usize::MAX);
+    assert_eq!(a.text(), "B0123456789A", "Ann's typing is still shown, at the end");
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(a.text(), "B0123456789A");
+    assert_eq!(b.text(), a.text());
+}

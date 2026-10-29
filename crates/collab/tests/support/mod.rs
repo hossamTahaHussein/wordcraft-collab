@@ -76,6 +76,8 @@ impl Relay {
     pub fn collect(&mut self, peers: &mut [&mut Peer], order: &[usize]) -> usize {
         let mut n = 0;
         for &i in order {
+            let p = &mut *peers[i];
+            p.replica.drain_local(&mut p.visible);
             if let Some(mut op) = peers[i].replica.next_to_send() {
                 op.rev = Some(self.rev() + 1);
                 op.user = Some(op.ctx.author.clone());
