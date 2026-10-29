@@ -175,21 +175,23 @@ pub(super) fn insert(app: &mut WordApp, ui: &mut Ui) {
                 }
             }
             items.truncate(30);
-            egui::Grid::new("syms").show(ui, |ui| {
-                for (i, (c, font)) in items.iter().enumerate() {
-                    let b = ui.button(egui::RichText::new(c).size(16.0));
-                    let b = if font.is_empty() { b } else { b.on_hover_text(font) };
-                    if b.clicked() {
-                        let params = if font.is_empty() { json!({"char": c}) } else { json!({"char": c, "font": font}) };
-                        if app.run("insert.symbol", params).is_ok() {
-                            crate::dialogs_insert::remember_symbol(app, c, font);
+            crate::widgets::ltr_block(ui, "syms", |ui| {
+                egui::Grid::new("syms").show(ui, |ui| {
+                    for (i, (c, font)) in items.iter().enumerate() {
+                        let b = ui.button(egui::RichText::new(c).size(16.0));
+                        let b = if font.is_empty() { b } else { b.on_hover_text(font) };
+                        if b.clicked() {
+                            let params = if font.is_empty() { json!({"char": c}) } else { json!({"char": c, "font": font}) };
+                            if app.run("insert.symbol", params).is_ok() {
+                                crate::dialogs_insert::remember_symbol(app, c, font);
+                            }
+                            ui.close();
                         }
-                        ui.close();
+                        if i % 6 == 5 {
+                            ui.end_row();
+                        }
                     }
-                    if i % 6 == 5 {
-                        ui.end_row();
-                    }
-                }
+                })
             });
             ui.separator();
             mi(ui, app, "More Symbols…", "ui.dialog", json!({"name": "symbol"}));

@@ -21,19 +21,21 @@ pub(crate) fn gradient_menu(ui: &mut Ui, app: &mut WordApp, fill: Option<&wordcr
     }
     for (title, tiles) in ["Light Variations", "Dark Variations"].into_iter().zip(shape_fill::variations(main)) {
         ui.label(egui::RichText::new(tl!(title)).small().weak());
-        egui::Grid::new(title).spacing(vec2(4.0, 4.0)).show(ui, |ui| {
-            for (i, (f, name)) in tiles.iter().enumerate() {
-                if crate::format_shape::swatch(ui, f, name) {
-                    let _ = app.run("shape.fill", shape_fill::params(Some(f)));
-                    if let (Some(p), Some(Some(now))) = (pos.clone(), crate::format_shape::current(app)) {
-                        crate::format_shape::remember_variation(ui.ctx(), p, now, main);
+        crate::widgets::ltr_block(ui, title, |ui| {
+            egui::Grid::new(title).spacing(vec2(4.0, 4.0)).show(ui, |ui| {
+                for (i, (f, name)) in tiles.iter().enumerate() {
+                    if crate::format_shape::swatch(ui, f, name) {
+                        let _ = app.run("shape.fill", shape_fill::params(Some(f)));
+                        if let (Some(p), Some(Some(now))) = (pos.clone(), crate::format_shape::current(app)) {
+                            crate::format_shape::remember_variation(ui.ctx(), p, now, main);
+                        }
+                        ui.close();
                     }
-                    ui.close();
+                    if i % 5 == 4 {
+                        ui.end_row();
+                    }
                 }
-                if i % 5 == 4 {
-                    ui.end_row();
-                }
-            }
+            })
         });
     }
     ui.separator();

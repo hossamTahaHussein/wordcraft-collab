@@ -37,6 +37,25 @@ pub use tooltip::{key_text, shortcut_text};
 const _: () = assert!(BIG_LABEL_Y + LABEL_PITCH + LABEL_LINE_H <= CONTENT_H);
 const _: () = assert!(BIG_ICON_Y + 16.0 <= BIG_LABEL_Y);
 
+/// Content that keeps its left-to-right layout in a mirrored row (an egui `Grid`, whose
+/// arithmetic assumes rows run left to right): placed at the row's cursor at the size it took
+/// last frame, its own rows left to right. Left to right it is `add` as is.
+pub(crate) fn ltr_block<R>(ui: &mut Ui, salt: impl std::hash::Hash + std::fmt::Debug, add: impl FnOnce(&mut Ui) -> R) -> R {
+    if !craft_ui::direction::is_rtl(ui) {
+        return add(ui);
+    }
+    let id = ui.scope_id().with(("ltr_block", salt));
+    let size = ui.data(|d| d.get_temp::<egui::Vec2>(id)).unwrap_or(egui::Vec2::ZERO);
+    let shown = ui.allocate_ui_with_layout(size, egui::Layout::left_to_right(egui::Align::Min), add);
+    let used = shown.response.rect.size();
+    if (used - size).length() > 0.5 {
+        // First seen, or grown: lay the frame out again at the new size.
+        ui.data_mut(|d| d.insert_temp(id, used));
+        ui.ctx().request_discard("a left-to-right block changed size");
+    }
+    shown.inner
+}
+
 /// A top-aligned row in reading order (a ribbon group's controls, a gallery's thumbnails).
 pub(crate) fn row_top(ui: &Ui) -> egui::Layout {
     if craft_ui::direction::is_rtl(ui) { egui::Layout::right_to_left(egui::Align::Min) } else { egui::Layout::left_to_right(egui::Align::Min) }

@@ -217,7 +217,8 @@ fn icon_points(rtl: bool, name: &str) -> Vec<(f32, f32)> {
     let ctx = egui::Context::default();
     craft_ui::direction::apply(&ctx, if rtl { craft_ui::direction::Direction::Rtl } else { craft_ui::direction::Direction::Ltr });
     let r = egui::Rect::from_min_size(egui::pos2(100.0, 100.0), egui::vec2(20.0, 20.0));
-    let out = ctx.run_ui(egui::RawInput::default(), |ui| crate::icons::paint(ui.painter(), r, name, egui::Color32::BLACK, egui::Color32::RED));
+    let mut out = ctx.run_ui(egui::RawInput::default(), |ui| crate::icons::paint(ui.painter(), r, name, egui::Color32::BLACK, egui::Color32::RED));
+    out.textures_delta.clear();
     let mut pts = Vec::new();
     fn walk(s: &Shape, pts: &mut Vec<(f32, f32)>) {
         match s {
@@ -257,4 +258,16 @@ fn bullets_and_indent_icons_flip_right_to_left() {
     }
     // Undo keeps its drawing (history runs left to right).
     assert_eq!(sorted(&icon_points(true, "undo")), sorted(&icon_points(false, "undo")));
+}
+
+/// Layout › Paragraph's indent and spacing fields (an egui grid, kept left to right) stay inside
+/// their group in a mirrored ribbon.
+#[test]
+fn a_grid_in_a_mirrored_ribbon_group_stays_in_its_group() {
+    let (mut app, ctx) = app_in("ar");
+    app.ui.tab = "Layout".into();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let title = text_rect(&shapes, crate::tl!("Paragraph")).expect("Paragraph group title");
+    let indent = text_rect(&shapes, crate::tl!("Indent")).expect("Indent heading");
+    assert!((indent.center().x - title.center().x).abs() < 120.0, "the fields sit over their title: {indent:?} {title:?}");
 }

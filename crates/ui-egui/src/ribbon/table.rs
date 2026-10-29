@@ -5,24 +5,26 @@ pub(super) fn table_design(app: &mut WordApp, ui: &mut Ui) {
     let look = app.session.sel.focus.path.cell().and_then(|(tp, _, _)| app.session.doc.table(app.session.sel.focus.story, &tp).map(|t| t.props.look));
     group(ui, "Table Style Options", None, app, |ui, app| {
         let Some(l) = look else { return };
-        egui::Grid::new("look").show(ui, |ui| {
-            for (row, items) in [
-                [("Header Row", "headerRow", l.header_row), ("First Column", "firstColumn", l.first_column)],
-                [("Total Row", "totalRow", l.total_row), ("Last Column", "lastColumn", l.last_column)],
-                [("Banded Rows", "bandedRows", l.banded_rows), ("Banded Columns", "bandedColumns", l.banded_columns)],
-            ]
-            .iter()
-            .enumerate()
-            {
-                let _ = row;
-                for (label, key, val) in items {
-                    let mut v = *val;
-                    if ui.checkbox(&mut v, tl!(label)).changed() {
-                        let _ = app.run("table.look", json!({ *key: v }));
+        crate::widgets::ltr_block(ui, "look", |ui| {
+            egui::Grid::new("look").show(ui, |ui| {
+                for (row, items) in [
+                    [("Header Row", "headerRow", l.header_row), ("First Column", "firstColumn", l.first_column)],
+                    [("Total Row", "totalRow", l.total_row), ("Last Column", "lastColumn", l.last_column)],
+                    [("Banded Rows", "bandedRows", l.banded_rows), ("Banded Columns", "bandedColumns", l.banded_columns)],
+                ]
+                .iter()
+                .enumerate()
+                {
+                    let _ = row;
+                    for (label, key, val) in items {
+                        let mut v = *val;
+                        if ui.checkbox(&mut v, tl!(label)).changed() {
+                            let _ = app.run("table.look", json!({ *key: v }));
+                        }
                     }
+                    ui.end_row();
                 }
-                ui.end_row();
-            }
+            })
         });
     });
     group(ui, "Table Styles", None, app, |ui, app| {
@@ -286,17 +288,19 @@ pub(super) fn table_layout(app: &mut WordApp, ui: &mut Ui) {
         });
     });
     group(ui, "Alignment", None, app, |ui, app| {
-        egui::Grid::new("cellalign").spacing(vec2(1.0, 1.0)).show(ui, |ui| {
-            for row in [
-                [("topLeft", "Align Top Left"), ("topCenter", "Align Top Center"), ("topRight", "Align Top Right")],
-                [("centerLeft", "Align Center Left"), ("center", "Align Center"), ("centerRight", "Align Center Right")],
-                [("bottomLeft", "Align Bottom Left"), ("bottomCenter", "Align Bottom Center"), ("bottomRight", "Align Bottom Right")],
-            ] {
-                for (v, tip) in row {
-                    small(ui, app, "cellAlign", None, tip, crate::widgets::ButtonAction::new("table.cellAlign", json!({"value": v}), false));
+        crate::widgets::ltr_block(ui, "cellalign", |ui| {
+            egui::Grid::new("cellalign").spacing(vec2(1.0, 1.0)).show(ui, |ui| {
+                for row in [
+                    [("topLeft", "Align Top Left"), ("topCenter", "Align Top Center"), ("topRight", "Align Top Right")],
+                    [("centerLeft", "Align Center Left"), ("center", "Align Center"), ("centerRight", "Align Center Right")],
+                    [("bottomLeft", "Align Bottom Left"), ("bottomCenter", "Align Bottom Center"), ("bottomRight", "Align Bottom Right")],
+                ] {
+                    for (v, tip) in row {
+                        small(ui, app, "cellAlign", None, tip, crate::widgets::ButtonAction::new("table.cellAlign", json!({"value": v}), false));
+                    }
+                    ui.end_row();
                 }
-                ui.end_row();
-            }
+            })
         });
         big(ui, app, "textDirection", "Text\nDirection", "table.textDirection", json!({}), false);
         big(ui, app, "cellMargins", "Cell\nMargins", "table.cellMargins", json!({}), false);
