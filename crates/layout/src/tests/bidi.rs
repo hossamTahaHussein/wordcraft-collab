@@ -724,3 +724,25 @@ fn kashida_are_drawn_as_tatweel() {
         assert!(xs.iter().any(|&gx| gx < right && gx + adv > right - w), "a tatweel across the gap {}..{right}: {xs:?}", right - w);
     }
 }
+
+/// A space between words drawn in a fallback face (Arabic in a Latin-font run) is drawn in that
+/// face too: one run of text, the space the script's own, and readers of exported PDFs (pdf.js)
+/// see the space inside the words' text instead of dropping it (حسامطه).
+#[test]
+fn spaces_between_fallback_words_keep_their_face() {
+    let text = "حسام طه حسين";
+    let l = lay(&doc_of(&[(text, false)]));
+    let (pl, _) = first_line(&l, 0);
+    let face_at = |off: usize| {
+        let c = pl.clusters.iter().find(|c| c.start == off).unwrap_or_else(|| panic!("cluster at {off}"));
+        pl.styles[c.style as usize].face.id()
+    };
+    let space = text.find(' ').unwrap();
+    assert_eq!(face_at(space), face_at(0), "the space takes the Arabic face");
+    // Latin words keep the run's own face, and so do the spaces between them.
+    let latin = "Hello world";
+    let l = lay(&doc_of(&[(latin, false)]));
+    let (pl, _) = first_line(&l, 0);
+    let face = |off: usize| pl.styles[pl.clusters.iter().find(|c| c.start == off).unwrap().style as usize].face.id();
+    assert_eq!(face(5), face(0));
+}
