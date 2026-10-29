@@ -420,7 +420,10 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
             let font = TypeRung::Chrome.semibold();
             let track = TypeRung::Chrome.tracking();
             let cx = full.center().x;
-            let available = 2.0 * ((cx - qat_end).abs() - 10.0).min((right_start - cx).abs() - 10.0);
+            // The room on each side of the centre, negative once a group reaches past it (then the
+            // title isn't drawn).
+            let (start_room, end_room) = if rtl { (qat_end - cx, cx - right_start) } else { (cx - qat_end, right_start - cx) };
+            let available = 2.0 * (start_room - 10.0).min(end_room - 10.0);
             let mut shown: String = title.chars().take(240).collect();
             if text_width(ui.painter(), &shown, &font, track, t.text) > available {
                 while !shown.is_empty() && text_width(ui.painter(), &format!("{shown}…"), &font, track, t.text) > available {

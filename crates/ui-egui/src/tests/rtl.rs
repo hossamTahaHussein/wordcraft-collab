@@ -308,3 +308,21 @@ fn the_file_page_reads_from_the_right() {
     let recent = text_rect(&shapes, crate::tl!("Recent")).expect("Recent heading");
     assert!(blank.center().x > 640.0 && recent.center().x > 640.0, "the page starts at the right, next to the menu: {blank:?} {recent:?}");
 }
+
+/// A window too narrow for the title between the toolbar and the controls hides the title, in
+/// either direction, instead of drawing it over them.
+#[test]
+fn a_narrow_window_hides_the_title_rather_than_overlapping() {
+    for (lang, width) in ["en", "ar"].into_iter().flat_map(|l| [260.0, 300.0, 340.0, 380.0].map(move |w| (l, w))) {
+        let (mut app, ctx) = app_in(lang);
+        let shapes = frame(&mut app, &ctx, width);
+        let title = shapes.iter().find_map(|c| match &c.shape {
+            Shape::Text(t) if t.galley.text().contains(" — ") => Some(t.visual_bounding_rect()),
+            _ => None,
+        });
+        let save = text_rect(&shapes, crate::tl!("AutoSave"));
+        if let (Some(title), Some(save)) = (title, save) {
+            assert!(!title.intersects(save), "{lang} at {width}: the title over AutoSave: {title:?} {save:?}");
+        }
+    }
+}
