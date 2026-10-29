@@ -8,3 +8,4 @@ pub mod hash;
 pub mod mapping;
 pub mod proto;
 pub mod replica;
+pub mod undo;

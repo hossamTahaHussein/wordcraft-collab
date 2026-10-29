@@ -61,11 +61,13 @@ pub struct Relay {
     pub base: Document,
     pub base_rev: u64,
     pub log: Vec<Op>,
+    /// Kept versions (native JSON) by revision, for restore edits.
+    pub versions: std::collections::HashMap<u64, String>,
 }
 
 impl Relay {
     pub fn new(doc: Document) -> Relay {
-        Relay { base: doc, base_rev: 0, log: Vec::new() }
+        Relay { base: doc, base_rev: 0, log: Vec::new(), versions: Default::default() }
     }
 
     pub fn rev(&self) -> u64 {
@@ -81,6 +83,10 @@ impl Relay {
             if let Some(mut op) = peers[i].replica.next_to_send() {
                 op.rev = Some(self.rev() + 1);
                 op.user = Some(op.ctx.author.clone());
+                if op.kind == wordcraft_collab::proto::OpKind::Restore {
+                    let v = op.params["version"].as_u64().unwrap_or(0);
+                    op.params["doc"] = json!(self.versions.get(&v).cloned());
+                }
                 self.log.push(op.clone());
                 for p in peers.iter_mut() {
                     p.inbox.push_back(op.clone());
@@ -106,6 +112,14 @@ impl Relay {
             }
         }
     }
+}
+
+/// A peer's confirmed document as a kept version.
+pub fn keep_version(relay: &mut Relay, p: &Peer) -> u64 {
+    let rev = p.replica.rev();
+    let bytes = wordcraft_engine::io::save_bytes("v.json", p.replica.confirmed()).unwrap();
+    relay.versions.insert(rev, String::from_utf8(bytes).unwrap());
+    rev
 }
 
 pub fn doc_with(text: &str) -> Document {

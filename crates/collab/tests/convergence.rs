@@ -21,6 +21,8 @@ enum Action {
     ReplaceWord(usize, &'static str),
     Comment(usize),
     Table(usize),
+    Undo(usize),
+    Redo(usize),
     Send(usize),
     Deliver(usize, usize),
 }
@@ -40,6 +42,8 @@ fn action(peers: usize) -> impl Strategy<Value = Action> {
         1 => (p.clone(), prop::sample::select(TEXTS)).prop_map(|(i, t)| Action::ReplaceWord(i, t)),
         1 => p.clone().prop_map(Action::Comment),
         1 => p.clone().prop_map(Action::Table),
+        2 => p.clone().prop_map(Action::Undo),
+        1 => p.clone().prop_map(Action::Redo),
         3 => p.clone().prop_map(Action::Send),
         3 => (p, 1usize..4).prop_map(|(i, k)| Action::Deliver(i, k)),
     ]
@@ -73,6 +77,8 @@ fn play(peers: &mut [Peer], relay: &mut Relay, a: &Action) {
             peers[*i].act("review.newComment", json!({"text": "note"}));
         }
         Action::Table(i) => peers[*i].act("insert.table", json!({"rows": 2, "cols": 2})),
+        Action::Undo(i) => peers[*i].act("edit.undo", json!({})),
+        Action::Redo(i) => peers[*i].act("edit.redo", json!({})),
         Action::Send(i) => {
             let mut refs: Vec<&mut Peer> = peers.iter_mut().collect();
             relay.collect(&mut refs, &[*i]);

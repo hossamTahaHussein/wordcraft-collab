@@ -9,14 +9,12 @@ use wordcraft_doc::offsets::offset_of;
 
 use crate::{CmdError, RunCtx, Selection, Session};
 
-/// Commands refused while co-editing: undo works per person through the co-editing layer, a
-/// co-edited document can't be swapped for another one, and what pastes from this session's own
-/// stores (the Clipboard pane, the Spike, Quick Parts, the format painter) can't be replayed by
-/// the other replicas.
+/// Commands refused while co-editing: undo to a point of this session's own history (undo and
+/// redo themselves go to the co-editing layer, see [`COLLAB_UNDO`]), a co-edited document can't
+/// be swapped for another one, and what pastes from this session's own stores (the Clipboard
+/// pane, the Spike, Quick Parts, the format painter) can't be replayed by the other replicas.
 pub const COLLAB_DISABLED: &[&str] = &[
-    "edit.undo",
     "edit.undoTo",
-    "edit.redo",
     "file.new",
     "file.open",
     "file.close",
@@ -28,6 +26,11 @@ pub const COLLAB_DISABLED: &[&str] = &[
     "insert.quickParts",
     "insert.autoText",
 ];
+
+/// Undo and redo while co-editing: recorded for the co-editing layer, which undoes this person's
+/// own most recent edit for everyone (selective undo), instead of running on this session's
+/// snapshot history.
+pub const COLLAB_UNDO: &[&str] = &["edit.undo", "edit.redo"];
 
 /// Commands that paste this session's clipboard: their record carries it ([`RunCtx::clipboard`]).
 const CLIPBOARD_READERS: &[&str] = &["edit.paste", "edit.pasteSpecial", "edit.pasteText", "edit.pasteMerge"];
@@ -111,6 +114,16 @@ impl Session {
             return Err(CmdError::Disabled(format!(
                 "{id}: Opening or closing a document isn't available while co-editing: it would replace the shared document for everyone"
             )));
+        }
+        if COLLAB_UNDO.contains(&id) && self.collab.recording && !self.collab.busy {
+            if self.viewing {
+                return Err(CmdError::Disabled(format!("{id}: {}", crate::cmd::protect::VIEWING)));
+            }
+            let sel_before = self.sel.clone();
+            let anchor = anchor_of(self, &sel_before);
+            let ctx = self.run_ctx();
+            self.collab.outbox.push(Recorded { id: id.to_string(), params: params.clone(), sel_before, anchor, ctx });
+            return Ok(serde_json::json!({"queued": true}));
         }
         if COLLAB_DISABLED.contains(&id) || crate::run_ctx::NONDETERMINISTIC.iter().any(|(nd, _)| *nd == id) {
             return Err(CmdError::Disabled(format!("{id}: Not available while co-editing")));

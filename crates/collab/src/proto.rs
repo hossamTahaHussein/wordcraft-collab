@@ -9,7 +9,8 @@ use wordcraft_engine::RunCtx;
 
 /// The largest message that isn't a snapshot, in bytes.
 pub const MAX_OP_BYTES: usize = 256 * 1024;
-/// The largest message carrying a snapshot (`Welcome`, `Resync`), in bytes.
+/// The largest message carrying a whole document (`Welcome`, `Resync`, `VersionDoc`, a restore
+/// `Op`), in bytes.
 pub const MAX_SNAPSHOT_BYTES: usize = 50 * 1024 * 1024;
 
 /// A selection as story offsets (`wordcraft_doc::offsets`).
@@ -109,6 +110,9 @@ pub enum Inbound {
         /// The people already here (one that can't be read is left out, not the whole message).
         #[serde(default, deserialize_with = "readable_peers")]
         peers: Vec<Peer>,
+        /// The join token's role: `edit`, `comment` or `view` (an older relay sends none: `edit`).
+        #[serde(default)]
+        role: Option<String>,
     },
     Op(Box<Op>),
     /// Upload a snapshot of the confirmed document.
@@ -133,6 +137,50 @@ pub enum Inbound {
     },
     /// Someone's selection moved.
     Presence(Peer),
+    /// The relay didn't take this replica's edit `seq` (its role doesn't allow it, or an undo
+    /// names someone else's edit); it was not sequenced.
+    Refused {
+        seq: u64,
+        reason: String,
+    },
+    /// Keep the confirmed document at `rev` as a version (answer with `Outbound::Version` only
+    /// when the confirmed revision is `rev`).
+    VersionRequest {
+        rev: u64,
+    },
+    /// The document's versions, newest first.
+    VersionList {
+        versions: Vec<VersionInfo>,
+    },
+    /// One version's document (native JSON), or none when it is gone.
+    VersionDoc {
+        rev: u64,
+        doc: Option<String>,
+    },
+    /// The relay's HTTP API wants the document as a file of `format`.
+    Export {
+        id: String,
+        format: String,
+    },
+    /// The relay's HTTP API runs command `cmd` as an edit by `author`.
+    Run {
+        id: String,
+        cmd: String,
+        #[serde(default)]
+        params: Value,
+        author: String,
+    },
+}
+
+/// One kept version: its revision, when it was kept (ISO time) and who edited since the one
+/// before.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VersionInfo {
+    pub rev: u64,
+    pub at: String,
+    #[serde(default)]
+    pub users: Vec<String>,
 }
 
 /// Replica → relay.
@@ -164,6 +212,35 @@ pub enum Outbound {
         sel: Anchor,
         rev: u64,
     },
+    /// The confirmed document at `rev` (native JSON), answering `VersionRequest`.
+    Version {
+        rev: u64,
+        doc: String,
+    },
+    /// List the versions (`VersionList`).
+    Versions,
+    /// One version's document (`VersionDoc`).
+    GetVersion {
+        rev: u64,
+    },
+    /// Answers `Export`: the file's bytes in base64, or why there are none.
+    Exported {
+        id: String,
+        ok: bool,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        data: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+    },
+    /// Answers `Run`.
+    RunResult {
+        id: String,
+        ok: bool,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        result: Option<Value>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+    },
 }
 
 fn readable_peers<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Vec<Peer>, D::Error> {
@@ -185,7 +262,11 @@ pub fn decode_inbound(json: &str) -> Result<Inbound, ProtoError> {
         return Err(ProtoError::TooLarge { size: json.len(), limit: MAX_SNAPSHOT_BYTES });
     }
     let message: Inbound = serde_json::from_str(json)?;
-    let carries_snapshot = matches!(message, Inbound::Welcome { .. } | Inbound::Resync { .. });
+    let carries_snapshot = match &message {
+        Inbound::Welcome { .. } | Inbound::Resync { .. } | Inbound::VersionDoc { .. } => true,
+        Inbound::Op(op) => op.kind == OpKind::Restore,
+        _ => false,
+    };
     if !carries_snapshot && json.len() > MAX_OP_BYTES {
         return Err(ProtoError::TooLarge { size: json.len(), limit: MAX_OP_BYTES });
     }
@@ -239,7 +320,10 @@ mod tests {
     #[test]
     fn welcome_and_resync_decode() {
         let w = decode_inbound(r#"{"t":"Welcome","rev":3,"snapshot":null,"ops":[],"you":"c1"}"#).unwrap();
-        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None, history: vec![], peers: vec![] });
+        assert_eq!(
+            w,
+            Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into(), seen: None, history: vec![], peers: vec![], role: None }
+        );
         assert_eq!(decode_inbound(r#"{"t":"Save"}"#).unwrap(), Inbound::Save);
         assert_eq!(decode_inbound(r#"{"t":"SnapshotRequest"}"#).unwrap(), Inbound::SnapshotRequest);
         let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[]}"#).unwrap();
@@ -288,6 +372,54 @@ mod tests {
         let doc = "x".repeat(MAX_OP_BYTES * 2);
         let text = serde_json::json!({"t": "Resync", "rev": 1, "snapshot": doc, "ops": []}).to_string();
         assert!(decode_inbound(&text).is_ok());
+    }
+
+    #[test]
+    fn protocol_v2_inbound_messages_decode() {
+        let w = decode_inbound(r#"{"t":"Welcome","rev":0,"snapshot":null,"ops":[],"you":"c","role":"view"}"#).unwrap();
+        assert!(matches!(w, Inbound::Welcome { role: Some(ref r), .. } if r == "view"));
+        assert_eq!(
+            decode_inbound(r#"{"t":"Refused","seq":4,"reason":"You can only view this document"}"#).unwrap(),
+            Inbound::Refused { seq: 4, reason: "You can only view this document".into() }
+        );
+        assert_eq!(decode_inbound(r#"{"t":"VersionRequest","rev":12}"#).unwrap(), Inbound::VersionRequest { rev: 12 });
+        assert_eq!(
+            decode_inbound(r#"{"t":"VersionList","versions":[{"rev":9,"at":"2026-10-29T10:00:00Z","users":["Ann"]}]}"#).unwrap(),
+            Inbound::VersionList { versions: vec![VersionInfo { rev: 9, at: "2026-10-29T10:00:00Z".into(), users: vec!["Ann".into()] }] }
+        );
+        assert_eq!(decode_inbound(r#"{"t":"VersionDoc","rev":9,"doc":null}"#).unwrap(), Inbound::VersionDoc { rev: 9, doc: None });
+        assert_eq!(decode_inbound(r#"{"t":"Export","id":"e1","format":"pdf"}"#).unwrap(), Inbound::Export { id: "e1".into(), format: "pdf".into() });
+        assert_eq!(
+            decode_inbound(r#"{"t":"Run","id":"r1","cmd":"format.bold","params":{"value":true},"author":"API"}"#).unwrap(),
+            Inbound::Run { id: "r1".into(), cmd: "format.bold".into(), params: json!({"value": true}), author: "API".into() }
+        );
+    }
+
+    #[test]
+    fn protocol_v2_outbound_messages_encode() {
+        let v = |m: Outbound| serde_json::to_value(m).unwrap();
+        assert_eq!(v(Outbound::Version { rev: 3, doc: "{}".into() }), json!({"t": "Version", "rev": 3, "doc": "{}"}));
+        assert_eq!(v(Outbound::Versions), json!({"t": "Versions"}));
+        assert_eq!(v(Outbound::GetVersion { rev: 3 }), json!({"t": "GetVersion", "rev": 3}));
+        assert_eq!(
+            v(Outbound::Exported { id: "e".into(), ok: true, data: Some("AA==".into()), error: None }),
+            json!({"t": "Exported", "id": "e", "ok": true, "data": "AA=="})
+        );
+        assert_eq!(
+            v(Outbound::RunResult { id: "r".into(), ok: false, result: None, error: Some("Unknown command".into()) }),
+            json!({"t": "RunResult", "id": "r", "ok": false, "error": "Unknown command"})
+        );
+    }
+
+    #[test]
+    fn a_restore_op_or_version_may_be_as_large_as_a_snapshot() {
+        let mut o = op();
+        o.kind = OpKind::Restore;
+        o.rev = Some(1);
+        o.params = json!({"version": 3, "doc": "x".repeat(MAX_OP_BYTES + 10)});
+        assert!(decode_inbound(&serde_json::to_string(&Outbound::Op(Box::new(o))).unwrap()).is_ok());
+        let doc = json!({"t": "VersionDoc", "rev": 1, "doc": "x".repeat(MAX_OP_BYTES + 10)}).to_string();
+        assert!(decode_inbound(&doc).is_ok());
     }
 
     #[test]

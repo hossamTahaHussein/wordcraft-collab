@@ -63,15 +63,29 @@ fn not_collab_records_nothing() {
 }
 
 #[test]
-fn collab_refuses_undo_and_file_commands() {
+fn collab_refuses_undo_to_and_file_commands() {
     let mut s = collab();
     s.run("text.insert", &json!({"text": "x"})).unwrap();
-    for id in ["edit.undo", "edit.undoTo", "edit.redo", "file.new", "file.open", "file.close"] {
+    for id in ["edit.undoTo", "file.new", "file.open", "file.close"] {
         match s.run(id, &json!({})) {
             Err(CmdError::Disabled(m)) => assert!(m.contains("co-editing"), "{id}: {m}"),
             other => panic!("{id}: {other:?}"),
         }
     }
+}
+
+#[test]
+fn collab_undo_and_redo_are_recorded_not_run() {
+    let mut s = collab();
+    s.run("text.insert", &json!({"text": "x"})).unwrap();
+    s.take_outbox();
+    assert_eq!(s.run("edit.undo", &json!({})).unwrap(), json!({"queued": true}));
+    assert_eq!(s.run("edit.redo", &json!({})).unwrap(), json!({"queued": true}));
+    assert_eq!(s.doc.plain_text(StoryRef::Body).trim_end(), "x", "the session's own history is not used");
+    let ids: Vec<String> = s.take_outbox().into_iter().map(|r| r.id).collect();
+    assert_eq!(ids, ["edit.undo", "edit.redo"]);
+    s.run("view.viewing", &json!({"value": true})).unwrap();
+    assert!(matches!(s.run("edit.undo", &json!({})), Err(CmdError::Disabled(_))));
 }
 
 #[test]

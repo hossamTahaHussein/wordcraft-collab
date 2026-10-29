@@ -23,6 +23,7 @@ use wordcraft_engine::{Selection, Session};
 use crate::hash::{HASH_EVERY, doc_hash};
 use crate::mapping::{Span, changes, map, span};
 use crate::proto::{Anchor, HistEntry, HistSpan, Op, OpKind, Outbound};
+use crate::undo::UndoLog;
 
 /// How many revisions of changes a replica keeps for moving late edits' selections; an edit
 /// whose base is older needs a resync.
@@ -127,6 +128,13 @@ pub struct Replica {
     moved: Vec<Moved>,
     /// The confirmed document was replaced by a snapshot since the link last looked.
     restarted: bool,
+    /// Checkpoints and confirmed edits for selective undo.
+    undo: UndoLog,
+    /// This person's edits they undid, newest last: what Redo brings back (emptied by a new
+    /// edit of theirs).
+    undone: Vec<u64>,
+    /// Messages for the person ("Nothing of yours to undo").
+    notes: Vec<String>,
 }
 
 /// One confirmed edit as it moves positions: its revision, who made it, what it changed (in the
@@ -148,9 +156,13 @@ impl Replica {
     /// [`Replica::join`] with the changes of the revisions before the snapshot, so edits in
     /// `tail` based on an earlier revision can be placed.
     pub fn join_with_history(client: String, rev: u64, snapshot: Document, history: Vec<HistEntry>, tail: Vec<Op>) -> Result<Replica, CollabError> {
+        let undo = UndoLog::new(rev, &snapshot);
         let mut replica = Replica {
             client,
             rev,
+            undo,
+            undone: Vec::new(),
+            notes: Vec::new(),
             confirmed: headless(snapshot),
             scratch: headless(Document::new()),
             pending: VecDeque::new(),
@@ -217,20 +229,68 @@ impl Replica {
                 Some((story, anchor, head)) => Anchor { story, anchor, head },
                 None => Anchor::default(),
             };
-            self.pending.push_back(Op {
-                client: self.client.clone(),
-                seq: self.next_seq,
-                base: 0,
-                kind: OpKind::Cmd,
-                cmd: r.id,
-                params: r.params,
-                sel,
-                ctx: r.ctx,
-                rev: None,
-                user: None,
-            });
-            self.next_seq += 1;
+            // Undo and redo name their edit when they are sent, after the edits before them are
+            // confirmed (`next_to_send`).
+            let (kind, cmd, params) = match r.id.as_str() {
+                "edit.undo" => (OpKind::Undo, "collab.undo".to_string(), serde_json::json!({"target": 0})),
+                "edit.redo" => (OpKind::Redo, "collab.redo".to_string(), serde_json::json!({"target": 0})),
+                _ => {
+                    self.undone.clear();
+                    (OpKind::Cmd, r.id, r.params)
+                }
+            };
+            self.push_pending(kind, cmd, params, sel, r.ctx);
         }
+    }
+
+    /// Restore the kept version at revision `version` for everyone (the relay puts its document
+    /// in the edit). It can be undone like any edit.
+    pub fn restore(&mut self, version: u64) {
+        self.undone.clear();
+        self.push_pending(
+            OpKind::Restore,
+            "collab.restore".into(),
+            serde_json::json!({"version": version}),
+            Anchor::default(),
+            wordcraft_engine::RunCtx::default(),
+        );
+    }
+
+    fn push_pending(&mut self, kind: OpKind, cmd: String, params: Value, sel: Anchor, ctx: wordcraft_engine::RunCtx) {
+        self.pending.push_back(Op { client: self.client.clone(), seq: self.next_seq, base: 0, kind, cmd, params, sel, ctx, rev: None, user: None });
+        self.next_seq += 1;
+    }
+
+    /// Whether this person has an edit of theirs to undo (or an undone one to redo).
+    pub fn can_undo(&self) -> bool {
+        self.undo.newest_own(&self.client).is_some()
+    }
+
+    pub fn can_redo(&self) -> bool {
+        !self.undone.is_empty()
+    }
+
+    /// Messages for the person since the last call.
+    pub fn take_notes(&mut self) -> Vec<String> {
+        std::mem::take(&mut self.notes)
+    }
+
+    /// The relay refused this replica's edit `seq` (it was never sequenced): it leaves the
+    /// visible document and the next edit can go.
+    pub fn refused(&mut self, seq: u64, visible: &mut Session) {
+        self.drain_local(visible);
+        let Some(i) = self.pending.iter().position(|p| p.seq == seq) else { return };
+        if self.pending[i].kind == OpKind::Undo
+            && let Some(t) = self.pending[i].params.get("target").and_then(Value::as_u64)
+            && self.undone.last() == Some(&t)
+        {
+            self.undone.pop();
+        }
+        if i == 0 {
+            self.in_flight = false;
+        }
+        let before = self.confirmed.doc.clone();
+        self.rebuild_skipping(visible, before, None, |op| op.seq == seq);
     }
 
     /// The next op to send to the relay, if none is in flight: plain typing still waiting is
@@ -240,11 +300,31 @@ impl Replica {
             return None;
         }
         self.merge_typing();
+        while self.pending.front().is_some_and(|op| matches!(op.kind, OpKind::Undo | OpKind::Redo)) && !self.name_target() {
+            self.pending.pop_front();
+        }
         let rev = self.rev;
         let op = self.pending.front_mut()?;
         op.base = rev;
         self.in_flight = true;
         Some(op.clone())
+    }
+
+    /// The undo or redo first in line names its edit; false (with a note) when there is none.
+    fn name_target(&mut self) -> bool {
+        let Some(op) = self.pending.front() else { return false };
+        let undo = op.kind == OpKind::Undo;
+        let target = if undo { self.undo.newest_own(&self.client).inspect(|t| self.undone.push(*t)) } else { self.undone.pop() };
+        match (target, self.pending.front_mut()) {
+            (Some(t), Some(op)) => {
+                op.params = serde_json::json!({"target": t});
+                true
+            }
+            _ => {
+                self.notes.push(if undo { "Nothing of yours to undo".into() } else { "Nothing of yours to redo".into() });
+                false
+            }
+        }
     }
 
     /// Apply an op from the relay.
@@ -262,7 +342,7 @@ impl Replica {
     /// One relay edit: this replica's own (the first pending one) or someone else's.
     fn apply_from_relay(&mut self, op: Op, visible: &mut Session) -> Result<Applied, CollabError> {
         let own = op.client == self.client && self.pending.front().is_some_and(|p| p.seq == op.seq);
-        if own {
+        if own && op.kind == OpKind::Cmd {
             self.apply_confirmed(&op)?;
             self.pending.pop_front();
             self.in_flight = false;
@@ -270,6 +350,11 @@ impl Replica {
         }
         let before = self.confirmed.doc.clone();
         let spans = self.apply_confirmed(&op)?;
+        // An undo, redo or restore of this person's: the visible document never had it.
+        if own {
+            self.pending.pop_front();
+            self.in_flight = false;
+        }
         let hint = spans.iter().find(|(story, _)| *story == op.sel.story).map(|(story, s)| (*story, s.start));
         let dropped_pending = if self.pending.is_empty() { self.follow(visible, &spans) } else { self.rebuild(visible, before, hint) };
         Ok(Applied::Remote { dropped_pending })
@@ -324,6 +409,7 @@ impl Replica {
         self.in_flight = false;
         if let Some((doc, history)) = snapshot {
             let before = std::mem::replace(&mut self.confirmed, headless(doc)).doc;
+            self.undo.restart(rev, &self.confirmed.doc);
             self.rev = rev;
             self.history = History::from_entries(rev, history);
             self.hashed = rev;
@@ -354,10 +440,28 @@ impl Replica {
     fn apply_confirmed(&mut self, op: &Op) -> Result<Vec<(StoryRef, Span)>, CollabError> {
         let sel = self.history.rebase(&op.sel, op.base)?;
         let before = self.confirmed.doc.clone();
-        // A command that fails here fails on every replica: it is skipped everywhere.
-        let _ = run_at(&mut self.confirmed, op, &sel);
+        match op.kind {
+            // A command that fails here fails on every replica: it is skipped everywhere.
+            OpKind::Cmd => {
+                let _ = run_at(&mut self.confirmed, op, &sel);
+            }
+            OpKind::Restore => restore_into(&mut self.confirmed, op),
+            // An edit out of this replica's reach changes nothing here; the fingerprint check
+            // resyncs a replica that ends up different.
+            OpKind::Undo | OpKind::Redo => {
+                let target = op.params.get("target").and_then(Value::as_u64).unwrap_or(0);
+                if let Some(doc) = self.undo.apply(target, op.kind == OpKind::Undo) {
+                    self.confirmed.doc = doc;
+                    self.confirmed.clamp_selection();
+                }
+            }
+        }
         let spans = changes(&before, &self.confirmed.doc, Some((sel.story, sel.anchor.min(sel.head))));
         self.rev += 1;
+        let mut logged = op.clone();
+        logged.sel = sel;
+        logged.base = self.rev - 1;
+        self.undo.record(self.rev, logged, &self.confirmed.doc);
         self.history.push(self.rev, spans.clone());
         let author_sel = anchor_of(&self.confirmed.doc, &self.confirmed.sel);
         self.moved.push(Moved { rev: self.rev, client: op.client.clone(), spans: spans.clone(), author_sel });
@@ -416,6 +520,13 @@ impl Replica {
         let mut kept = VecDeque::new();
         let mut dropped = 0;
         for (i, mut op) in std::mem::take(&mut self.pending).into_iter().enumerate() {
+            if op.kind != OpKind::Cmd {
+                // Undo, redo and restore take effect when the relay confirms them.
+                if !confirmed_already(&op) {
+                    kept.push_back(op);
+                }
+                continue;
+            }
             let story = op.sel.story;
             let old_text = linear_text(&self.scratch.doc, story);
             let moved = crate::mapping::diff_near(&old_text, &linear_text(&visible.doc, story), story, hint);
@@ -497,8 +608,18 @@ fn headless(doc: Document) -> Session {
     s
 }
 
+/// Put back the document a restore edit carries (`params.doc`, native JSON); one that can't be
+/// read changes nothing, on every replica.
+pub(crate) fn restore_into(s: &mut Session, op: &Op) {
+    let Some(json) = op.params.get("doc").and_then(Value::as_str) else { return };
+    if let Ok(doc) = wordcraft_engine::io::open_bytes("version.json", json.as_bytes()) {
+        s.doc = doc;
+        s.clamp_selection();
+    }
+}
+
 /// Run `op` in `s` with its context, from `sel`.
-fn run_at(s: &mut Session, op: &Op, sel: &Anchor) -> Result<Value, wordcraft_engine::CmdError> {
+pub(crate) fn run_at(s: &mut Session, op: &Op, sel: &Anchor) -> Result<Value, wordcraft_engine::CmdError> {
     s.sel = selection_at(&s.doc, sel);
     s.clamp_selection();
     s.run_with(&op.ctx, &op.cmd, &op.params)
@@ -515,7 +636,7 @@ fn anchor_of(doc: &Document, sel: &Selection) -> Option<Anchor> {
     Some(Anchor { story: sel.anchor.story, anchor: offset_of(doc, &sel.anchor)?, head: offset_of(doc, &sel.focus)? })
 }
 
-fn move_anchor(a: &Anchor, s: Option<&Span>) -> Anchor {
+pub(crate) fn move_anchor(a: &Anchor, s: Option<&Span>) -> Anchor {
     match s {
         Some(s) => Anchor { story: a.story, anchor: map(s, a.anchor, false), head: map(s, a.head, false) },
         None => a.clone(),
