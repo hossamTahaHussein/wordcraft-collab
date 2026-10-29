@@ -1424,6 +1424,7 @@ mod protocol_v2_tests {
         echo["rev"] = json!(4);
         link.on_message(&echo.to_string(), &mut s);
         assert!(link.can_undo());
+        assert!(!link.can_redo());
         s.run("edit.undo", &json!({})).unwrap();
         let out = super::edits_only(link.tick(&mut s, 0.0));
         let op = parse(&out[0]);

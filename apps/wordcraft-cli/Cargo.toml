@@ -18,6 +18,10 @@ wordcraft-doc = { workspace = true }
 wordcraft-engine = { workspace = true }
 wordcraft-render = { workspace = true }
 wordcraft-mcp = { workspace = true }
+wordcraft-collab = { workspace = true }
+# `collab-mcp`: agents join co-edited documents over the relay's WebSocket, ws:// or wss://.
+tungstenite = { version = "0.29", default-features = false, features = ["handshake", "rustls-tls-native-roots"] }
+rustls = { version = "0.23", default-features = false, features = ["std", "ring"] }
 wordcraft-zotero = { workspace = true }
 serde_json = { workspace = true }
 sys-locale = "0.3"

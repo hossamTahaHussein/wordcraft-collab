@@ -136,6 +136,34 @@ pub fn tool_definitions() -> Value {
             true
         ),
         tool(
+            "who_is_here",
+            "Who is here",
+            "The people in the shared document with you (names and colours) and its revision. Only when joined to a shared document (wordcraft-cli collab-mcp).",
+            obj(json!({}), &[]),
+            true
+        ),
+        tool(
+            "wait_for_changes",
+            "Wait for changes",
+            "Wait until someone changes the shared document after revision `since` (default: now), up to `timeoutMs` (default 30000, at most 120000), and list the changes: revision, who, which command. Only when joined to a shared document.",
+            obj(json!({"since": n("Revision to wait past"), "timeoutMs": n("Longest wait in milliseconds")}), &[]),
+            true
+        ),
+        tool(
+            "comment",
+            "Comment",
+            "Add a comment: on the first occurrence of `quote` when given, otherwise at the selection.",
+            with_doc(obj(json!({"text": s("The comment"), "quote": s("Text to comment on")}), &["text"])),
+            false
+        ),
+        tool(
+            "reply",
+            "Reply to a comment",
+            "Reply to comment `id` (inspect_document lists comments).",
+            with_doc(obj(json!({"id": n("Comment id"), "text": s("The reply")}), &["id", "text"])),
+            false
+        ),
+        tool(
             "render_page",
             "Render page",
             "Render a page to PNG to look at the result.",
@@ -299,6 +327,30 @@ pub fn call_tool(b: &mut dyn Backend, name: &str, a: &Value) -> ToolResult {
         )),
         "get_text" => wrap(exec(b, "document.text", json!({}), doc)),
         "inspect_document" => wrap(b.call("document.inspect", addressed(json!({}), doc))),
+        "who_is_here" => wrap(b.call("collab.who", json!({}))),
+        "wait_for_changes" => {
+            let mut p = json!({});
+            for k in ["since", "timeoutMs"] {
+                if let Some(v) = a.get(k).filter(|v| !v.is_null()) {
+                    p[k] = v.clone();
+                }
+            }
+            wrap(b.call("collab.wait", p))
+        }
+        "comment" => match st("text") {
+            Some(text) => {
+                let quoted = match st("quote") {
+                    Some(q) => exec(b, "select.text", json!({"text": q}), doc).map(|_| ()),
+                    None => Ok(()),
+                };
+                wrap(quoted.and_then(|()| exec(b, "review.newComment", json!({"text": text}), doc)))
+            }
+            None => ToolResult::error("missing `text`"),
+        },
+        "reply" => match (a.get("id").and_then(Value::as_u64), st("text")) {
+            (Some(id), Some(text)) => wrap(exec(b, "review.reply", json!({"id": id, "text": text}), doc)),
+            _ => ToolResult::error("`id` and `text` are required"),
+        },
         "parity" => wrap(b.call("ui.parity", json!({}))),
         // Pictures travel inside the reply (`png`), headless or through the app: no file with a
         // predictable name in the shared temporary folder.

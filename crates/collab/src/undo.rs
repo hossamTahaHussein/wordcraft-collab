@@ -57,7 +57,7 @@ impl UndoLog {
     /// Edit `op` (its selection as applied) became revision `rev`, leaving `after`.
     pub fn record(&mut self, rev: u64, op: Op, after: &Document) {
         self.entries.push_back(Logged { rev, op });
-        if rev % CHECKPOINT_EVERY == 0 {
+        if rev.is_multiple_of(CHECKPOINT_EVERY) {
             self.checkpoints.push_back((rev, after.clone()));
         }
         while self.checkpoints.len() > KEEP_CHECKPOINTS {

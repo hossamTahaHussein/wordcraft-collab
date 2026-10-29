@@ -2,6 +2,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 mod automation_args;
+mod collab_agent;
 mod script;
 
 use std::ffi::{OsStr, OsString};
@@ -51,6 +52,12 @@ USAGE:
                                               export, merge output…) to DIR, links followed; a root left
                                               out grants none of its access. They apply to the headless
                                               server and are an error with --connect.
+  wordcraft-cli collab-mcp --relay URL --token TOKEN [--name NAME] [--no-suggest]
+                                              MCP server on stdio that joins a co-edited document as
+                                              a participant (ws:// or wss:// relay, a join token from
+                                              the host's backend; WORDCRAFT_TOKEN works instead of
+                                              --token). Its edits sync live as NAME's (default
+                                              \"Agent\"), as tracked suggestions unless --no-suggest.
   wordcraft-cli zotero <command> <file> [--cmd 'id={json}' …] [--save OUT] [--trace] [--port P]
                                               run a Zotero command on a document (Zotero must be
                                               running): addEditCitation, addEditBibliography,
@@ -71,7 +78,7 @@ same output on every machine.
 ";
 
 /// The subcommands, in `USAGE` order; `--help` or `-h` after any of them prints `USAGE` (#968).
-const SUBCOMMANDS: &[&str] = &["convert", "info", "text", "inspect", "render", "run", "commands", "parity", "mcp", "zotero"];
+const SUBCOMMANDS: &[&str] = &["convert", "info", "text", "inspect", "render", "run", "commands", "parity", "mcp", "collab-mcp", "zotero"];
 
 fn wants_help(cmd: &str, rest: &[String]) -> bool {
     SUBCOMMANDS.contains(&cmd) && rest.iter().any(|a| a == "--help" || a == "-h")
@@ -324,6 +331,12 @@ const RUN_OPTIONS: &[OptionSpec] = &[
 const COMMANDS_OPTIONS: &[OptionSpec] = &[OptionSpec { name: "--json", takes_value: false }];
 const PARITY_OPTIONS: &[OptionSpec] = &[OptionSpec { name: "--markdown", takes_value: false }];
 const MCP_OPTIONS: &[OptionSpec] = &[OptionSpec { name: "--connect", takes_value: true }, OptionSpec { name: "--author", takes_value: true }];
+const COLLAB_MCP_OPTIONS: &[OptionSpec] = &[
+    OptionSpec { name: "--relay", takes_value: true },
+    OptionSpec { name: "--token", takes_value: true },
+    OptionSpec { name: "--name", takes_value: true },
+    OptionSpec { name: "--no-suggest", takes_value: false },
+];
 const ZOTERO_OPTIONS: &[OptionSpec] = &[
     OptionSpec { name: "--cmd", takes_value: true },
     OptionSpec { name: "--save", takes_value: true },
@@ -652,6 +665,23 @@ fn run<S: AsRef<OsStr>>(args: &[S]) -> Result<(), Failure> {
             let mut server = wordcraft_mcp::Server::new(backend);
             let stdin = std::io::stdin();
             // A client that closes our stdout has hung up: `serve` returns BrokenPipe and we end cleanly.
+            Ok(server.serve(stdin.lock(), std::io::stdout())?)
+        }
+        "collab-mcp" => {
+            validate_options("collab-mcp", &rest, COLLAB_MCP_OPTIONS)?;
+            let relay = arg_value(&rest, "--relay").ok_or("collab-mcp: --relay URL is required (the relay's ws:// or wss:// address)")?;
+            if !(relay.starts_with("ws://") || relay.starts_with("wss://")) {
+                return Err(format!("collab-mcp: --relay needs a ws:// or wss:// URL, got `{relay}`").into());
+            }
+            let token = arg_value(&rest, "--token")
+                .or_else(|| std::env::var("WORDCRAFT_TOKEN").ok())
+                .ok_or("collab-mcp: --token TOKEN (or WORDCRAFT_TOKEN) is required: a join token from the host's backend")?;
+            let name = arg_value(&rest, "--name").unwrap_or_else(|| "Agent".into());
+            let suggesting = !rest.iter().any(|a| a == "--no-suggest");
+            let backend = collab_agent::Collab::connect(&relay, &token, &name, suggesting).map_err(|e| format!("collab-mcp: {e}"))?;
+            eprintln!("wordcraft-cli collab-mcp: joined the shared document at {relay} as {name}");
+            let mut server = wordcraft_mcp::Server::new(Box::new(backend));
+            let stdin = std::io::stdin();
             Ok(server.serve(stdin.lock(), std::io::stdout())?)
         }
         "zotero" => {

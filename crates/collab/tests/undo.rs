@@ -117,7 +117,7 @@ fn restoring_a_version_and_undoing_the_restore() {
 
 #[test]
 fn a_refused_edit_leaves_and_the_next_one_goes() {
-    let mut relay = Relay::new(doc_with("Hi"));
+    let relay = Relay::new(doc_with("Hi"));
     let mut a = Peer::join("a", "Ann", &relay);
     end(&mut a);
     a.type_text("!");
@@ -145,4 +145,23 @@ fn undo_out_of_reach_changes_nothing_and_does_not_panic() {
     relay.settle(&mut [&mut a, &mut b]);
     assert_eq!(a.text(), "x");
     assert_eq!(b.text(), "xy", "out of reach: the fingerprint check resyncs him");
+}
+
+#[test]
+fn an_undo_sent_again_after_a_reconnect_keeps_its_edit() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    end(&mut a);
+    a.type_text("1");
+    relay.settle(&mut [&mut a]);
+    end(&mut a);
+    a.type_text("2");
+    relay.settle(&mut [&mut a]);
+    a.act("edit.undo", json!({}));
+    let first = a.replica.next_to_send().unwrap();
+    assert_eq!(first.params, json!({"target": 2}));
+    // The connection drops before the relay got it; the Welcome resumes and it goes again.
+    let again = a.replica.resume(relay.rev(), None, Vec::new(), None, &mut a.visible).unwrap();
+    assert_eq!(again[0].params, json!({"target": 2}));
+    assert!(a.replica.can_redo());
 }

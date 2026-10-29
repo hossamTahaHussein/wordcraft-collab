@@ -300,7 +300,9 @@ impl Replica {
             return None;
         }
         self.merge_typing();
-        while self.pending.front().is_some_and(|op| matches!(op.kind, OpKind::Undo | OpKind::Redo)) && !self.name_target() {
+        // An undo or redo names its edit once (one sent again after a reconnect keeps it).
+        let unnamed = |op: &Op| matches!(op.kind, OpKind::Undo | OpKind::Redo) && op.params.get("target").and_then(Value::as_u64) == Some(0);
+        while self.pending.front().is_some_and(unnamed) && !self.name_target() {
             self.pending.pop_front();
         }
         let rev = self.rev;

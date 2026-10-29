@@ -543,3 +543,13 @@ fn script_parse_resolves_paths_against_the_base() {
     assert_eq!(s.save, vec!["o.docx".to_string()]);
     assert_eq!(s.commands.len(), 1);
 }
+
+#[test]
+fn collab_mcp_needs_a_ws_relay_and_a_token() {
+    assert!(
+        validate_options("collab-mcp", &args(&["--relay", "ws://x/relay", "--token", "t", "--name", "A", "--no-suggest"]), COLLAB_MCP_OPTIONS)
+            .is_ok()
+    );
+    assert!(run(&args(&["collab-mcp", "--token", "t"])).is_err_and(|e| e.to_string().contains("--relay")));
+    assert!(run(&args(&["collab-mcp", "--relay", "http://x", "--token", "t"])).is_err_and(|e| e.to_string().contains("ws://")));
+}

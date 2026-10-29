@@ -66,7 +66,9 @@ pub fn doc_param(params: &Value) -> Result<Option<u64>, String> {
     }
 }
 
-fn answer_on(session: &mut Session, method: &str, params: Value) -> Result<Value, String> {
+/// Answer `method` on `session` as the headless server does (`collab-mcp` answers on the shared
+/// document with it).
+pub fn answer_on(session: &mut Session, method: &str, params: Value) -> Result<Value, String> {
     match method {
         "engine.execute" | "command" => {
             let id = params.get("command").and_then(Value::as_str).ok_or("missing `command`")?.to_string();
@@ -87,6 +89,7 @@ fn answer_on(session: &mut Session, method: &str, params: Value) -> Result<Value
             Ok(json!({"png": wordcraft_engine::cmd::insert::base64_encode(&png), "width": img.width, "height": img.height, "pages": l.pages.len()}))
         }
         m if m.starts_with("ui.") => Err(format!("`{m}` {NEEDS_APP}")),
+        m if m.starts_with("collab.") => Err(format!("`{m}` needs a shared document: run `wordcraft-cli collab-mcp --relay URL --token TOKEN`")),
         other => session.run(other, &params).map_err(|e| e.to_string()),
     }
 }

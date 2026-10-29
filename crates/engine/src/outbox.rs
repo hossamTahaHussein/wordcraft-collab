@@ -33,7 +33,7 @@ pub const COLLAB_DISABLED: &[&str] = &[
 pub const COLLAB_UNDO: &[&str] = &["edit.undo", "edit.redo"];
 
 /// What a commenter may change while co-editing (the relay's `comment-commands.json`).
-pub const COMMENT_COMMANDS: &[&str] = &["review.newComment", "review.editComment", "review.deleteComment", "review.resolveComment"];
+pub const COMMENT_COMMANDS: &[&str] = &["review.newComment", "review.reply", "review.editComment", "review.deleteComment", "review.resolveComment"];
 
 /// What the person may do in a co-edited document (their join token's role).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

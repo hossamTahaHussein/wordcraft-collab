@@ -16,10 +16,10 @@ ArtCraft team. It is independent: not made, sponsored or endorsed by the ArtCraf
 | | |
 |---|---|
 | How it syncs | Every edit is a WordCraft command. Each browser applies its own edits at once; a small relay server puts everyone's edits in one order, and every copy replays them and re-applies its unconfirmed ones on top. |
-| Code | `crates/collab` (replicas, rebasing, position mapping, protocol), `crates/engine/src/outbox.rs` and `run_ctx.rs` (recording edits, replaying them identically), `apps/wordcraft-web/src/collab_link.rs` (browser bridge) |
+| Features | Cursors, names and who is present; Undo and Redo of your own edits for everyone; edit, comment-only and view-only roles; version history with preview and restore; read only with "Save my copy" after five minutes offline; the relay's HTTP API and webhooks; AI agents as participants (`wordcraft-cli collab-mcp`) |
+| Code | `crates/collab` (replicas, rebasing, position mapping, selective undo, protocol), `crates/engine/src/outbox.rs` and `run_ctx.rs` (recording edits, replaying them identically, roles), `apps/wordcraft-web/src/collab_link.rs` (browser bridge), `crates/ui-egui/src/collab_ui.rs` (Version history, offline notice), `apps/wordcraft-cli/src/collab_agent.rs` (agents) |
 | Relay and SDK | [wordcraft-embed](https://github.com/hossamTahaHussein/wordcraft-embed) (`relay/`, `src/wordcraft-embed.js`) |
-| Tested | Randomised multi-user convergence tests, unit tests, and end-to-end tests with three browsers and a relay restart |
-| Not yet | Other people's cursors and a presence list, undo while co-editing, comment-only and view-only roles, version history |
+| Tested | Randomised multi-user convergence tests (with undo and redo), unit tests, end-to-end tests with three browsers and a relay restart, and an agent against the real relay |
 
 Build the browser app with co-editing: `cd apps/wordcraft-web && trunk build --release`
 (output in `dist/web`), then serve it with wordcraft-embed's demo (`EDITOR_DIR=…/dist/web npm start`).

@@ -18,6 +18,17 @@ isn't open yet: tool calls return "not reachable … will retry on each call" an
 app's port opens (#4078), so a client that starts before WordCraft doesn't lose the server for
 its whole session.
 
+## Joining a shared document
+
+`wordcraft-cli collab-mcp --relay wss://…/relay --token TOKEN [--name NAME] [--no-suggest]` joins
+a co-edited document as a participant (see the README's Co-editing). The session is the shared
+document: the agent's edits sync live under NAME, as tracked suggestions unless `--no-suggest`,
+and people see its caret. Each call first takes in what others changed and returns once the
+relay has confirmed the agent's edits. Extra tools: `who_is_here`, `wait_for_changes`
+(`since`, `timeoutMs`), and, like any session, `comment` (`text`, `quote`) and `reply`
+(`id`, `text`). A join token with role `comment` limits it to comments. Opening or starting
+another document is refused.
+
 ## Scripts from the command line
 
 `wordcraft-cli run --script job.json` (`--script -` reads standard input) runs the commands in a
