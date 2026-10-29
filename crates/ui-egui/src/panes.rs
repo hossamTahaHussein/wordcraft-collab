@@ -147,6 +147,18 @@ impl PaneContent<Pane> for Content<'_> {
     }
 
     fn body(&mut self, ui: &mut Ui, pane: &Pane) {
+        // Right to left a pane's rows start at its right (rows nested in it follow).
+        let layout = craft_ui::direction::column(ui);
+        ui.with_layout(layout, |ui| self.body_rows(ui, pane));
+    }
+
+    fn default_state(&self, pane: &Pane) -> PaneState {
+        pane.default_state()
+    }
+}
+
+impl Content<'_> {
+    fn body_rows(&mut self, ui: &mut Ui, pane: &Pane) {
         let app = &mut *self.app;
         match pane {
             Pane::SmartArtText => crate::dialogs_smart_art::text_pane(app, ui),
@@ -162,10 +174,6 @@ impl PaneContent<Pane> for Content<'_> {
             Pane::RestrictEditing => crate::dialogs_review::restrict_pane(app, ui),
             Pane::Comments => comments(app, ui),
         }
-    }
-
-    fn default_state(&self, pane: &Pane) -> PaneState {
-        pane.default_state()
     }
 }
 

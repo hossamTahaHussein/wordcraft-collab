@@ -271,3 +271,13 @@ fn a_grid_in_a_mirrored_ribbon_group_stays_in_its_group() {
     let indent = text_rect(&shapes, crate::tl!("Indent")).expect("Indent heading");
     assert!((indent.center().x - title.center().x).abs() < 120.0, "the fields sit over their title: {indent:?} {title:?}");
 }
+
+#[test]
+fn pane_contents_read_from_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("view.navigationPane", serde_json::json!({"value": true})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let headings = text_rect(&shapes, crate::tl!("Headings")).expect("Headings tab");
+    let results = text_rect(&shapes, crate::tl!("Results")).expect("Results tab");
+    assert!(headings.min.x > results.max.x, "the first tab is the rightmost: {headings:?} {results:?}");
+}
