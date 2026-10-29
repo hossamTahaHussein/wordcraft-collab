@@ -7,7 +7,8 @@
 //! Differences from the desktop app: no TCP control channel; Open and Insert › Pictures use the
 //! browser file picker (bytes arrive through `Services::inbox`); Save and Export download.
 //! Preferences (theme, interface size, editing options…) are kept in `localStorage` (`prefs`).
-//! URL flags: `?webgl` forces WebGL2; `?sample` opens the sample document.
+//! URL flags: `?webgl` forces WebGL2; `?sample` opens the sample document; `?lang=ar` sets the
+//! interface language.
 //! `?host=parent` (inside an `<iframe>`) talks to a same-origin parent page instead: it sends the
 //! document to open and stores what WordCraft saves (`host`), and `&author=` names the user for
 //! comments and tracked changes.

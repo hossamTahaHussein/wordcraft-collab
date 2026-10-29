@@ -45,9 +45,14 @@ fn craft_i18n() -> String {
     println!("cargo::rerun-if-env-changed=CRAFT_I18N_DIR");
     println!("cargo::rerun-if-env-changed=CRAFT_I18N_REQUIRED");
     let required = std::env::var("CRAFT_I18N_REQUIRED").is_ok_and(|v| v.trim() == "1");
-    let entries = match std::env::var_os("CRAFT_I18N_DIR").filter(|d| !d.is_empty()) {
+    // The catalogues bundled in this repository (`i18n/`), unless `CRAFT_I18N_DIR` names a
+    // craft-i18n checkout.
+    let bundled = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../i18n");
+    let dir =
+        std::env::var_os("CRAFT_I18N_DIR").filter(|d| !d.is_empty()).map(std::path::PathBuf::from).or_else(|| bundled.is_dir().then_some(bundled));
+    let entries = match dir {
         // Not canonicalized: on Windows that gives `\\?\C:\…`, which `include_str!` can't read.
-        Some(dir) => match locales(&std::path::PathBuf::from(dir).join("locales")) {
+        Some(dir) => match locales(&dir.join("locales")) {
             Ok(entries) => entries,
             Err(e) => {
                 let level = if required { "error" } else { "warning" };

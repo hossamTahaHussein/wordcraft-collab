@@ -85,6 +85,12 @@ pub fn start() {
                         let doc = app.session.blank_document();
                         app.session.set_document(doc);
                     }
+                    // `?lang=ar`: the host page picks the interface language (the browser's otherwise).
+                    if let Some(lang) = query_param("lang")
+                        && let Err(e) = app.execute("ui.language", serde_json::json!({ "value": lang }))
+                    {
+                        log::warn!("?lang={lang}: {e}");
+                    }
                     let mut prefs = crate::prefs::PrefsSync::new(stored);
                     // No document to show: start on File › Home, as the desktop app does (#766).
                     if !sample {

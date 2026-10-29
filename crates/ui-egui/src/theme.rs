@@ -579,15 +579,26 @@ pub fn font_definitions_language(prefer_hans: bool, prefer_korean: bool, system_
     add(&mut fonts, "InterSemiBold", include_bytes!("../../../assets/fonts/Inter-SemiBold.ttf"));
     add(&mut fonts, "SourceSans", include_bytes!("../../../assets/fonts/SourceSans3-Regular.ttf"));
     add(&mut fonts, "Mono", include_bytes!("../../../assets/fonts/JetBrainsMono-Regular.ttf"));
+    // Arabic (and Persian) and Hebrew interfaces: the same bundled faces the documents use.
+    add(&mut fonts, "NotoSansArabic", include_bytes!("../../../assets/fonts/NotoSansArabic.ttf"));
+    add(&mut fonts, "NotoSansHebrew", include_bytes!("../../../assets/fonts/NotoSansHebrew-Regular.ttf"));
     if let Some(prop) = fonts.families.get_mut(&FontFamily::Proportional) {
         prop.insert(0, "Inter".into());
         prop.push("SourceSans".into());
+        prop.push("NotoSansArabic".into());
+        prop.push("NotoSansHebrew".into());
     }
     if let Some(m) = fonts.families.get_mut(&FontFamily::Monospace) {
         m.insert(0, "Mono".into());
     }
-    fonts.families.insert(FontFamily::Name("medium".into()), vec!["InterMedium".into(), "Inter".into(), "SourceSans".into()]);
-    fonts.families.insert(FontFamily::Name("semibold".into()), vec!["InterSemiBold".into(), "Inter".into(), "SourceSans".into()]);
+    fonts.families.insert(
+        FontFamily::Name("medium".into()),
+        vec!["InterMedium".into(), "Inter".into(), "SourceSans".into(), "NotoSansArabic".into(), "NotoSansHebrew".into()],
+    );
+    fonts.families.insert(
+        FontFamily::Name("semibold".into()),
+        vec!["InterSemiBold".into(), "Inter".into(), "SourceSans".into(), "NotoSansArabic".into(), "NotoSansHebrew".into()],
+    );
     let add_cjk = |fonts: &mut FontDefinitions, name: String, data: FontData| {
         fonts.font_data.insert(name.clone(), Arc::new(data));
         for fam in [FontFamily::Proportional, FontFamily::Name("medium".into()), FontFamily::Name("semibold".into())] {

@@ -7,7 +7,7 @@ use super::{
 /// The family used when a requested family is unknown (the UI sans).
 pub const FALLBACK_FAMILY: &str = "Source Sans 3";
 
-/// The bundled fonts (OFL), as font file bytes. Japanese fonts are not bundled: they come from
+/// The bundled fonts (OFL), as font file bytes: Latin, Arabic and Hebrew. Japanese fonts are not bundled: they come from
 /// the optional craft-fonts build input ([`crate::japanese_document_fonts`]).
 pub fn bundled() -> &'static [&'static [u8]] {
     BUNDLED
@@ -27,6 +27,10 @@ pub(super) static BUNDLED: &[&[u8]] = &[
     include_bytes!("../../../../assets/fonts/Inter-Medium.ttf"),
     include_bytes!("../../../../assets/fonts/Inter-SemiBold.ttf"),
     include_bytes!("../../../../assets/fonts/JetBrainsMono-Regular.ttf"),
+    // Arabic (also Persian and Urdu) and Hebrew, so right-to-left text draws without system or
+    // craft-fonts fonts (the browser has neither).
+    include_bytes!("../../../../assets/fonts/NotoSansArabic.ttf"),
+    include_bytes!("../../../../assets/fonts/NotoSansHebrew-Regular.ttf"),
 ];
 
 #[derive(Clone)]

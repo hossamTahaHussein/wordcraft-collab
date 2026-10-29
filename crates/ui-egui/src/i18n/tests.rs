@@ -1159,3 +1159,24 @@ fn the_flatpak_manifest_pins_the_craft_i18n_rev() {
     assert_eq!(commit.trim().trim_matches(['\'', '"']), rev);
     assert!(manifest.contains("CRAFT_I18N_DIR: /run/build/wordcraft/craft-i18n"), "the build embeds the catalogs");
 }
+
+/// The bundled catalogue gives an Arabic interface: Arabic is offered and actually translates.
+#[test]
+fn arabic_is_available_and_translates() {
+    let ar = Lang::all().find(|l| l.code() == "ar").expect("Arabic is one of the interface languages");
+    set_current(ar);
+    let page = crate::tl!("Page {page} of {pages}");
+    let words = crate::tl!("{words} words");
+    set_current(Lang::EN);
+    assert_ne!(page, "Page {page} of {pages}", "translated");
+    assert!(page.contains("{page}") && page.contains("{pages}"), "placeholders kept: {page}");
+    assert!(words.chars().any(|c| ('\u{0600}'..='\u{06FF}').contains(&c)), "Arabic script: {words}");
+}
+
+/// Persian and Hebrew, the other right-to-left interface languages, come with it.
+#[test]
+fn the_other_right_to_left_languages_are_available() {
+    for code in ["fa", "he"] {
+        assert!(Lang::all().any(|l| l.code() == code), "{code}");
+    }
+}

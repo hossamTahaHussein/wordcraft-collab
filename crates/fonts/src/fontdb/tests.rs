@@ -378,3 +378,18 @@ fn named_instances_and_collection_members_are_capped() {
     // (under 0.1 s on a loaded machine) only backs up "read once", with room for a busy CI.
     assert!(started.elapsed() < std::time::Duration::from_secs(10), "{:?}", started.elapsed());
 }
+
+/// Arabic, Persian and Hebrew text draws with the bundled fonts alone (the browser has no system
+/// fonts, and builds without craft-fonts have no others).
+#[test]
+fn bundled_fonts_draw_arabic_and_hebrew_without_system_fonts() {
+    let db = FontDb::with_font_dirs(Vec::new());
+    db.set_system_fallback(false);
+    for c in ['ب', 'ی', 'ש', 'ﻻ'] {
+        let face = db.fallback_for(c, u32::MAX).unwrap_or_else(|| panic!("a bundled face for {c}"));
+        assert!(face.covers(c), "{c}");
+    }
+    let families = db.families();
+    assert!(families.iter().any(|f| f == "Noto Sans Arabic"), "{families:?}");
+    assert!(families.iter().any(|f| f == "Noto Sans Hebrew"), "{families:?}");
+}

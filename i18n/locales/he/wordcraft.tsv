@@ -1,0 +1,2469 @@
+# עברית (he) interface catalog for WordCraft.
+# Columns, separated by a TAB:  context <TAB> English source text <TAB> translation
+#   context  usually empty. `@plural`, `@id` and `@msg` mean something to the apps; any other
+#            word is a label that tells apart two meanings of the same English.
+#   escapes  \n  \t  \\  inside a column. `{name}` placeholders must appear in both columns (in any
+#            order), and a trailing "…" in one needs one in the other.
+#   @plural  English `one|other`; the translation lists this language's plural forms, `|`-separated.
+#   Lines starting with # and blank lines are ignored. A missing entry shows in English.
+#
+# Clean room: every entry was written from the plain meaning of the English text in ordinary
+# computing vocabulary. No other product's localisation, string table or translated UI was
+# consulted or copied; add entries the same way.
+
+	(All)	(הכול)
+	(no style)	(ללא סגנון)
+	(no suggestions)	(אין הצעות)
+	(normal text)	(טקסט רגיל)
+	(not matched)	(אין התאמה)
+	(picture or object)	(תמונה או אובייקט)
+	0 or More Characters	0 תווים או יותר
+	1. Formatting restrictions	1. הגבלות עיצוב
+	1.5 Line Spacing	מרווח שורות 1.5
+	1/4 Em Space	רווח של 1/4 Em
+	1×2 Empty Matrix	מטריצה ריקה 1×2
+	1×3 Empty Matrix	מטריצה ריקה 1×3
+	2. Editing restrictions	2. הגבלות עריכה
+	2×1 Empty Matrix	מטריצה ריקה 2×1
+	2×2 Determinant	דטרמיננטה 2×2
+	2×2 Empty Matrix	מטריצה ריקה 2×2
+	2×2 Identity Matrix	מטריצת יחידה 2×2
+	2×2 Identity Matrix (sparse)	מטריצת יחידה 2×2 (דלילה)
+	2×2 Matrix in Brackets	מטריצה 2×2 בסוגריים מרובעים
+	2×2 Matrix in Double Bars	מטריצה 2×2 בקווים כפולים
+	2×2 Matrix in Parentheses	מטריצה 2×2 בסוגריים עגולים
+	2×3 Empty Matrix	מטריצה ריקה 2×3
+	3-D	תלת-ממד
+	3. Start enforcement	3. הפעלת האכיפה
+	3×1 Empty Matrix	מטריצה ריקה 3×1
+	3×2 Empty Matrix	מטריצה ריקה 3×2
+	3×3 Empty Matrix	מטריצה ריקה 3×3
+	3×3 Identity Matrix	מטריצת יחידה 3×3
+	3×3 Identity Matrix (sparse)	מטריצת יחידה 3×3 (דלילה)
+	<< Less	<< פחות
+	<< Remove	<< הסרה
+	a drawing canvas can't be ungrouped	אי אפשר לפרק קבוצה של בד ציור
+	a drawing canvas can't go inside a text box	אי אפשר להכניס בד ציור לתיבת טקסט
+	A file dialog is already open.	חלון בחירת קבצים כבר פתוח.
+	A free, open-source word processor written from scratch in Rust.\nPart of the Crafting Apps from the ArtCraft team.	מעבד תמלילים חינמי בקוד פתוח, שנכתב מאפס ב-Rust.\nחלק מ-Crafting Apps של צוות ArtCraft.
+	a group holding Word ink can't be ungrouped yet	עדיין אי אפשר לפרק קבוצה שיש בה דיו של Word
+	A mail merge field	שדה של מיזוג דואר
+	A numbered sequence (figures, tables…)	רצף ממוספר (איורים, טבלאות…)
+	A password is required to open this document.	נדרשת סיסמה כדי לפתוח מסמך זה.
+	A table of contents	תוכן עניינים
+	A xor B	A xor B
+	A, B, C, …	A, B, C, …
+	a, b, c, …	a, b, c, …
+	AaBbCcDd	AaBbCcDd
+	AaBbYyZz	AaBbYyZz
+	About WordCraft	אודות WordCraft
+	Above Chart	מעל התרשים
+	Above the item	מעל הפריט
+	Above/below	מעל/מתחת
+	Absolute value cases	מקרים עם ערך מוחלט
+	Accent	הדגשה
+	Accent Gradient	הדגשה עם מעבר צבע
+	Accent with Reflection	הדגשה עם השתקפות
+	Accent {n}	הדגשה {n}
+	Accents	סימני ניקוד
+	Accept	קבלה
+	Accept All Changes	קבלת כל השינויים
+	Accept This Change	קבלת שינוי זה
+	Accessed on	תאריך גישה
+	Accessibility Pane	חלונית נגישות
+	Account	חשבון
+	Acute	חד
+	Add >>	הוספה >>
+	Add a Table	הוספת טבלה
+	Add at least one field.	יש להוסיף שדה אחד לפחות.
+	Add Chart Element	הוספת רכיב תרשים
+	Add Condition	הוספת תנאי
+	Add Field	הוספת שדה
+	Add Font…	הוספת גופן…
+	Add gradient stop	הוספת נקודת מעבר צבע
+	Add line numbering	הוספת מספור שורות
+	Add New Source…	הוספת מקור חדש…
+	Add Object to Selection	הוספת אובייקט לבחירה
+	Add Pen	הוספת עט
+	Add Row	הוספת שורה
+	Add Series	הוספת סדרה
+	Add Shape	הוספת צורה
+	Add Space Before Paragraph	הוספת רווח לפני פסקה
+	Add space between Asian and Latin text	הוספת רווח בין טקסט אסייתי לטקסט לטיני
+	Add space between Asian text and numbers	הוספת רווח בין טקסט אסייתי למספרים
+	Add tab stop at:	הוספת טאב בנקודה:
+	Add Text	הוספת טקסט
+	Add the chapter number	הוספת מספר הפרק
+	Add to Document	הוספה למסמך
+	Add to Quick Access Toolbar	הוספה לסרגל הכלים לגישה מהירה
+	Add to Style Gallery	הוספה לגלריית הסגנונות
+	Add whether it is above or below	הוספת ציון אם הוא מעל או מתחת
+	Add/Edit\nBibliography	הוספה/עריכה של\nביבליוגרפיה
+	Add/Edit\nCitation	הוספה/עריכה של\nציטוט
+	Add\nNote	הוספת\nהערה
+	Add\nPen	הוספת\nעט
+	Add\nShape	הוספת\nצורה
+	Added 1 font	נוסף גופן אחד
+	Added Fonts	גופנים שנוספו
+	Added {n} fonts	נוספו גופנים: {n}
+	Address	כתובת
+	Address Block	גוש כתובת
+	Address labels	מדבקות כתובת
+	Address:	כתובת:
+	Address\nBlock	גוש\nכתובת
+	Advanced Find	חיפוש מתקדם
+	Advanced Find…	חיפוש מתקדם…
+	After:	אחרי:
+	Agents	סוכנים
+	Agents connected to WordCraft can show you messages through the Assistant. Muted, they're told you'd rather not.	סוכנים המחוברים ל-WordCraft יכולים להציג לך הודעות דרך העוזר. כשההודעות מושתקות, הם יודעים שעדיף לך בלעדיהן.
+	Ah, Latin. The language of deadlines.	אה, לטינית. שפת הדדליינים.
+	Ah, the editing phase. My favourite. Very decisive.	אה, שלב העריכה. האהוב עליי. מאוד החלטי.
+	Align Bottom Center	יישור למטה במרכז
+	Align Bottom Left	יישור למטה משמאל
+	Align Bottom Right	יישור למטה מימין
+	Align Center	יישור למרכז
+	Align Center Left	יישור למרכז משמאל
+	Align Center Right	יישור למרכז מימין
+	Align Top Center	יישור למעלה במרכז
+	Align Top Left	יישור למעלה משמאל
+	Align Top Right	יישור למעלה מימין
+	Aligned at:	מיושר ב:
+	All - Linear	הכול - ליניארי
+	All - Professional	הכול - מקצועי
+	All Borders	כל הגבולות
+	All caps	אותיות רישיות בלבד
+	All Commands	כל הפקודות
+	All Fonts	כל הגופנים
+	All Levels	כל הרמות
+	All Markup	כל הסימונים
+	All pages in the range	כל העמודים בטווח
+	All symbol sets	כל ערכות הסמלים
+	All system fonts are already available.	כל הגופנים של המערכת כבר זמינים.
+	Allow hanging punctuation	התרת פיסוק תלוי
+	Allow Latin text to wrap in the middle of a word	התרת גלישה של טקסט לטיני באמצע מילה
+	Allow line breaks	התרת מעברי שורה
+	Allow row to break across pages	התרת פיצול שורה בין עמודים
+	Alphabetical	אלפביתי
+	Alt Text	טקסט חלופי
+	Alt text	טקסט חלופי
+	Alt Text Pane	חלונית טקסט חלופי
+	Alt:	Alt:
+	Alt\nText	טקסט\nחלופי
+	an agent	סוכן
+	And	וגם
+	Angle Brackets	סוגריים זוויתיים
+	Angle Brackets with Separator	סוגריים זוויתיים עם מפריד
+	Angle Brackets with Two Separators	סוגריים זוויתיים עם שני מפרידים
+	Animate the caret (it glides and fades)	הנפשת הסמן (גולש ודוהה)
+	Animation effects:	אפקטי הנפשה:
+	Annotation Reference	הפניה להערה
+	Annotation Subject	נושא ההערה
+	Annotation Text	טקסט הערה
+	Annoying	מעצבן
+	Another file	קובץ אחר
+	Any Character	תו כלשהו
+	Any Digit	ספרה כלשהי
+	Any field	כל שדה
+	Any Letter	אות כלשהי
+	Anyone can open this document. Encrypt it with a password to keep it private.	כל אחד יכול לפתוח מסמך זה. הצפנה בסיסמה תשמור עליו פרטי.
+	Anyone who opens the document will need this password.	כל מי שיפתח את המסמך יזדקק לסיסמה זו.
+	APA	APA
+	Apply as you type	החלה תוך כדי הקלדה
+	Apply Asian line-breaking rules (kinsoku)	החלת כללי שבירת שורות אסייתיים (kinsoku)
+	Apply formatting to:	החלת עיצוב על:
+	Apply Style	החלת סגנון
+	Apply Styles	החלת סגנונות
+	Arabic	ערבית
+numerals	Arabic	ערביות
+	Arch Down	קשת כלפי מטה
+	Arch Up	קשת כלפי מעלה
+	Arrange\nAll	סידור\nהכול
+	Article I.	סעיף I.
+	Artistic Effects	אפקטים אומנותיים
+	As Recommended	כמומלץ
+	As you type	תוך כדי הקלדה
+	ASAP	בהקדם האפשרי
+	Asian text font:	גופן לטקסט אסייתי:
+	Asian Typography	טיפוגרפיה אסייתית
+	Assistant	עוזר
+	Assistant Suggestions	הצעות העוזר
+	At least	לפחות
+	At least {n}	לפחות {n}
+	Atelier	סטודיו
+	Atmosphere	אווירה
+	Attach Template	צירוף תבנית
+	Attach…	צירוף…
+	Auto orientation	כיוון אוטומטי
+	AutoCorrect	תיקון אוטומטי
+	AutoCorrect Options	אפשרויות תיקון אוטומטי
+	AutoFit	התאמה אוטומטית
+	AutoFit behavior	התאמה אוטומטית
+	AutoFit Column by Double-Clicking	התאמה אוטומטית של עמודה בלחיצה כפולה
+	AutoFit Contents	התאמה אוטומטית לתוכן
+	AutoFit to contents	התאמה אוטומטית לתוכן
+	AutoFit to window	התאמה אוטומטית לחלון
+	AutoFit Window	התאמה אוטומטית לחלון
+	AutoFormat As You Type	עיצוב אוטומטי בעת ההקלדה
+	Automatic ({language})	אוטומטי ({language})
+	Automatic ({region})	אוטומטי ({region})
+	Automatic bulleted lists	רשימות תבליטים אוטומטיות
+	Automatic follows your system's language. Menus and commands change; your documents don't.	המצב האוטומטי עוקב אחר שפת המערכת. התפריטים והפקודות משתנים; המסמכים שלך לא.
+	Automatic numbered lists	רשימות ממוספרות אוטומטיות
+	Automatic Table 1 (3 levels)	טבלה אוטומטית 1 (3 רמות)
+	Automatic Table 2 (2 levels)	טבלה אוטומטית 2 (2 רמות)
+	Automatically add words to list (First Letter)	הוספה אוטומטית של מילים לרשימה (אות ראשונה)
+	Automatically add words to list (INitial CAps)	הוספה אוטומטית של מילים לרשימה (שתי אותיות רישיות)
+	Automatically hyphenate document	הוספת מקפים אוטומטית במסמך
+	Automatically Update Document Styles	עדכון אוטומטי של סגנונות המסמך
+	Automatically update document styles	עדכון אוטומטי של סגנונות המסמך
+	AutoSave	שמירה אוטומטית
+	AutoSave documents you have saved in WordCraft	שמירה אוטומטית של מסמכים ששמרת ב-WordCraft
+	AutoSave failed: {error}. Save the document to turn AutoSave back on.	השמירה האוטומטית נכשלה: {error}. יש לשמור את המסמך כדי להפעיל שוב את השמירה האוטומטית.
+	AutoSave isn't available in the browser: it can't write to your files. Save downloads a copy.	שמירה אוטומטית אינה זמינה בדפדפן: אין לה אפשרות לכתוב לקבצים שלך. שמירה מורידה עותק.
+	AutoSave only keeps .docx, .odt and .rtf files; {name} can't keep all formatting. Save as .docx to turn on AutoSave.	שמירה אוטומטית נתמכת רק בקובצי .docx, .odt ו-.rtf; הקובץ {name} אינו יכול לשמור את כל העיצוב. יש לשמור בתבנית .docx כדי להפעיל שמירה אוטומטית.
+	AutoSave saves every change to the file (needs a saved document)	שמירה אוטומטית שומרת כל שינוי בקובץ (נדרש מסמך שמור)
+	AutoSave writes your changes to the file a moment after you stop typing.	שמירה אוטומטית כותבת את השינויים לקובץ רגע אחרי שמפסיקים להקליד.
+	AutoText	טקסט אוטומטי
+	B4 (JIS)   10.12" × 14.33"	B4 (JIS)   10.12" × 14.33"
+	B5 (JIS)   7.17" × 10.12"	B5 (JIS)   7.17" × 10.12"
+	Balloons	בועות
+	Banded Columns	עמודות מפוספסות
+	Banded Rows	שורות מפוספסות
+	Base text:	טקסט בסיס:
+	Based on: {style}	מבוסס על: {style}
+	Baseline Dots	נקודות בקו הבסיס
+	Basic Cycle	מחזור בסיסי
+	Basic List	רשימה בסיסית
+	Basic Math	מתמטיקה בסיסית
+	Basic Matrix	מטריצה בסיסית
+	Basic Process	תהליך בסיסי
+	Basic Pyramid	פירמידה בסיסית
+	Basic Radial	רדיאלי בסיסי
+	Basic Venn	ון בסיסי
+	Bayes' rule	כלל בייס
+	Before:	לפני:
+	Beginning of Word	תחילת מילה
+	Behind Text	מאחורי הטקסט
+	Below text	מתחת לטקסט
+	Below the item	מתחת לפריט
+	Between	בין
+	Bibliography	ביבליוגרפיה
+	Binomial Coefficient	מקדם בינומי
+	Binomial Coefficient (angle)	מקדם בינומי (זוויתי)
+	Binomial Coefficient with Angle Brackets	מקדם בינומי עם סוגריים זוויתיים
+	Binomial expansion of (x+a)ⁿ	פיתוח בינומי של (x+a)ⁿ
+	Blank	ריק
+	Blank (Three Columns)	ריק (שלוש עמודות)
+	Blank document	מסמך ריק
+	Blank Page	עמוד ריק
+	Block\nAuthors	חסימת\nמחברים
+	Blue:	כחול:
+	Body Text	גוף הטקסט
+	Body text in a short paragraph to show spacing.	טקסט גוף בפסקה קצרה להמחשת הריווח.
+	Bold choice. Ctrl+Z is right there if you need it.	בחירה נועזת. Ctrl+Z ממש כאן אם צריך.
+	Book	ספר
+	Book Title	כותר ספר
+	Book title	כותר הספר
+	Bookmark	סימנייה
+	Bookmark name:	שם הסימנייה:
+	Bookmark text	טקסט הסימנייה
+	Bookmarks	סימניות
+	Border lines	קווי גבול
+	Border Painter	צייר גבולות
+	Border\nPainter	צייר\nגבולות
+	Borders and Shading	גבולות והצללה
+	Borders and Shading…	גבולות והצללה…
+	Both Sides	שני הצדדים
+	Bottom Border	גבול תחתון
+	Bottom Left Cell	תא שמאלי תחתון
+	Bottom Margin	שוליים תחתונים
+	Bottom of Page	תחתית העמוד
+	Bottom Right Cell	תא ימני תחתון
+	Box	תיבה
+	Boxed Formula	נוסחה ממוסגרת
+	Boxed Formula (example)	נוסחה ממוסגרת (דוגמה)
+	Boxed Formulas	נוסחאות ממוסגרות
+	Braces	סוגריים מסולסלים
+	Braces with Separator	סוגריים מסולסלים עם מפריד
+	Bracket	סוגר
+	Brackets	סוגריים
+	Brackets with Separators	סוגריים עם מפרידים
+	Breaks	מעברים
+	Breve	קשת קצרה
+	Brighter +20%	בהיר יותר +20%
+	Brightness, contrast and sharpness	בהירות, ניגודיות וחדות
+	Browse in WordCraft…	עיון ב-WordCraft…
+	Building Block Gallery Content Control	פקד תוכן של גלריית אבני בניין
+	Built-In	מובנה
+	Built-in style	סגנון מובנה
+	Built-in styles can't be deleted.	לא ניתן למחוק סגנונות מובנים.
+	Bullet Library	ספריית תבליטים
+	Bullets	תבליטים
+	By author	לפי מחבר
+	Calendar	לוח שנה
+	Can't be deleted	לא ניתן למחיקה
+	Can't find a command? Press Alt+Q and type what you want to do.	לא מוצאים פקודה? לוחצים Alt+Q ומקלידים מה רוצים לעשות.
+	can't split at the first row	אי אפשר לפצל בשורה הראשונה
+	Canvas Member	רכיב בקנבס
+	Capitalize Each Word	אות ראשונה רישית בכל מילה
+	Capitalize first letter of sentences	אות ראשונה רישית במשפטים
+	Capitalize first letter of table cells	אות ראשונה רישית בתאי טבלה
+	Capitalize names of days	אות רישית בשמות ימים
+	Capitalize the first word of a sentence	אות רישית במילה הראשונה במשפט
+	Caption Numbering	מספור כיתובים
+	Caption text	טקסט הכיתוב
+	Caption:	כיתוב:
+	Captions	כיתובים
+	Careful, any further back and we'll undo the invention of paper.	זהירות, עוד צעד אחורה ונבטל את המצאת הנייר.
+	Caret Character	תו גג
+	Case changes	שינויי רישיות
+	Cases (Three Conditions)	מקרים (שלושה תנאים)
+	Cases (Two Conditions)	מקרים (שני תנאים)
+	Cases and Stacks	מקרים וערימות
+	Categories	קטגוריות
+	Categories:	קטגוריות:
+	Category {n}	קטגוריה {n}
+	Ceiling	עיגול כלפי מעלה
+	Cell	תא
+	Cell Margins	שולי תא
+	Cell\nMargins	שולי\nתא
+	Center Glow	זוהר במרכז
+	Centered as Group	ממורכז כקבוצה
+	Change Chart Type	שינוי סוג תרשים
+	Change Colors	שינוי צבעים
+	Change in y over change in x	השינוי ב-y חלקי השינוי ב-x
+	Change Layout	שינוי פריסה
+	Change List Level	שינוי רמת רשימה
+	Change Password…	שינוי סיסמה…
+	Change Picture	שינוי תמונה
+	Change Picture…	שינוי תמונה…
+	Change Shape	שינוי צורה
+	Change Structure	שינוי מבנה
+	Change to Display	שינוי לתצוגה
+	Change to Inline	שינוי לשורה
+	Change to Level 1	שינוי לרמה 1
+	Change to Level 2	שינוי לרמה 2
+	Change to Level 3	שינוי לרמה 3
+	Change to Level 4	שינוי לרמה 4
+	Change to Level 5	שינוי לרמה 5
+	Change to Level 6	שינוי לרמה 6
+	Change to Level 7	שינוי לרמה 7
+	Change to Level 8	שינוי לרמה 8
+	Change to Level 9	שינוי לרמה 9
+	Change\nChart Type	שינוי\nסוג תרשים
+	Change\nColors	שינוי\nצבעים
+	Changed lines:	שורות ששונו:
+	Changes	שינויים
+	Chapter 1	פרק 1
+	Chapter in a book	פרק בספר
+	Chapters begin at:	הפרקים מתחילים ב:
+	Character Border	גבול תווים
+	Character code:	קוד תו:
+	Character in Range	תו בטווח
+	Character level	רמת תו
+	Character Position	מיקום תווים
+	Character Scale	קנה מידה של תווים
+	Character Shading	הצללת תווים
+	Character Spacing	ריווח תווים
+	Character spacing	ריווח תווים
+	Character style	סגנון תווים
+	Characters (no spaces)	תווים (ללא רווחים)
+	Characters (with spaces)	תווים (כולל רווחים)
+	Characters per line:	תווים בשורה:
+	Chart	תרשים
+	Chart Design	עיצוב תרשים
+	Chart Layouts	פריסות תרשים
+	Chart Title	כותרת תרשים
+	charts and diagrams can't be moved or resized yet	עדיין אי אפשר להזיז תרשימים ודיאגרמות או לשנות את גודלם
+	Check	בדיקה
+	Check Accessibility	בדיקת נגישות
+	Check Box Content Control	פקד תוכן של תיבת סימון
+	Check Compatibility	בדיקת תאימות
+	Check for Errors	בדיקת שגיאות
+	Check Spelling as You Type	בדיקת איות תוך כדי הקלדה
+	Check spelling as you type	בדיקת איות תוך כדי הקלדה
+	Check\nAccessibility	בדיקת\nנגישות
+	Checked styles are allowed:	הסגנונות המסומנים מותרים:
+	Checked symbol	סמל מסומן
+	Chevron Down	שברון למטה
+	Chevron Up	שברון למעלה
+	Chicago	Chicago
+	Chinese (Simplified)	סינית (פשוטה)
+	Chinese (Traditional)	סינית (מסורתית)
+	Choose a command	בחירת פקודה
+	Choose a shortcut	בחירת קיצור דרך
+	Choose List Item	בחירת פריט ברשימה
+	Choose the sheet that holds the recipients.	יש לבחור את הגיליון שמכיל את הנמענים.
+	Circle area from its radius	שטח עיגול לפי הרדיוס
+	Circled Dot	נקודה בעיגול
+	Circled Plus	פלוס בעיגול
+	Circled Times	כפל בעיגול
+	Citation Style	סגנון ציטוט
+	Citations	ציטוטים
+	Citations & Bibliography	ציטוטים וביבליוגרפיה
+	Clear All Formatting	ניקוי כל העיצוב
+	Clear Character Formatting	ניקוי עיצוב תווים
+	Clear Character Style	ניקוי סגנון תווים
+	Clear Formatting Level	רמת ניקוי עיצוב
+	Clear Paragraph Formatting	ניקוי עיצוב פסקה
+	Click a border between two cells to merge them. Esc stops.	יש ללחוץ על גבול בין שני תאים כדי למזג אותם. Esc מפסיק.
+	Click an item to paste it.	יש ללחוץ על פריט כדי להדביק אותו.
+	Click level to modify:	יש ללחוץ על הרמה לשינוי:
+	Click the empty text box the text should continue in (Esc cancels)	יש ללחוץ על תיבת הטקסט הריקה שבה הטקסט אמור להמשיך (Esc לביטול)
+	Click to switch back to inserting	יש ללחוץ כדי לחזור למצב הוספה
+	Clipboard Contents	תוכן הלוח
+	Clipboard Items	פריטי הלוח
+	Clipboard Pane	חלונית הלוח
+	Close Equation	סגירת המשוואה
+	Close Header and Footer	סגירת כותרת עליונה ותחתונה
+	Close Outline View	סגירת תצוגת חלוקה לרמות
+	Close Outline\nView	סגירת תצוגת\nחלוקה לרמות
+	Clustered Bar	פסים מקובצים
+	Clustered Column	עמודות מקובצות
+	cm	ס"מ
+	Col #:	מס' עמודה:
+	Collapse Selection	כיווץ הבחירה
+	Collate copies	איסוף עותקים
+	Collect entries from:	איסוף ערכים מ:
+	Colon Equal	נקודתיים שווה
+	Color model:	מודל צבע:
+	Color only	צבע בלבד
+	Color: {color}	צבע: {color}
+	Colorful	צבעוני
+	Column	עמודה
+	Column Break	מעבר עמודה
+	Column Selection	בחירת עמודה
+	Column {n}	עמודה {n}
+	Column:	עמודה:
+	Combine Documents	שילוב מסמכים
+	Combo Box Content Control	פקד תוכן של תיבה משולבת
+	Commands	פקודות
+	Commas	פסיקים
+	Comments beside each page and tracked changes in PDFs, prints and images; a comment list at the end of web pages, Markdown and text.	הערות לצד כל עמוד ושינויים במעקב בקובצי PDF, בהדפסות ובתמונות; רשימת הערות בסוף דפי אינטרנט, Markdown וטקסט.
+	Comments Pane	חלונית הערות
+	Common Accent Objects	אובייקטי ניקוד נפוצים
+	Common Brackets	סוגריים נפוצים
+	Common Fractions	שברים נפוצים
+	Common Functions	פונקציות נפוצות
+	Common Large Operators	אופרטורים גדולים נפוצים
+	Common Operator Structures	מבני אופרטורים נפוצים
+	Common Operators	אופרטורים נפוצים
+	Common Radicals	שורשים נפוצים
+	Common Subscripts and Superscripts	כתב תחתי וכתב עילי נפוצים
+	Communication	תקשורת
+	Community\nDiscord	קהילת\nDiscord
+	Compact	דחוס
+	Compare Documents	השוואת מסמכים
+	Compare to	השוואה אל
+	Compared: {changes} changes	הושוו: {changes} שינויים
+	Comparing with another file needs the desktop app.	השוואה עם קובץ אחר דורשת את היישום למחשב.
+	Comparison settings	הגדרות השוואה
+	Compress Pictures	דחיסת תמונות
+	Compress punctuation at the start of a line	דחיסת פיסוק בתחילת שורה
+	Conference	כנס
+	Conference paper	מאמר בכנס
+	CONFIDENTIAL	חסוי
+	Confirm password:	אישור סיסמה:
+	Connect Shapes	חיבור צורות
+	Container Title	כותר המכיל
+	Content Control at Selection	פקד תוכן בבחירה
+	Content Control Properties	מאפייני פקד תוכן
+	Contents can't be edited	לא ניתן לערוך את התוכן
+	Context	הקשר
+numerals	Context	לפי ההקשר
+	Continue from previous section	המשך מהמקטע הקודם
+	Continue without restoring	המשך בלי שחזור
+	Continuous	רציף
+	Continuous numbering	מספור רציף
+	Contour Integral	אינטגרל מסלולי
+	Contour Integral with Limits	אינטגרל מסלולי עם גבולות
+	Contour Integral with Stacked Limits	אינטגרל מסלולי עם גבולות מוערמים
+	Contour Integrals	אינטגרלים מסלוליים
+	Controls	פקדים
+	Conversions	המרות
+	Convert between built-up and linear form	המרה בין צורה בנויה לצורה ליניארית
+	Convert Notes	המרת הערות
+	Convert Text to Table	המרת טקסט לטבלה
+	Convert Text to Table…	המרת טקסט לטבלה…
+	Convert to Shapes	המרה לצורות
+	Convert to Text	המרה לטקסט
+	Coproduct	מכפלה משלימה
+	Coproduct with Limits	מכפלה משלימה עם גבולות
+	Coproduct with Lower Limit	מכפלה משלימה עם גבול תחתון
+	Coproduct with Subscript-Superscript Limits	מכפלה משלימה עם גבולות בכתב תחתי ועילי
+	Copy Formatting	העתקת עיצוב
+	Copy of the text a bookmark marks	עותק של הטקסט שסימנייה מסמנת
+	Copy Styles	העתקת סגנונות
+	Copy to	העתקה אל
+	Copyright Sign	סימן זכויות יוצרים
+	Correct accidental usage of cAPS LOCK key	תיקון שימוש מקרי במקש cAPS LOCK
+	Correct TWo INitial CApitals	תיקון שתי אותיות רישיות בתחילת מילה
+	Corrections	תיקונים
+	Cosecant Function	פונקציית קוסקאנס
+	Cosine 2x	קוסינוס 2x
+	Cosine Function	פונקציית קוסינוס
+	Cotangent Function	פונקציית קוטנגנס
+	Couldn't download {name}: {error}	לא ניתן היה להוריד את {name}: {error}
+	Couldn't make WordCraft the default: {error}	לא ניתן היה להגדיר את WordCraft כברירת מחדל: {error}
+	Couldn't open {path}: {error}	לא ניתן היה לפתוח את {path}: {error}
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	לא ניתן היה לשמור את {name}, ולכן הוא עדיין פתוח ושום דבר לא אבד: {error}
+	Count by:	ספירה בקפיצות של:
+	Count words in text boxes and notes	ספירת מילים בתיבות טקסט ובהערות
+	Courtesy Title	תואר נימוס
+	Cover Page	עמוד שער
+	Craft	Craft
+	Create a Style	יצירת סגנון
+	Create an interactive outline of your document.\n\nIt's a great way to keep track of where you are or quickly move your content around.\n\nTo get started, go to the Home tab and apply Heading styles to the headings in your document.	יצירת מתאר אינטראקטיבי של המסמך.\n\nזו דרך מצוינת לדעת איפה נמצאים ולהזיז תוכן במהירות.\n\nכדי להתחיל, יש לעבור ללשונית 'בית' ולהחיל סגנונות כותרת על הכותרות במסמך.
+	Create Graphic	יצירת גרפיקה
+	Create Link	יצירת קישור
+	Create New Style	יצירת סגנון חדש
+	Create Source	יצירת מקור
+	Croatian	קרואטית
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	חיתוך על הדף עובד רק בתמונות שאינן מסובבות: יש לקבוע קודם סיבוב של 0°, או להשתמש בתיבות החיתוך
+	Cross-reference	הפניה צולבת
+	Cross-reference:	הפניה צולבת:
+	Ctrl+Enter starts a new page. Much tidier than pressing Enter until it happens.	Ctrl+Enter פותח עמוד חדש. הרבה יותר מסודר מללחוץ Enter עד שזה קורה.
+	Ctrl+H finds and replaces text, formatting and special characters.	Ctrl+H מוצא ומחליף טקסט, עיצוב ותווים מיוחדים.
+	Ctrl+K turns the selected text into a link.	Ctrl+K הופך את הטקסט הנבחר לקישור.
+	Ctrl+Shift+G counts your words, characters and paragraphs.	Ctrl+Shift+G סופר מילים, תווים ופסקאות.
+	Cube Root	שורש שלישי
+	Current - Linear	נוכחי - ליניארי
+	Current - Professional	נוכחי - מקצועי
+	Current Document	המסמך הנוכחי
+	Current Position	המיקום הנוכחי
+	Current record	הרשומה הנוכחית
+	Current style: {style}	הסגנון הנוכחי: {style}
+	Curved Arrow Connector	מחבר חץ מעוקל
+	Curved Connector	מחבר מעוקל
+	Custom dictionary	מילון מותאם אישית
+	Custom Margins…	שוליים מותאמים אישית…
+	Custom mark:	סימן מותאם אישית:
+	Custom range	טווח מותאם אישית
+	Custom size	גודל מותאם אישית
+	Custom Table of Contents…	תוכן עניינים מותאם אישית…
+	Custom Watermark	סימן מים מותאם אישית
+	Custom Watermark…	סימן מים מותאם אישית…
+	Customize	התאמה אישית
+	Customize Keyboard	התאמה אישית של המקלדת
+	Customize Quick Access Toolbar	התאמה אישית של סרגל הכלים לגישה מהירה
+	Customize Quick Access Toolbar…	התאמה אישית של סרגל הכלים לגישה מהירה…
+	Customize Ribbon	התאמה אישית של רצועת הכלים
+	Customize the Ribbon…	התאמה אישית של רצועת הכלים…
+	Cycle	מחזור
+	Czech	צ'כית
+	Danish	דנית
+	Dark Mode	מצב כהה
+	Dark page (white text on black)	עמוד כהה (טקסט לבן על שחור)
+	Dark Variations	וריאציות כהות
+	Dark with Shadow	כהה עם צל
+	Darker −20%	כהה יותר −20%
+	Darkroom	חדר חושך
+	Data Labels	תוויות נתונים
+	Date & Time	תאריך ושעה
+	Date formats:	תבניות תאריך:
+	Date Picker Content Control	פקד תוכן של בורר תאריכים
+	Day	יום
+	Decimal	עשרוני
+	Decorative objects only add visual interest: screen readers skip them.	אובייקטים דקורטיביים מוסיפים עניין חזותי בלבד: קוראי מסך מדלגים עליהם.
+	Decrease Indent	הקטנת הזחה
+	Deep	עמוק
+	Default Paragraph Font	גופן פסקה המוגדר כברירת מחדל
+	Default tab stops:	טאבים המוגדרים כברירת מחדל:
+	Define New Bullet	הגדרת תבליט חדש
+	Define New Multilevel List	הגדרת רשימה חדשה מרובת רמות
+	Define New Multilevel List…	הגדרת רשימה חדשה מרובת רמות…
+	Define New Number Format	הגדרת תבנית מספר חדשה
+	Deflate	ניפוח לפנים
+	Delete Around Caret in Equation	מחיקה סביב הסמן במשוואה
+	Delete Back in Equation	מחיקה לאחור במשוואה
+	Delete Bookmark	מחיקת סימנייה
+	Delete Cells	מחיקת תאים
+	Delete Clipboard Item	מחיקת פריט מהלוח
+	Delete Columns	מחיקת עמודות
+	Delete Comment	מחיקת הערה
+	Delete in Equation	מחיקה במשוואה
+	Delete Label	מחיקת תווית
+	Delete Next Word	מחיקת המילה הבאה
+	Delete Previous Word	מחיקת המילה הקודמת
+	Delete Rows	מחיקת שורות
+	Delete Selected Ink	מחיקת דיו שנבחר
+	Delete Table	מחיקת טבלה
+	Delete Table Style	מחיקת סגנון טבלה
+	Deletions:	מחיקות:
+	Delivery address:	כתובת למשלוח:
+	Delta Equal To	דלתא שווה ל
+	Delta over arrow	דלתא מעל חץ
+	Demote	הורדת רמה
+	Demote to Body Text	הורדה לטקסט גוף
+	Derivative as a limit	נגזרת כגבול
+	Describe what this object shows, for people who can't see it.	תארו מה מציג אובייקט זה, עבור אנשים שאינם יכולים לראות אותו.
+	Describe what this table shows, for people who can't see it.	תארו מה מציגה טבלה זו, עבור אנשים שאינם יכולים לראות אותה.
+	Design	עיצוב
+	Design Mode	מצב עיצוב
+	Detach Template	ניתוק תבנית
+	Detect language automatically	זיהוי שפה אוטומטי
+	Developer	מפתחים
+	development build	גרסת פיתוח
+	Diagonal Dots	נקודות באלכסון
+	Dictate	הכתבה
+	Dictionaries	מילונים
+	Dictionaries folder:	תיקיית מילונים:
+	Different First Page	עמוד ראשון שונה
+	Different Odd & Even Pages	עמודים זוגיים ואי-זוגיים שונים
+	Differential	דיפרנציאל
+	Differential theta	דיפרנציאל תטא
+	Differential x	דיפרנציאל x
+	Differential y	דיפרנציאל y
+	Differentials	דיפרנציאלים
+	Direct formatting	עיצוב ישיר
+	Directory	מדריך
+	Discard the recovery copy of {name}?	למחוק את עותק השחזור של {name}?
+	Discard…	מחיקה…
+	Discord community	קהילת Discord
+	Display for Review	תצוגה לסקירה
+	Display text	טקסט לתצוגה
+	Distance from text	מרחק מהטקסט
+	Distance from text:	מרחק מהטקסט:
+	Distribute Columns	פיזור עמודות
+	Distribute letters	פיזור אותיות
+	Distribute Rows	פיזור שורות
+	Distribute spacing	פיזור ריווח
+	Distributed	מפוזר
+	Do Not Check Spelling or Grammar	ללא בדיקת איות ודקדוק
+	Do not check spelling or grammar	ללא בדיקת איות ודקדוק
+	DO NOT COPY	אין להעתיק
+	Do Not Show in TOC	לא להציג בתוכן העניינים
+	Do you want to save changes to {name}?	לשמור את השינויים ב-{name}?
+	Document End	סוף המסמך
+	Document Formatting	עיצוב מסמך
+	Document Grid	רשת מסמך
+	Document Information	מידע על המסמך
+	Document name	שם המסמך
+	Document Property	מאפיין מסמך
+	Document Start	תחילת המסמך
+	Document template:	תבנית מסמך:
+	Document Text	טקסט המסמך
+	Document1	מסמך1
+	Document\nPreferences	העדפות\nמסמך
+	Documents you open will show up here.	מסמכים שתפתחו יופיעו כאן.
+	Does not contain	אינו מכיל
+	DOI	DOI
+	Don't add space between paragraphs of the same style	ללא הוספת רווח בין פסקאות באותו סגנון
+	Don't capitalize after:	ללא אות רישית אחרי:
+	Don't hyphenate	ללא מקפים
+	Don't read Zotero, Mendeley or EndNote citations and bibliographies	ללא קריאת ציטוטים וביבליוגרפיות של Zotero, Mendeley או EndNote
+	Don't show me this tip again	לא להציג לי שוב את העצה הזו
+	Dot dash	נקודה-קו
+	Dot-dash	נקודה-קו
+	Dot-dot-dash	נקודה-נקודה-קו
+	Double	כפול
+	Double Bar	קו כפול
+	Double Closing Quote	מירכאות כפולות סוגרות
+	Double Dot	נקודה כפולה
+	Double Integral	אינטגרל כפול
+	Double Integral with Limits	אינטגרל כפול עם גבולות
+	Double Integral with Stacked Limits	אינטגרל כפול עם גבולות מוערמים
+	Double Left Arrow with Text Above	חץ כפול שמאלה עם טקסט מעל
+	Double Left Arrow with Text Below	חץ כפול שמאלה עם טקסט מתחת
+	Double Left Right Arrow with Text Above	חץ כפול דו-כיווני עם טקסט מעל
+	Double Left Right Arrow with Text Below	חץ כפול דו-כיווני עם טקסט מתחת
+	Double Opening Quote	מירכאות כפולות פותחות
+	Double Right Arrow with Text Above	חץ כפול ימינה עם טקסט מעל
+	Double Right Arrow with Text Below	חץ כפול ימינה עם טקסט מתחת
+	Double Spacing	ריווח כפול
+	Double Square Brackets	סוגריים מרובעים כפולים
+	Double Strikethrough	קו חוצה כפול
+	Double strikethrough	קו חוצה כפול
+	Double summation	סכום כפול
+	Double Underline	קו תחתון כפול
+	Double Vertical Bars	קווים אנכיים כפולים
+	Doughnut	טבעת
+	DRAFT	טיוטה
+	Drag a rectangle to draw a table, or a line across cells to split them. Esc stops.	גררו מלבן כדי לצייר טבלה, או קו לרוחב תאים כדי לפצל אותם. Esc מפסיק.
+	Draw Ink	ציור בדיו
+	Draw Table	ציור טבלה
+	Draw\nTable	ציור\nטבלה
+	Drawing Canvas	משטח ציור
+	Drawing Tools	כלי ציור
+	Drawing\nCanvas	משטח\nציור
+	Drop Cap	אות פתיח
+	Drop cap	אות פתיח
+	Drop Cap Options…	אפשרויות אות פתיחה…
+	drop caps can't go in a table	אי אפשר להוסיף אות פתיח בטבלה
+	Drop-Down List Content Control	פקד תוכן של רשימה נפתחת
+	Dropped	בטקסט
+	Drops all formatting and pastes plain text.	מסיר את כל העיצוב ומדביק טקסט פשוט.
+	E-mail Messages	הודעות דואר אלקטרוני
+	Edit Comment	עריכת הערה
+	Edit Data	עריכת נתונים
+	Edit Document	עריכת המסמך
+	Edit Equation	עריכת משוואה
+	Edit Field Code	עריכת קוד שדה
+	Edit Field…	עריכת שדה…
+	Edit Footer	עריכת כותרת תחתונה
+	Edit Header	עריכת כותרת עליונה
+	Edit Individual Documents…	עריכת מסמכים בודדים…
+	Edit Items	עריכת פריטים
+	Edit Recipient List	עריכת רשימת נמענים
+	Edit Source	עריכת מקור
+	Edit\nData	עריכת\nנתונים
+	Edit\nRecipient List	עריכת\nרשימת נמענים
+	Edited	נערך
+	Editing endnote	עריכת הערת סיום
+	Editing footnote	עריכת הערת שוליים
+	Editing header/footer	עריכת כותרת עליונה/תחתונה
+	Editing in this document is restricted.	העריכה במסמך זה מוגבלת.
+	Editing — edit the document directly	עריכה — עריכת המסמך ישירות
+	Edition	מהדורה
+	Editor	עורך
+	Elbow Arrow Connector	מחבר חץ מרפקי
+	Elbow Connector	מחבר מרפקי
+	Emphasis	הדגשה
+	Empty Matrices	מטריצות ריקות
+	Enclose Characters	תיחום תווים
+	Enclosure	מסגרת
+	Encrypt with Password	הצפנה באמצעות סיסמה
+	Encrypt with Password…	הצפנה באמצעות סיסמה…
+	End of document	סוף המסמך
+	End of section	סוף המקטע
+	End of Word	סוף המילה
+	Endnote Reference	הפניה להערת סיום
+	Endnote Text	טקסט הערת סיום
+	Endnotes	הערות סיום
+	Endnotes to footnotes	הערות סיום להערות שוליים
+	English (Australia)	אנגלית (אוסטרליה)
+	English (Canada)	אנגלית (קנדה)
+	English (India)	אנגלית (הודו)
+	English (Ireland)	אנגלית (אירלנד)
+	English (New Zealand)	אנגלית (ניו זילנד)
+	English (South Africa)	אנגלית (דרום אפריקה)
+	English (United Kingdom)	אנגלית (בריטניה)
+	English (United States)	אנגלית (ארצות הברית)
+	Engrave	חריטה
+	Enlarge symbol	הגדלת סמל
+	Enter a number.	יש להזין מספר.
+	Enter bookmark name:	יש להזין שם סימנייה:
+	Enter formatting for number:	הזינו עיצוב למספר:
+	Enter in Equation	כניסה למשוואה
+	Enter page number:	הזינו מספר עמוד:
+	Entire caption	הכיתוב כולו
+	Entry marked.	הערך סומן.
+	Envelope #10	מעטפה #10
+	Envelope #10   4.12" × 9.50"	מעטפה #10   4.12" × 9.50"
+	Envelope Address	כתובת על מעטפה
+	Envelope DL   4.33" × 8.66"	מעטפה DL   4.33" × 8.66"
+	Envelope Return	כתובת השולח על מעטפה
+	Envelope size:	גודל מעטפה:
+	Envelopes	מעטפות
+	Equal by Definition	שווה בהגדרה
+	Equal column width	רוחב עמודות שווה
+	Equal Equal	שווה שווה
+	Equal to	שווה ל
+	Equals:	שווה ל:
+	Equation	משוואה
+	Equation Gallery	גלריית משוואות
+	Equation Info	מידע על המשוואה
+	Equation Number	מספר משוואה
+	Equation Options	אפשרויות משוואה
+	Erase Ink	מחיקת דיו
+	Errors ({n})	שגיאות ({n})
+	Estonian	אסטונית
+	Euler's identity	זהות אוילר
+	Even Banded Columns	עמודות מפוספסות זוגיות
+	Even Banded Rows	שורות מפוספסות זוגיות
+	Even Page	עמוד זוגי
+	Every change is recorded as a tracked change.	כל שינוי מתועד כשינוי במעקב.
+	Every command is available to scripts and AI agents: run `wordcraft-cli mcp` for an MCP server, or start the app with `--control <port>` for the JSON control channel.	כל פקודה זמינה לסקריפטים ולסוכני AI: הריצו `wordcraft-cli mcp` לשרת MCP, או הפעילו את היישום עם `--control <port>` לערוץ הבקרה JSON.
+	Every field needs a name.	לכל שדה נדרש שם.
+	Everyone	כולם
+	Exactly	בדיוק
+	Exactly {n}	בדיוק {n}
+	Exceptions (optional)	חריגים (אופציונלי)
+	Exceptions…	חריגים…
+	Executive   7.25" × 10.50"	Executive   7.25" × 10.50"
+	Existing File or Web Page	קובץ או דף אינטרנט קיים
+	Expand or Collapse Heading	הרחבה או כיווץ של כותרת
+	Exponential	מעריכי
+	Exponential series	טור מעריכי
+	Export a copy to share (PDF, Word document)	ייצוא עותק לשיתוף (PDF, מסמך Word)
+	Export Page as PNG	ייצוא עמוד כ-PNG
+	Extend Selection	הרחבת הבחירה
+	Extend Selection by Units	הרחבת הבחירה ביחידות
+	Extra space	רווח נוסף
+	F4 repeats your last action. Formatting ten headings is suddenly one click and nine taps.	F4 חוזר על הפעולה האחרונה. פתאום עיצוב של עשר כותרות הוא לחיצה אחת ותשע הקשות.
+	F7 checks the spelling and grammar of the whole document.	F7 בודק איות ודקדוק בכל המסמך.
+	Faster: {command} is {key} on the keyboard.	מהר יותר: {command} הוא {key} במקלדת.
+	Field code:	קוד שדה:
+	Field Codes	קודי שדות
+	Field codes:	קודי שדות:
+	Field name	שם שדה
+	Field name:	שם שדה:
+	Field names must be different.	שמות השדות חייבים להיות שונים.
+	Field names:	שמות שדות:
+	Field:	שדה:
+	Field…	שדה…
+	Figure	איור
+	File locations	מיקומי קבצים
+	File name:	שם קובץ:
+	File › New lists the .dotx and .dotm templates here under Personal; Save as Word Template starts here.	קובץ › חדש מציג את תבניות ה-.dotx וה-.dotm שכאן תחת 'אישי'; שמירה כתבנית Word מתחילה כאן.
+	Fill color:	צבע מילוי:
+	Filling in forms	מילוי טפסים
+	Film	סרט
+	Filter and Sort	סינון ומיון
+	Filter Recipients	סינון נמענים
+	Find in list:	חיפוש ברשימה:
+	Find Next Editable Region	חיפוש האזור הבא הניתן לעריכה
+	Find Previous	חיפוש הקודם
+	Find Recipient	חיפוש נמען
+	Find What Expression	ביטוי לחיפוש
+	Find What Text	טקסט לחיפוש
+	Find what:	טקסט לחיפוש:
+	Find “{text}” in the document	חיפוש "{text}" במסמך
+	Finding printers…	מחפש מדפסות…
+	Finish & Merge	סיום ומיזוג
+	Finish &\nMerge	סיום\nומיזוג
+	Finished	הסתיים
+	Finnish	פינית
+	First Column	עמודה ראשונה
+	First line	שורה ראשונה
+	First line:	שורה ראשונה:
+	First Name	שם פרטי
+	First Record	הרשומה הראשונה
+	First row of data contains column headers	השורה הראשונה בנתונים מכילה כותרות עמודות
+	Fix Position on Page	קיבוע מיקום בעמוד
+	Fixed Column Width	רוחב עמודה קבוע
+	Floor	רצפה
+	Follow number with:	אחרי המספר:
+	Font Color	צבע גופן
+	Font color	צבע גופן
+	Font color:	צבע גופן:
+	Font Dialog	חלון גופן
+	Font: {font}	גופן: {font}
+	Font…	גופן…
+	Footer	כותרת תחתונה
+	Footnote and Endnote	הערת שוליים והערת סיום
+	Footnote Reference	הפניה להערת שוליים
+	Footnote Text	טקסט הערת שוליים
+	Footnotes	הערות שוליים
+	Footnotes and endnotes	הערות שוליים והערות סיום
+	Footnotes to endnotes	הערות שוליים להערות סיום
+	For which item:	עבור איזה פריט:
+	Format Page Numbers	עיצוב מספרי עמודים
+	Format Page Numbers…	עיצוב מספרי עמודים…
+	Format Painter	מברשת עיצוב
+	Format Shape	עיצוב צורה
+	Format Shape Pane	חלונית עיצוב צורה
+	Format Shape…	עיצוב צורה…
+	Formatted	מעוצב
+	Formatted Text	טקסט מעוצב
+	Formatting	עיצוב
+	Formatting at Selection	העיצוב בבחירה
+	Formatting exceptions	חריגי עיצוב
+	Formatting marks	סימני עיצוב
+	Formatting, case changes, white space and tables are compared; the other settings are kept for later.	עיצוב, שינויי רישיות, רווחים לבנים וטבלאות מושווים; שאר ההגדרות נשמרות לשימוש מאוחר יותר.
+	Formula	נוסחה
+	Formula:	נוסחה:
+	Forward	קדימה
+	Fraction	שבר
+	Fractions (1/2) as fraction characters (½)	שברים (1/2) כתווי שבר (½)
+	Frames and effects	מסגרות ואפקטים
+	French (France)	צרפתית (צרפת)
+	From Bottom Left Corner	מהפינה השמאלית התחתונה
+	From Bottom Right Corner	מהפינה הימנית התחתונה
+	From Center	מהמרכז
+	From text:	מהטקסט:
+	From Top Left Corner	מהפינה השמאלית העליונה
+	From Top Right Corner	מהפינה הימנית העליונה
+	from Unicode (hex)	מ-Unicode (הקס)
+	From {name}	מתוך {name}
+	From:	מ:
+	Full page of the same label	עמוד מלא של אותה תווית
+	Full Saturation 100%	רוויה מלאה 100%
+	Full Screen View	תצוגת מסך מלא
+	Full\nScreen	מסך\nמלא
+	Fun fact: a blank page is just a draft that hasn't been told yet.	עובדה משעשעת: דף ריק הוא פשוט טיוטה שעוד לא סיפרו לה.
+	Function	פונקציה
+	Gallery	גלריה
+	GB/T 7714	GB/T 7714
+	German (Germany)	גרמנית (גרמניה)
+	getartcraft.com/apps/wordcraft	getartcraft.com/apps/wordcraft
+	Glow Colors	צבעי זוהר
+	Go Back	חזרה
+	Go To	מעבר אל
+	Go to	מעבר אל
+	Go To (⌘⌥G)	מעבר אל (⌘⌥G)
+	Go to Record	מעבר לרשומה
+	Go to what:	מעבר אל:
+	Go To…	מעבר אל…
+	Gone! Like it was never written. Mostly because it now wasn't.	נעלם! כאילו לא נכתב מעולם. בעיקר כי עכשיו באמת לא.
+	Good afternoon	צהריים טובים
+	Good evening	ערב טוב
+	Good morning	בוקר טוב
+	GOST (name sort)	GOST (מיון לפי שם)
+	GOST (title sort)	GOST (מיון לפי כותרת)
+	Grab bag	שונות
+	Gradient fill	מילוי מדורג
+	Gradient stops	נקודות מעבר צבע
+	Grave	גרב
+	Gray 0%	אפור 0%
+	Greater than	גדול מ
+	Greater than or equal	גדול או שווה ל
+	Greek	יוונית
+	Greek Letters	אותיות יווניות
+	Green:	ירוק:
+	Greeting Line	שורת פתיחה
+	Greeting\nLine	שורת\nפתיחה
+	Grid Table 1 Light	טבלת רשת 1 בהירה
+	Grid Table 4 – Blue	טבלת רשת 4 – כחול
+	Grid Table 4 – Green	טבלת רשת 4 – ירוק
+	Grid Table 4 – Orange	טבלת רשת 4 – כתום
+	Grid Table 4 – Purple	טבלת רשת 4 – סגול
+	Gridlines	קווי רשת
+	Grouping Character Above	תו קיבוץ מעל
+	Grouping Character Below	תו קיבוץ מתחת
+	Grow Font 1 Point	הגדלת גופן בנקודה אחת
+	H:	ג:
+	Hanging Indent	כניסה תלויה
+	Harvard (Anglia)	Harvard (Anglia)
+	Hat	כובע
+	Header	כותרת עליונה
+	Header & Footer	כותרת עליונה ותחתונה
+	Header Row	שורת כותרת
+	Header row	שורת כותרת
+	Header/Footer Position	מיקום כותרת עליונה/תחתונה
+	Headers and footers	כותרות עליונות ותחתונות
+	Heading	כותרת
+	Heading 1	כותרת 1
+	Heading 2	כותרת 2
+	Heading 3	כותרת 3
+	Heading styles (levels 1–{n})	סגנונות כותרת (רמות 1–{n})
+	Heading text	טקסט הכותרת
+	Heading {n}	כותרת {n}
+	Hebrew	עברית
+	Hex:	הקס:
+	Hi! I'm Nib, your writing assistant. I offer tips, shortcuts and the occasional unsolicited opinion. Shall I stick around?	היי! אני Nib, עוזר הכתיבה שלך. אני מציע עצות, קיצורי דרך ומדי פעם גם דעה שלא ביקשו. להישאר?
+	Hidden bookmarks	סימניות מוסתרות
+	Hide Codes	הסתרת קודים
+	Hide from style lists	הסתרה מרשימות הסגנונות
+	Hide Ink	הסתרת דיו
+	Hide Quick Access Toolbar	הסתרת סרגל הכלים לגישה מהירה
+	Hide White Space	הסתרת רווח לבן
+	Hide\nInk	הסתרת\nדיו
+	Hierarchy	היררכיה
+	Highlight	סימון
+	Highlight Merge Fields	סימון שדות מיזוג
+	Highlight\nMerge Fields	סימון\nשדות מיזוג
+	Highlighter	מרקר
+numerals	Hindi	הודיות
+	Home folder	תיקיית הבית
+	Horizontal Line	קו אופקי
+	How many pages the whole document has	מספר העמודים במסמך כולו
+	How many pages this section has	מספר העמודים במקטע זה
+	How many words the document holds	מספר המילים במסמך
+	HTML Format	תבנית HTML
+	Hue:	גוון:
+	Hunspell .aff and .dic files here (pl_PL, pt_BR, it_IT, hr_HR, tr_TR) are used before the system's.	קובצי aff. ו-dic. של Hunspell שבתיקייה זו (pl_PL, pt_BR, it_IT, hr_HR, tr_TR) משמשים לפני אלה של המערכת.
+	Hyperbolic Cosecant Function	פונקציית קוסקנס היפרבולי
+	Hyperbolic Cosine Function	פונקציית קוסינוס היפרבולי
+	Hyperbolic Cotangent Function	פונקציית קוטנגנס היפרבולי
+	Hyperbolic Functions	פונקציות היפרבוליות
+	Hyperbolic Secant Function	פונקציית סקנס היפרבולי
+	Hyperbolic Sine Function	פונקציית סינוס היפרבולי
+	Hyperbolic Tangent Function	פונקציית טנגנס היפרבולי
+	Hyperlink	היפר-קישור
+	Hyphenate at:	הוספת מקף ב:
+	Hyphenate words in CAPS	מקפים במילים באותיות רישיות
+	Hyphenation Options…	אפשרויות מקפים…
+	Hyphenation zone:	אזור מקפים:
+	Hyphens (--) as dashes (—)	מקפים (--) כקווים מפרידים (—)
+	Hypotenuse	יתר
+	I promise it's saved. I checked. Twice.	אני מבטיח שזה שמור. בדקתי. פעמיים.
+	I'd write something myself, but I'm all nib and no ink.	הייתי כותב משהו בעצמי, אבל אני כולי חוד ובלי טיפת דיו.
+	I, II, III, …	I, II, III, …
+	i, ii, iii, …	i, ii, iii, …
+	Icon Color	צבע סמל
+	Icons	סמלים
+	Identity Matrices	מטריצות יחידה
+	IEEE	IEEE
+	If…Then…Else	אם…אז…אחרת
+	If…Then…Else…	אם…אז…אחרת…
+	Ignore punctuation characters	התעלמות מסימני פיסוק
+	Ignore web and file addresses	התעלמות מכתובות אינטרנט וקבצים
+	Ignore white-space characters	התעלמות מתווי רווח לבן
+	Ignore words in capitals	התעלמות ממילים באותיות רישיות
+	Ignore words with numbers	התעלמות ממילים עם מספרים
+	Illustrations	איורים
+	Immersive	סוחף
+	Immersive Reader	קורא סוחף
+	Immersive\nReader	קורא\nסוחף
+	Imported 1 source	מקורות שיובאו: 1
+	Imported {n} sources	מקורות שיובאו: {n}
+	In Default apps, choose WordCraft for the document types you want it to open.	ב'אפליקציות ברירת מחדל', בחרו ב-WordCraft עבור סוגי המסמכים שברצונכם שייפתחו בו.
+	In equations, typing a name after a backslash replaces it with its symbol.	במשוואות, הקלדת שם אחרי לוכסן הפוך מחליפה אותו בסמל שלו.
+	In Front of Text	לפני הטקסט
+	In Line with Text	בשורה עם הטקסט
+	In margin	בשוליים
+	In the margin	בשוליים
+	Include label and number	כולל תווית ומספר
+	Include level number from:	הכללת מספר רמה מתוך:
+	Include page numbers	הכללת מספרי עמודים
+	Increase Indent	הגדלת כניסה
+	Indent	כניסה
+	Indent from left:	כניסה משמאל:
+	Indentation	הזחה
+	Indented	מוזח
+	Indents	כניסות
+	Indents and Spacing	כניסות וריווח
+	Index and Tables	אינדקס וטבלאות
+	Index Heading	כותרת אינדקס
+	Index {n}	אינדקס {n}
+	Indonesian	אינדונזית
+	Initial column width:	רוחב עמודה התחלתי:
+	Initials:	ראשי תיבות:
+	Ink	דיו
+	Ink Replay	הפעלה חוזרת של דיו
+	Ink to Shape	דיו לצורה
+	Ink to\nMath	דיו\nלמתמטיקה
+	Ink to\nShape	דיו\nלצורה
+	Ink\nReplay	הפעלה חוזרת\nשל דיו
+	Inline	בשורה
+	Input Format	תבנית קלט
+	Insert a new equation (Alt+=)	הוספת משוואה חדשה (Alt+=)
+	Insert Above	הוספה מעל
+	Insert Below	הוספה מתחת
+	Insert Caption	הוספת כיתוב
+	Insert Caption…	הוספת כיתוב…
+	Insert Chart	הוספת תרשים
+	Insert Citation	הוספת ציטוט
+	Insert Columns to the Left	הוספת עמודות משמאל
+	Insert Columns to the Right	הוספת עמודות מימין
+	Insert Date Field	הוספת שדה תאריך
+	Insert Endnote	הוספת הערת סיום
+	Insert Footnote	הוספת הערת שוליים
+	Insert Hyperlink	הוספת היפר-קישור
+	Insert Index	הוספת אינדקס
+	Insert Left	הוספה משמאל
+	Insert Merge Field	הוספת שדה מיזוג
+	Insert Merge\nField	הוספת שדה\nמיזוג
+	Insert New Equation	הוספת משוואה חדשה
+	Insert one text or another, depending on a field's value.	הוספת טקסט אחד או אחר, בהתאם לערך של שדה.
+	Insert Page Field	הוספת שדה עמוד
+	Insert reference to:	הוספת הפניה אל:
+	Insert Right	הוספה מימין
+	Insert Row or Column by Clicking	הוספת שורה או עמודה בלחיצה
+	Insert Rows Above	הוספת שורות מעל
+	Insert Rows Below	הוספת שורות מתחת
+	Insert Shapes	הוספת צורות
+	Insert SmartArt	הוספת SmartArt
+	Insert Spike	הוספת אוסף הגזירות
+	Insert Structure	הוספת מבנה
+	Insert Symbol	הוספת סמל
+	Insert Table	הוספת טבלה
+	Insert Table of Authorities	הוספת טבלת מקורות
+	Insert Table of Figures	הוספת טבלת איורים
+	Insert Table…	הוספת טבלה…
+	Insert Time Field	הוספת שדה שעה
+	Insert\nAbove	הוספה\nמעל
+	Insert\nCaption	הוספת\nכיתוב
+	Insert\nCitation	הוספת\nציטוט
+	Insert\nFootnote	הוספת\nהערת שוליים
+	Insertions and Deletions	הוספות ומחיקות
+	Insertions:	הוספות:
+	Inside Borders	גבולות פנימיים
+	Inside Horizontal Border	גבול אופקי פנימי
+	Inside Vertical Border	גבול אנכי פנימי
+	Inside:	פנימי:
+	Inspect Styles at Selection	בדיקת הסגנונות בבחירה
+	Institution	מוסד
+	Integral	אינטגרל
+	Integral of e^(−x²)	אינטגרל של e^(−x²)
+	Integral with Limits	אינטגרל עם גבולות
+	Integral with Stacked Limits	אינטגרל עם גבולות מוערמים
+	Integrals	אינטגרלים
+	Intense Emphasis	הדגשה חזקה
+	Intense Quote	ציטוט חזק
+	Intense Reference	הפניה חזקה
+	Interface language:	שפת הממשק:
+	Interface size:	גודל הממשק:
+	Interface theme:	ערכת נושא לממשק:
+	Interface\nTheme	ערכת נושא\nלממשק
+	Internet addresses as links	כתובות אינטרנט כקישורים
+	Intersection with Limits	חיתוך עם גבולות
+	Intersection with Lower Limit	חיתוך עם גבול תחתון
+	Intersection with Subscript-Superscript Limits	חיתוך עם גבולות כתב תחתי ועילי
+	Inverse Cosecant Function	פונקציית קוסקנס הפוכה
+	Inverse Cosine Function	פונקציית קוסינוס הפוכה
+	Inverse Cotangent Function	פונקציית קוטנגנס הפוכה
+	Inverse Functions	פונקציות הפוכות
+	Inverse Hyperbolic Cosecant Function	פונקציית קוסקנס היפרבולי הפוכה
+	Inverse Hyperbolic Cosine Function	פונקציית קוסינוס היפרבולי הפוכה
+	Inverse Hyperbolic Cotangent Function	פונקציית קוטנגנס היפרבולי הפוכה
+	Inverse Hyperbolic Functions	פונקציות היפרבוליות הפוכות
+	Inverse Hyperbolic Secant Function	פונקציית סקנס היפרבולי הפוכה
+	Inverse Hyperbolic Sine Function	פונקציית סינוס היפרבולי הפוכה
+	Inverse Hyperbolic Tangent Function	פונקציית טנגנס היפרבולי הפוכה
+	Inverse Secant Function	פונקציית סקנס הפוכה
+	Inverse Sine Function	פונקציית סינוס הפוכה
+	Inverse Tangent Function	פונקציית טנגנס הפוכה
+	Ionosphere	יונוספרה
+	Is blank	ריק
+	Is not blank	אינו ריק
+	ISO 690 (author-date)	ISO 690 (מחבר-תאריך)
+	ISO 690 (numerical)	ISO 690 (מספרי)
+	Issue	גיליון
+	It looks like you're writing a letter. Want an envelope for it, or a letter template to start from?	נראה שכותבים כאן מכתב. רוצים מעטפה בשבילו, או תבנית מכתב להתחיל ממנה?
+	Join the ArtCraft community on Discord	הצטרפו לקהילת ArtCraft ב-Discord
+	Join us on Discord: discord.gg/artcraft	הצטרפו אלינו ב-Discord: discord.gg/artcraft
+	Journal	כתב עת
+	Journal article	מאמר בכתב עת
+	Justification of a display equation	יישור של משוואת תצוגה
+	Justified	מיושר לשני הצדדים
+	Keep Lines Together	שמירת שורות יחד
+	Keep lines together	שמירת שורות יחד
+	Keep me around	שיישאר
+	Keep Text Only	שמירת טקסט בלבד
+	Keep the password somewhere safe: without it nobody, WordCraft included, can open the document. Leave both boxes empty to remove the password.	שמרו את הסיסמה במקום בטוח: בלעדיה אף אחד, כולל WordCraft, לא יוכל לפתוח את המסמך. השאירו את שתי התיבות ריקות כדי להסיר את הסיסמה.
+	Keep with Next	שמירה עם הבא
+	Keep with next	שמירה עם הבא
+	Keeps the fonts and formatting of the copied text.	שומר על הגופנים והעיצוב של הטקסט שהועתק.
+	Kerning for fonts:	קירוב אותיות בגופנים:
+	Keyboard shortcuts:	קיצורי מקשים:
+	Keys for this command:	מקשים לפקודה זו:
+	Label changes with:	התווית משתנה עם:
+	Label:	תווית:
+	Language Preferences…	העדפות שפה…
+	Large\nOperator	אופרטור\nגדול
+	Largest Only	הגדול ביותר בלבד
+	Lasso Select	בחירה בלאסו
+	Last Column	עמודה אחרונה
+	Last Name	שם משפחה
+	Last Record	הרשומה האחרונה
+	Last, First; Last, First	משפחה, פרטי; משפחה, פרטי
+	Latin text font:	גופן לטקסט לטיני:
+	Layout Summary	סיכום פריסה
+	Layouts	פריסות
+	Leader	תו מילוי
+	Leave a recipient out of the merge when a field has this value.	השמטת נמען מהמיזוג כאשר לשדה יש ערך זה.
+	Leave Equation	יציאה מהמשוואה
+	Leave out the date and time of comments and tracked changes when saving	השמטת התאריך והשעה של הערות ושינויים במעקב בעת השמירה
+	Leave the equation (Esc)	יציאה מהמשוואה (Esc)
+	leave the equation first	יש לצאת קודם מהמשוואה
+	Leave the label out of the caption	השמטת התווית מהכיתוב
+	Left Arrow with Text Above	חץ שמאלה עם טקסט מעל
+	Left Arrow with Text Below	חץ שמאלה עם טקסט מתחת
+	Left Border	גבול שמאלי
+	Left border	גבול שמאלי
+	Left Bracket Twice	סוגר שמאלי פעמיים
+	Left indent	כניסה משמאל
+	Left Margin	שוליים שמאליים
+	Left Only	שמאל בלבד
+	Left Right Arrow Above	חץ דו-כיווני מעל
+	Left Right Arrow with Text Above	חץ דו-כיווני עם טקסט מעל
+	Left Right Arrow with Text Below	חץ דו-כיווני עם טקסט מתחת
+	Left Subscript-Superscript	כתב תחתי ועילי משמאל
+	Left-to-right	משמאל לימין
+	Left-to-Right Text Direction	כיוון טקסט משמאל לימין
+	Leftwards Arrow Above	חץ שמאלה מעל
+	Leftwards Harpoon Above	צלצל שמאלה מעל
+	Legal   8.50" × 14.00"	Legal   8.50" × 14.00"
+	Legal style numbering	מספור בסגנון משפטי
+	Legend	מקרא
+	Less Contrast −20%	פחות ניגודיות −20%
+	Less than	קטן מ
+	Less than or equal	קטן או שווה ל
+template	Letter	מכתב
+	Letter   8.50" × 11.00"	Letter   8.50" × 11.00"
+	Letter headings	כותרות עם אותיות
+	Letter template	תבנית מכתב
+	Letter-Like Symbols	סמלים דמויי אותיות
+	Letters	מכתבים
+	Level 5	רמה 5
+	Level 6	רמה 6
+	Level 7	רמה 7
+	Level 8	רמה 8
+	Level 9	רמה 9
+	Level {n}	רמה {n}
+	Levels:	רמות:
+	Light Variations	וריאציות בהירות
+	Light with Outline	בהיר עם קו מתאר
+	Limit	גבול
+	Limit and	גבול ו
+	Limit and\nLog	גבול\nולוגריתם
+	Limit consecutive hyphens to:	הגבלת מקפים רצופים ל:
+	Limit Example	דוגמת גבול
+	Limit formatting to a selection of styles	הגבלת העיצוב למבחר סגנונות
+	Line and Page Breaks	מעברי שורה ועמוד
+	Line and Paragraph Spacing	ריווח שורות ופסקאות
+	Line between	קו מפריד
+	Line Break	מעבר שורה
+	Line breaking	שבירת שורות
+	Line End	סוף השורה
+	Line Number	מספר שורה
+	Line Numbering Options…	אפשרויות מספור שורות…
+	Line Numbers	מספרי שורות
+	Line Spacing	ריווח שורות
+	Line Spacing Options…	אפשרויות מרווח בין שורות…
+	Line spacing:	מרווח בין שורות:
+	Line Start	תחילת השורה
+	Linear Diagonal - Bottom Left to Top Right	לינארי באלכסון - משמאל למטה לימין למעלה
+	Linear Diagonal - Bottom Right to Top Left	לינארי באלכסון - מימין למטה לשמאל למעלה
+	Linear Diagonal - Top Left to Bottom Right	לינארי באלכסון - משמאל למעלה לימין למטה
+	Linear Diagonal - Top Right to Bottom Left	לינארי באלכסון - מימין למעלה לשמאל למטה
+	Linear Down	לינארי למטה
+	Linear Fraction	שבר לינארי
+	Linear Left	לינארי שמאלה
+	Linear Right	לינארי ימינה
+	Linear Up	לינארי למעלה
+	Lines and characters	שורות ותווים
+	Lines only	שורות בלבד
+	Lines per page:	שורות בעמוד:
+	Lines to drop:	מספר שורות לאות:
+	Link entries to their headings	קישור ערכים לכותרות שלהם
+	Link level to style:	קישור רמה לסגנון:
+	Link to Previous	קישור לקודם
+	Link to:	קישור אל:
+	Linked style (paragraph and character)	סגנון מקושר (פסקה ותו)
+	Links and References	קישורים והפניות
+	Link…	קישור…
+	List Definition	הגדרת רשימה
+	List entries	ערכי רשימה
+	List Paragraph	פסקת רשימה
+	List Table 3 – Blue	טבלת רשימה 3 – כחול
+	List Table 3 – Green	טבלת רשימה 3 – ירוק
+	List Table 3 – Orange	טבלת רשימה 3 – כתום
+	List Table 3 – Purple	טבלת רשימה 3 – סגול
+	Lit from Bottom	מואר מלמטה
+	Lit from Top	מואר מלמעלה
+	Load System Installed Fonts…	טעינת הגופנים המותקנים במערכת…
+	Loaded {count} system fonts.	נטענו גופני מערכת: {count}.
+	Local font access is not supported by your browser.	הדפדפן אינו תומך בגישה לגופנים מקומיים.
+	Local font access was denied.	הגישה לגופנים מקומיים נדחתה.
+	Local recovery is unavailable or still loading.	השחזור המקומי אינו זמין או שהוא עדיין נטען.
+	Location: {path}	מיקום: {path}
+	Lock aspect ratio	נעילת יחס גובה-רוחב
+	Lock Fields	נעילת שדות
+	Log	יומן
+	Logarithm	לוגריתם
+	Logarithm with Base	לוגריתם עם בסיס
+	Logical AND	AND לוגי
+	Logical AND with Limits	AND לוגי עם גבולות
+	Logical OR	OR לוגי
+	Logical OR with Limits	OR לוגי עם גבולות
+	Lorem ipsum: because the real words are still at the café.	Lorem ipsum: כי המילים האמיתיות עדיין בבית הקפה.
+	Lum:	בהירות:
+	Macros	פקודות מאקרו
+	Made from the author and year when empty	נוצר מהמחבר והשנה כאשר השדה ריק
+	Magazine or newspaper article	מאמר בכתב עת או בעיתון
+	Mail Merge	מיזוג דואר
+	Mailings	דברי דואר
+	Main entry:	ערך ראשי:
+	Make WordCraft the default for Word documents…	הגדרת WordCraft כברירת המחדל למסמכי Word…
+	Makes the ribbon, menus and dialogs larger or smaller. Auto follows your system's display scaling; 100% is one screen pixel per point. Document zoom is separate.	הגדלה או הקטנה של רצועת הכלים, התפריטים ותיבות הדו-שיח. "אוטומטי" פועל לפי קנה המידה של התצוגה במערכת; 100% הם פיקסל מסך אחד לכל נקודה. התקריב של המסמך נפרד.
+	Manage Sources	ניהול מקורות
+	Manage Styles	ניהול סגנונות
+	Manage Styles…	ניהול סגנונות…
+	Manual Hyphenation	מקפים ידניים
+	Manual hyphenation is complete.	הוספת המקפים הידנית הושלמה.
+	Manual Line Break	מעבר שורה ידני
+	Manual Page Break	מעבר עמוד ידני
+	Manual…	ידני…
+	Many pages	עמודים רבים
+	Mark	סימון
+	Mark All	סימון הכול
+	Mark as decorative	סימון כדקורטיבי
+	Mark Citation	סימון ציטוט
+	Mark Entry	סימון ערך
+	Mark Entry…	סימון ערך…
+	Mark grammar errors as you type	סימון שגיאות דקדוק בזמן ההקלדה
+	Mark Index Entry	סימון ערך אינדקס
+	Mark selected text as:	סימון הטקסט הנבחר כ:
+	Mark\nCitation	סימון\nציטוט
+	Mark\nEntry	סימון\nערך
+	Markdown (*.md)	Markdown (*.md)
+	Match case	התאמת רישיות
+	Match Fields	התאמת שדות
+	Match prefix	התאמת תחילית
+	Match suffix	התאמת סיומת
+	Matches: {count}	התאמות: {count}
+	Math AutoCorrect	תיקון אוטומטי במתמטיקה
+	Matrices with Brackets	מטריצות עם סוגריים
+	Matrix	מטריצה
+	Maximum Example	דוגמת מקסימום
+	Measured By	נמדד לפי
+	Measurement units:	יחידות מידה:
+	Merge cells before split	מיזוג תאים לפני הפיצול
+	Merge Formatting	מיזוג עיצוב
+	Merge Record #	רשומת מיזוג מס'
+	Mesosphere	מזוספרה
+	Midline Dots	נקודות באמצע השורה
+	Minus Equal	מינוס שווה
+	Mirror indents	הזחות במראה
+	Mirror margins	שוליים במראה
+	Mirrored	מראה
+	MIT OR Apache-2.0. Copyright (c) 2026 ArtCraft Team and the WordCraft contributors.	MIT OR Apache-2.0. Copyright (c) 2026 ArtCraft Team and the WordCraft contributors.
+	MLA	MLA
+	mm	מ"מ
+	Moderate	בינוני
+	Modify Style	שינוי סגנון
+	Modify Table Style	שינוי סגנון טבלה
+	Modify Table Style…	שינוי סגנון טבלה…
+	Modify…	שינוי…
+	Mon	ב'
+	Month	חודש
+	More >>	עוד >>
+	More Colors…	צבעים נוספים…
+	More Columns…	עמודות נוספות…
+	More Commands…	פקודות נוספות…
+	More Contrast +20%	יותר ניגודיות +20%
+	More Gradients…	מעברי צבע נוספים…
+	More Paper Sizes…	גודלי נייר נוספים…
+	More Symbols…	סמלים נוספים…
+	More tabs	כרטיסיות נוספות
+	More templates →	תבניות נוספות →
+	More Underlines…	קווים תחתונים נוספים…
+	Move in Equation	הזזה בתוך המשוואה
+	Move or Resize	הזזה או שינוי גודל
+	Move Paragraph Down	הזזת פסקה למטה
+	Move Paragraph Up	הזזת פסקה למעלה
+	Move Past Citation	מעבר אל מעבר לציטוט
+	Move Past\nCitation	מעבר אל מעבר\nלציטוט
+	Move Selected Ink	הזזת דיו נבחר
+	Move Table by Dragging	הזזת טבלה בגרירה
+	Move with Text	הזזה עם הטקסט
+	Moved from	הועבר מ-
+	Moved from:	הועבר מ:
+	Moved objects snap to the page's edges and centre, the margins and other objects. Hold Alt to move freely.	אובייקטים שמוזזים נצמדים לקצוות העמוד ולמרכזו, לשוליים ולאובייקטים אחרים. יש להחזיק את Alt כדי להזיז בחופשיות.
+	Moved to	הועבר אל
+	Moved to:	הועבר אל:
+	Moves	העברות
+	Multilevel List	רשימה מרובת רמות
+	Multilevel List Library	ספריית רשימות מרובות רמות
+	Multiple Pages	עמודים מרובים
+	Mute agent messages	השתקת הודעות סוכנים
+	Muted 50%	מעומעם 50%
+	My list has	ברשימה שלי יש
+	Name of the file this document is saved as	שם הקובץ שבו נשמר מסמך זה
+	Narrow	צר
+	Narrow  {size} all	צר  {size} מכל הצדדים
+	Natural Logarithm	לוגריתם טבעי
+	Nature	טבע
+	Navigation Pane	חלונית ניווט
+	Negated Relations	יחסים שליליים
+	New Comment	הערה חדשה
+	New comments and tracked changes are recorded under this name and these initials.	הערות חדשות ושינויים במעקב נרשמים תחת שם זה וראשי תיבות אלה.
+	New Drawing Canvas	בד ציור חדש
+	New Entry	ערך חדש
+	New Label	תווית חדשה
+	New Label…	תווית חדשה…
+	New Paragraph	פסקה חדשה
+	New shortcut:	קיצור דרך חדש:
+	New Tab	כרטיסייה חדשה
+	New Table Style	סגנון טבלה חדש
+	New Table Style…	סגנון טבלה חדש…
+	New word	מילה חדשה
+	New\nComment	הערה\nחדשה
+	New\nWindow	חלון\nחדש
+	Next Comment	ההערה הבאה
+	Next Field	השדה הבא
+	Next Footnote	הערת השוליים הבאה
+	Next Record	הרשומה הבאה
+	Next Section	המקטע הבא
+	Next Sentence	המשפט הבא
+	Next sentence	המשפט הבא
+	Nib floats over the window with tips and the occasional remark.	Nib מרחף מעל החלון עם עצות והערה פה ושם.
+	Nib, your assistant. Drag to move; right-click for options.	Nib, העוזר שלך. גרירה מזיזה; לחיצה ימנית פותחת אפשרויות.
+	No accessibility issues found.	לא נמצאו בעיות נגישות.
+	No Border	ללא גבול
+	No changes (read only)	ללא שינויים (קריאה בלבד)
+	No contributor data was built into this copy.	לא נכללו נתוני תורמים בעותק זה.
+	No document is open. Create a document or open one first.	אין מסמך פתוח. יש ליצור מסמך או לפתוח מסמך קיים תחילה.
+	no equation at the caret	אין משוואה במקום הסמן
+	No errors found: every merge field is in the recipient list.	לא נמצאו שגיאות: כל שדה מיזוג קיים ברשימת הנמענים.
+	No Fill	ללא מילוי
+	No fill	ללא מילוי
+	No Glow	ללא זוהר
+	No Gradient	ללא מעבר צבע
+	No grid	ללא רשת
+	No header row	אין שורת כותרת
+	No icons match your search.	אין סמלים התואמים לחיפוש.
+	No items to show.	אין פריטים להצגה.
+	No Markup	ללא סימון
+	No model credits were built into this copy.	לא נכללו קרדיטים למודלים בעותק זה.
+	No new sources in that file	אין מקורות חדשים בקובץ הזה
+	No Outline	ללא קו מתאר
+	No Paragraph Space	ללא רווח בין פסקאות
+	No printers found. Configure a system printer or export a PDF.	לא נמצאו מדפסות. יש להגדיר מדפסת במערכת או לייצא קובץ PDF.
+	No recovery copies.	אין עותקי שחזור.
+	No Reflection	ללא השתקפות
+	No Scaling	ללא שינוי קנה מידה
+	No Shadow	ללא צל
+	No Soft Edges	ללא קצוות רכים
+	No sources yet.	אין עדיין מקורות.
+	No Spacing	ללא מרווח
+	No spelling dictionary for {language} is installed, so it isn't checked. WordCraft looks for the Hunspell dictionary {name} in the WORDCRAFT_DICTIONARIES folder and in the usual system locations.	לא מותקן מילון איות עבור {language}, ולכן האיות בשפה זו אינו נבדק. WordCraft מחפש את מילון Hunspell {name} בתיקייה WORDCRAFT_DICTIONARIES ובמיקומים הרגילים של המערכת.
+	No templates match your search.	אין תבניות התואמות לחיפוש.
+	No Transform	ללא המרה
+	No words yet. Add to Dictionary on a misspelled word puts it here.	אין עדיין מילים. "הוספה למילון" על מילה שגויה מוסיפה אותה לכאן.
+	No-Width Non Break	מחבר ברוחב אפס
+	No-Width Optional Break	מעבר אופציונלי ברוחב אפס
+	Nonbreaking Hyphen	מקף בלתי ניתן לשבירה
+	Normal  {size} all	רגיל  {size} מכל הצדדים
+	Normal Indent	הזחה רגילה
+	Normal probability density	צפיפות הסתברות נורמלית
+	Normal speed	מהירות רגילה
+	Normal Style	סגנון רגיל
+	Normal Table	טבלה רגילה
+	Normal Text	טקסט רגיל
+	Normal Word Document	מסמך Word רגיל
+	North	צפון
+	Norwegian (Bokmål)	נורווגית (בוקמול)
+	Not	לא
+	Not available right now	לא זמין כרגע
+	not editing an equation	לא בעריכת משוואה
+	Not equal to	שונה מ
+	Not linked: click a text box	לא מקושר: יש ללחוץ על תיבת טקסט
+	Not now	לא עכשיו
+	Not saved	לא נשמר
+	Not saved yet	טרם נשמר
+	Not set	לא הוגדר
+	Not set: the system's usual places	לא הוגדרה: המיקומים הרגילים של המערכת
+	Not used by any command	לא בשימוש על ידי אף פקודה
+	Not {name}	לא {name}
+	Nothing	כלום
+	Nothing collected yet. Items you copy or cut appear here.	לא נאסף דבר עדיין. פריטים שמעתיקים או גוזרים יופיעו כאן.
+	nothing is selected	לא נבחר דבר
+	Nothing of this type in the document.	אין במסמך שום דבר מהסוג הזה.
+	Now used by {command}	בשימוש כעת על ידי {command}
+	Nudge	דחיפה
+	Num Occurrences	מספר מופעים
+	Number alignment:	יישור מספר:
+	Number format	תבנית מספר
+	Number of columns:	מספר עמודות:
+	Number of rows:	מספר שורות:
+	Number of the page the field sits on	מספר העמוד שבו נמצא השדה
+	Number of the section the field sits in	מספר המקטע שבו נמצא השדה
+	Number only, without the label's words	המספר בלבד, בלי מילות התווית
+	Number style for this level:	סגנון מספור לרמה זו:
+	Number the equation; the number sits at the right margin (or type # then the number)	מספור המשוואה; המספר ממוקם בשוליים הימניים (או הקלדת # ואחריו המספר)
+	Numbering	מספור
+	Numbering:	מספור:
+	Numbering…	מספור…
+	Numerals	ספרות
+	Numerals:	ספרות:
+	n×n Identity Matrix	מטריצת יחידה n×n
+	n×n Matrix	מטריצה n×n
+	Odd Banded Columns	עמודות מפוספסות אי-זוגיות
+	Odd Banded Rows	שורות מפוספסות אי-זוגיות
+	Odd Page	עמוד אי-זוגי
+	Office	Office
+	Office 2003 Default	ברירת המחדל של Office 2003
+	Offset (pt):	היסט (נק'):
+	Offset: Bottom	היסט: למטה
+	Offset: Bottom Left	היסט: למטה משמאל
+	Offset: Bottom Right	היסט: למטה מימין
+	Offset: Center	היסט: מרכז
+	Offset: Left	היסט: שמאל
+	Offset: Right	היסט: ימין
+	Offset: Top	היסט: למעלה
+	Offset: Top Left	היסט: למעלה משמאל
+	Offset: Top Right	היסט: למעלה מימין
+	Old menu keys: Alt, {keys}. Keep typing, or press Esc to cancel.	מקשי התפריט הישנים: Alt, {keys}. אפשר להמשיך להקליד, או ללחוץ Esc לביטול.
+	On: the caret glides to its new place when you type or use the arrow keys, and its blink fades. Off: it jumps and blinks on and off.	מופעל: הסמן גולש למקומו החדש בעת הקלדה או שימוש במקשי החצים, והבהוב שלו דועך. כבוי: הסמן קופץ ומהבהב.
+	On: WordCraft opens on File › Home, with a blank document, the templates and your recent documents. Off: it opens a blank document.	מופעל: WordCraft נפתח בקובץ › בית, עם מסמך ריק, התבניות והמסמכים האחרונים שלך. כבוי: נפתח מסמך ריק.
+	One	אחד
+	One half	חצי
+	One label per recipient	תווית אחת לכל נמען
+	One line per item. Enter adds an item.	שורה אחת לכל פריט. Enter מוסיף פריט.
+	One Page	עמוד אחד
+	One-sided	חד-צדדית
+	Only allow this kind of editing:	אפשר רק סוג עריכה זה:
+	Only comments can be added, except in regions marked editable.	ניתן להוסיף הערות בלבד, למעט באזורים שסומנו כניתנים לעריכה.
+	Only for the selected text	רק עבור הטקסט שנבחר
+	Only form fields can be filled in.	ניתן למלא שדות טופס בלבד.
+	only in Outline view	רק בתצוגת חלוקה לרמות
+	Only label and number	תווית ומספר בלבד
+	Only the allowed styles can be applied.	ניתן להחיל רק את הסגנונות המותרים.
+	Only web (http, https) and email (mailto) links can be followed	ניתן לפתוח רק קישורי אינטרנט (http, https) ודואר אלקטרוני (mailto)
+	Open a document first	יש לפתוח קודם מסמך
+	Open a file with WordCraft's own browser when the system file dialog doesn't appear.	פתיחת קובץ בדפדפן הקבצים של WordCraft כאשר תיבת הדו-שיח של המערכת אינה מופיעה.
+	OpenDocument Text (*.odt)	OpenDocument Text (*.odt)
+	Opening print dialog…	פתיחת תיבת הדו-שיח של ההדפסה…
+	Opens .docx, .doc, .rtf and .odt files and Word templates with WordCraft from now on.	מעתה פותח קבצי .docx, .doc, .rtf ו-.odt ותבניות Word באמצעות WordCraft.
+	Opens Settings › Default apps, where you choose WordCraft for .docx and the other document types.	פותח את הגדרות › אפליקציות ברירת מחדל, שם בוחרים את WordCraft עבור .docx וסוגי המסמכים האחרים.
+	Operator	אופרטור
+	Operator Structures	מבני אופרטורים
+	Operators	אופרטורים
+	Optional Hyphen	מקף אופציונלי
+	Or	או
+	Or save a copy in another format:	או שמירת עותק בתבנית אחרת:
+	Ordinals (1st) as superscript	מספרים סודרים (1st) ככתב עילי
+	Organizer	מארגן
+	Organizer…	מארגן…
+	Original document	מסמך מקורי
+	Original size	גודל מקורי
+	Other Large Operators	אופרטורים גדולים אחרים
+	Other styles and their TOC level:	סגנונות אחרים ורמת תוכן העניינים שלהם:
+	Other:	אחר:
+	Otherwise insert:	אחרת להוסיף:
+	Outline Level	רמת חלוקה
+	Outline level	רמת חלוקה
+	Outline levels	רמות חלוקה
+	Outline State	מצב החלוקה לרמות
+	Outline Tools	כלי חלוקה לרמות
+	Outlining	חלוקה לרמות
+	Outside border	גבול חיצוני
+	Outside Borders	גבולות חיצוניים
+	Outside:	חיצוני:
+	Outward Brackets	סוגריים כלפי חוץ
+	Overbar	קו עליון
+	Overbars and Underbars	קווים עליונים ותחתונים
+	Overbrace	סוגר מסולסל עליון
+	Overtype	החלפה
+	Overtype (typing replaces the characters after the caret)	החלפה (ההקלדה מחליפה את התווים שאחרי הסמן)
+	Page Background	רקע עמוד
+	Page Border	גבול עמוד
+	Page Borders	גבולות עמוד
+	Page Break	מעבר עמוד
+	Page Break Before	מעבר עמוד לפני
+	Page break before	מעבר עמוד לפני
+	Page Breaks	מעברי עמוד
+	Page Color	צבע עמוד
+	Page color	צבע עמוד
+	Page display	תצוגת עמוד
+	Page Down	Page Down
+	Page image (*.png)	תמונת עמוד (*.png)
+	Page Movement	מעבר בין עמודים
+	Page Number	מספר עמוד
+	Page number	מספר עמוד
+	Page Number Format	תבנית מספרי עמודים
+	Page number style	סגנון מספר עמוד
+	Page numbering	מספור עמודים
+	Page numbers at the right margin	מספרי עמודים בשוליים הימניים
+	Page on which a bookmarked passage falls	העמוד שבו נמצא קטע מסומן בסימנייה
+	Page Setup	הגדרת עמוד
+	Page title	כותרת העמוד
+	Page Up	Page Up
+	Page Width	רוחב עמוד
+	Page width	רוחב עמוד
+	Page X of Y	עמוד X מתוך Y
+	Page {page}	עמוד {page}
+	Page\nBorders	גבולות\nעמוד
+	Page\nColor	צבע\nעמוד
+	Page\nNumber	מספר\nעמוד
+	Pages like 1-3, 5	עמודים כגון 1-3, 5
+	Pages of bookmark:	עמודים של סימנייה:
+	Paper size:	גודל נייר:
+	Paragraph Character	תו פסקה
+	Paragraph Details	פרטי פסקה
+	Paragraph Down	פסקה למטה
+	Paragraph Mark	סימן פסקה
+	Paragraph marks	סימני פסקה
+	Paragraph Settings	הגדרות פסקה
+	Paragraph Spacing	מרווח בין פסקאות
+	Paragraph style	סגנון פסקה
+	Paragraph Up	פסקה למעלה
+	Paragraphs	פסקאות
+	Paragraph…	פסקה…
+	Parentheses	סוגריים עגולים
+	Parentheses with Separator	סוגריים עגולים עם מפריד
+	Partial Differential	נגזרת חלקית
+	Password:	סיסמה:
+	Paste (⌘V)	הדבקה (⌘V)
+	Paste All	הדבקת הכול
+	Paste as:	הדבקה כ:
+	Paste Clipboard Item	הדבקת פריט מלוח העריכה
+	Paste Formatting	הדבקת עיצוב
+	Paste function:	הדבקת פונקציה:
+	Paste Special…	הדבקה מיוחדת…
+	Paste: Keep Text Only	הדבקה: שמירת טקסט בלבד
+	Paste: Merge Formatting	הדבקה: מיזוג עיצוב
+	Pastes the clipboard's picture.	מדביק את התמונה שבלוח העריכה.
+	Paused	מושהה
+	PDF document (*.pdf)	מסמך PDF (*.pdf)
+	Pens	עטים
+	People	אנשים
+	Periodical	כתב עת
+	Personal	אישי
+	Personal Templates	תבניות אישיות
+	Personalize	התאמה אישית
+	Phonetic Guide	מדריך פונטי
+#	pi	
+	Pi Over 2	פאי חלקי 2
+	Pick a custom group (New Group makes one)	יש לבחור קבוצה מותאמת אישית (קבוצה חדשה יוצרת אחת)
+	Pick a field from the list	יש לבחור שדה מהרשימה
+	Picture	תמונה
+	Picture Border	גבול תמונה
+	Picture border	גבול תמונה
+	Picture Content Control	פקד תוכן תמונה
+	Picture Format	עיצוב תמונה
+	Picture Styles	סגנונות תמונה
+	Picture transparency	שקיפות תמונה
+	Pictures	תמונות
+	Pie	עוגה
+	Place in This Document	מקום במסמך זה
+	Placeholder text	טקסט מציין מיקום
+	Plain Table 1	טבלה פשוטה 1
+	Plain text (*.txt)	טקסט פשוט (*.txt)
+	Plain Text Content Control	פקד תוכן טקסט פשוט
+	Play/Pause	הפעלה/השהיה
+	Plus Equal	פלוס שווה
+	Points and above	נקודות ומעלה
+	Polish	פולנית
+	Portuguese (Brazil)	פורטוגזית (ברזיל)
+	Portuguese (Portugal)	פורטוגזית (פורטוגל)
+	Possible spelling mistake	שגיאת איות אפשרית
+	Postal Code	מיקוד
+	Power series of (1+x)ⁿ	טור חזקות של (1+x)ⁿ
+	Preferred width:	רוחב מועדף:
+	Preserve formatting during updates	שמירה על העיצוב בעת עדכון
+	Preset gradients	מעברי צבע מוכנים
+	Press a key combination	יש להקיש צירוף מקשים
+	Preview Results	תצוגה מקדימה של התוצאות
+	Preview\nResults	תצוגה מקדימה\nשל התוצאות
+	Previous 1 or More	הקודם 1 או יותר
+	Previous Comment	ההערה הקודמת
+	Previous Field	השדה הקודם
+	Previous Record	הרשומה הקודמת
+	Previous Section	המקטע הקודם
+	Previous Sentence	המשפט הקודם
+	Previous sentence	המשפט הקודם
+	Print Documents	הדפסת מסמכים
+	Print Documents…	הדפסת מסמכים…
+	Print failed: the printing worker stopped.	ההדפסה נכשלה: תהליך ההדפסה נעצר.
+	Print failed: {error}	ההדפסה נכשלה: {error}
+	Print job submitted.	עבודת ההדפסה נשלחה.
+	Print job submitted: spooled {count} sheet(s)	עבודת ההדפסה נשלחה: גיליונות במאגר ההדפסה: {count}
+	Print job submitted: {receipt}	עבודת ההדפסה נשלחה: {receipt}
+	Print Layout	פריסת הדפסה
+	Print Markup	הדפסת סימון
+	Print settings	הגדרות הדפסה
+	Print the page color	הדפסת צבע העמוד
+	Print to PDF	הדפסה ל-PDF
+	Print\nLayout	פריסת\nהדפסה
+	Printer default	ברירת המחדל של המדפסת
+	Printer discovery failed.	חיפוש המדפסות נכשל.
+	Privacy for this document	פרטיות עבור מסמך זה
+	Privacy Options	אפשרויות פרטיות
+	Privacy Settings	הגדרות פרטיות
+	Process	תהליך
+	Product	מכפלה
+	Product of A	מכפלה של A
+	Product with Limits	מכפלה עם גבולות
+	Product with Lower Limit	מכפלה עם גבול תחתון
+	Product with Subscript-Superscript Limits	מכפלה עם גבולות בכתב תחתי ועילי
+	Products and Coproducts	מכפלות וקו-מכפלות
+	Professional	מקצועי
+	Promote	קידום
+	Promote to Heading 1	קידום לכותרת 1
+	Proofing	הגהה
+	Proofing Issues	בעיות הגהה
+	Proofing language	שפת הגהה
+	Protect Document	הגנה על המסמך
+	pt	נק'
+	Publisher	מוציא לאור
+	Put the caret in a content control first.	יש למקם קודם את הסמן בתוך פקד תוכן.
+	Put the default commands back on the Quick Access Toolbar?	להחזיר את פקודות ברירת המחדל לסרגל הכלים לגישה מהירה?
+	Quadratic Root	שורש ריבועי
+	Quick Access Toolbar	סרגל כלים לגישה מהירה
+	Quick Parts	חלקים מהירים
+	Quick Tables	טבלאות מהירות
+	Quote	ציטוט
+	Radical	שורש
+	Radical with Degree	שורש עם מעלה
+	Radicals	שורשים
+	Raised/lowered	מוגבה/מונמך
+	Read Aloud	הקראה
+	Read Aloud Status	מצב הקראה
+	Read Mode	מצב קריאה
+	Read\nAloud	הקראה
+	Read\nMode	מצב\nקריאה
+	Reading	קריאה
+	Reading Column Width	רוחב עמודת קריאה
+	Reading Highlight	הדגשת קריאה
+	Reading Line Spacing	מרווח שורות בקריאה
+	Reading Mode	מצב קריאה
+	Reading Page Color	צבע עמוד הקריאה
+	Reading Speed	מהירות קריאה
+	Reading Text Size	גודל טקסט בקריאה
+	Reads the clipboard's rich text and keeps its formatting.	קורא את הטקסט העשיר שבלוח העריכה ושומר על העיצוב שלו.
+	Reads the clipboard's web content and keeps its formatting.	קורא את תוכן האינטרנט שבלוח העריכה ושומר על העיצוב שלו.
+	Recent documents to show:	מספר המסמכים האחרונים להצגה:
+	Recently Used Fonts	גופנים שהיו בשימוש לאחרונה
+	Recently used symbols:	סמלים שהיו בשימוש לאחרונה:
+	Recipient List	רשימת נמענים
+	Recipient lists	רשימות נמענים
+	Recipients: {count}	נמענים: {count}
+	Recolor a one-color picture, such as an icon	צביעה מחדש של תמונה חד-צבעית, כגון סמל
+	Recolor Selected Ink	צביעה מחדש של דיו נבחר
+	Record Macro	הקלטת מאקרו
+	Recover documents	שחזור מסמכים
+	Recover Unsaved Documents	שחזור מסמכים שלא נשמרו
+	Recovery copy	עותק שחזור
+	Recovery is disabled while this document has a password.	השחזור מושבת כל עוד יש למסמך סיסמה.
+	Red:	אדום:
+	Reduce Hanging Indent	הקטנת הזחה תלויה
+	Reference type:	סוג ההפניה:
+	References	הפניות
+	Reflection	השתקפות
+	Refresh printers	רענון רשימת המדפסות
+	Region:	אזור:
+	Registered	רשום
+	Registered Sign	סימן רשום
+	Regular expressions	ביטויים רגולריים
+	Reject	דחייה
+	Reject All Changes	דחיית כל השינויים
+	Reject Change	דחיית השינוי
+	Relationship	קשר
+	Relative to original picture size	ביחס לגודל המקורי של התמונה
+	Remove Added Font	הסרת גופן שנוסף
+	Remove condition	הסרת תנאי
+	Remove Content Control	הסרת פקד תוכן
+	Remove every custom shortcut and restore the built-in keys?	להסיר את כל קיצורי הדרך המותאמים אישית ולשחזר את המקשים המובנים?
+	Remove every custom tab and group and show all tabs again?	להסיר את כל הכרטיסיות והקבוצות המותאמות אישית ולהציג שוב את כל הכרטיסיות?
+	Remove field	הסרת שדה
+	Remove Footer	הסרת כותרת תחתונה
+	Remove from Quick Access Toolbar	הסרה מסרגל הכלים לגישה מהירה
+	Remove gradient stop	הסרת נקודת מעבר צבע
+	Remove Header	הסרת כותרת עליונה
+	Remove Hyperlink	הסרת היפר-קישור
+	Remove my name from comments, changes and file properties when saving	הסרת השם שלי מהערות, משינויים וממאפייני הקובץ בעת השמירה
+	Remove Password	הסרת סיסמה
+	Remove Pen	הסרת עט
+	Remove recipient	הסרת נמען
+	Remove row	הסרת שורה
+	Remove series	הסרת סדרה
+	Remove Space After Paragraph	הסרת רווח אחרי פסקה
+	Remove Table of Contents	הסרת תוכן העניינים
+	Remove the control once edited	הסרת הפקד לאחר העריכה
+	Remove the space before the punctuation	הסרת הרווח שלפני סימן הפיסוק
+	Remove Watermark	הסרת סימן מים
+	Rename Document	שינוי שם המסמך
+	Reopen	פתיחה מחדש
+	Repeat as header row on each page	חזרה כשורת כותרת בכל עמוד
+	Repeat Header Rows	חזרה על שורות כותרת
+	Repeating Section Content Control	פקד תוכן של מקטע חוזר
+	Replace All	החלפת הכול
+	Replace as you type	החלפה בזמן ההקלדה
+	Replace Document Text	החלפת טקסט המסמך
+	Replace text as you type	החלפת טקסט בזמן ההקלדה
+	Replace with:	החלפה ב:
+	Replay	הפעלה חוזרת
+	Research	מחקר
+	Researcher	חוקר
+	Researcher needs an online service; WordCraft keeps your documents offline.	החוקר זקוק לשירות מקוון; WordCraft שומר את המסמכים שלך במצב לא מקוון.
+	Reset All…	איפוס הכול…
+	Reset Character Formatting	איפוס עיצוב תווים
+	Reset Crop	איפוס חיתוך
+	Reset Graphic	איפוס גרפיקה
+	Reset Paragraph Formatting	איפוס עיצוב פסקה
+	Reset Picture	איפוס תמונה
+	Reset tips	איפוס עצות
+	Reset to Normal	איפוס לרגיל
+	Reset\nGraphic	איפוס\nגרפיקה
+	Resize Table by Dragging	שינוי גודל טבלה בגרירה
+	Resolve	פתרון
+	Resolved	נפתר
+	Restart at 1	התחלה מחדש מ-1
+	Restart Each Page	התחלה מחדש בכל עמוד
+	Restart Each Section	התחלה מחדש בכל מקטע
+	Restart list after:	התחלת הרשימה מחדש אחרי:
+	Restore opens an unsaved copy. Your original file stays unchanged.	שחזור פותח עותק שלא נשמר. הקובץ המקורי נשאר ללא שינוי.
+	Restrict Editing	הגבלת עריכה
+	Restrict\nEditing	הגבלת\nעריכה
+	Results	תוצאות
+	Return address labels	תוויות כתובת השולח
+	Return address:	כתובת השולח:
+	Reviewing	סקירה
+	Reviewing Pane	חלונית סקירה
+	Reviewing — edits become suggestions	סקירה — עריכות הופכות להצעות
+	Revised document	מסמך מתוקן
+	Rewind	הרצה אחורה
+	Rewinding. Tell me when to stop.	מריץ אחורה. תגידו לי מתי לעצור.
+	Ribbon	רצועת הכלים
+	Ribbon and Quick Access Toolbar:	רצועת הכלים וסרגל הכלים לגישה מהירה:
+	Ribbon tabs	כרטיסיות רצועת הכלים
+	Rich Text Content Control	פקד תוכן טקסט עשיר
+	Rich Text Format (*.rtf)	Rich Text Format (*.rtf)
+	Rich Text Format (RTF)	Rich Text Format (RTF)
+	Right (vertical)	ימין (אנכי)
+	Right Arrow with Text Above	חץ ימינה עם טקסט מעל
+	Right Arrow with Text Below	חץ ימינה עם טקסט מתחת
+	Right Border	גבול ימני
+	Right border	גבול ימני
+	Right Bracket Twice	סוגר ימני כפול
+	Right indent	הזחה מימין
+	Right Margin	שוליים ימניים
+	Right Only	ימין בלבד
+	Right-to-left	מימין לשמאל
+	Right-to-Left Section	מקטע מימין לשמאל
+	Right-to-Left Table	טבלה מימין לשמאל
+	Right-to-Left Text Direction	כיוון טקסט מימין לשמאל
+	Rightwards Arrow Above	חץ ימינה מעל
+	Rightwards Harpoon Above	צלצל ימינה מעל
+	Romanian	רומנית
+	Roots of ax²+bx+c	שורשים של ax²+bx+c
+	Rotate all text 270°	סיבוב כל הטקסט ב-270°
+	Rotate all text 90°	סיבוב כל הטקסט ב-90°
+	Rotate Left 90°	סיבוב שמאלה ב-90°
+	Rotate Right 90°	סיבוב ימינה ב-90°
+	Rotate with shape	סיבוב עם הצורה
+	Rounded	מעוגל
+	Row	שורה
+	Row:	שורה:
+	Rows & Columns	שורות ועמודות
+	Ruby text:	טקסט רובי:
+	Rules	כללים
+	Run-in	בתוך השורה
+	Résumé	קורות חיים
+	SAMPLE	דוגמה
+	Sat:	ש':
+	Saturation and recolor	רוויה וצביעה מחדש
+	Save a copy in another format. Printing goes through a PDF you can print from any viewer.	שמירת עותק בתבנית אחרת. ההדפסה מתבצעת דרך קובץ PDF שאפשר להדפיס מכל מציג.
+	Save as Word Template…	שמירה כתבנית Word…
+	Save documents	שמירת מסמכים
+	Save the document to turn on AutoSave	יש לשמור את המסמך כדי להפעיל שמירה אוטומטית
+	Save the document to turn on AutoSave (a file you have only opened isn't rewritten until you save it)	יש לשמור את המסמך כדי להפעיל שמירה אוטומטית (קובץ שרק נפתח אינו נכתב מחדש עד שהוא נשמר)
+	Save these pages as PDF…	שמירת העמודים האלה כ-PDF…
+	Saved. Saved again. Still saved. It's very saved.	נשמר. נשמר שוב. עדיין שמור. זה מאוד שמור.
+	Saves a .dotx template in your templates folder. It shows up in File › New under Personal.	שומר תבנית .dotx בתיקיית התבניות. היא מופיעה בקובץ › חדש תחת 'אישי'.
+	Saving {name} was cancelled, so it is still open and nothing was lost.	השמירה של {name} בוטלה, ולכן הוא עדיין פתוח ושום דבר לא אבד.
+	Sayings	אמרות
+	Sayings:	אמרות:
+	Scale Drawing	שינוי קנה המידה של הציור
+	Scale to paper size	התאמה לגודל הנייר
+	Scatter	פיזור
+	Script	כתב
+	Scroll ribbon left	גלילת רצועת הכלים שמאלה
+	Scroll ribbon right	גלילת רצועת הכלים ימינה
+	Search Commands	חיפוש פקודות
+	Search commands and help	חיפוש פקודות ועזרה
+	Search document	חיפוש במסמך
+	Search for templates	חיפוש תבניות
+	Search icons	חיפוש סמלים
+	Search Options	אפשרויות חיפוש
+	Secant Function	פונקציית סקנס
+	Section 1.01	מקטע 1.01
+	Section Break	מעבר מקטע
+	Section Breaks	מעברי מקטע
+	Section Character	תו מקטע
+	Section direction:	כיוון המקטע:
+	Section Mark	סימן מקטע
+	Section Properties	מאפייני מקטע
+	Sections	מקטעים
+	See	ראו
+	select a chart first	יש לבחור קודם תרשים
+	select a connector first	יש לבחור קודם מחבר
+	select a drawing canvas first	יש לבחור קודם בד ציור
+	select a floating picture or shape first	יש לבחור קודם תמונה או צורה צפה
+	select a group first	יש לבחור קודם קבוצה
+	select a picture first	יש לבחור קודם תמונה
+	select a picture or shape first	יש לבחור תחילה תמונה או צורה
+	Select a picture, shape, chart or table to describe it.	יש לבחור תמונה, צורה, תרשים או טבלה כדי לתאר אותם.
+	Select a place in this document:	בחירת מקום במסמך זה:
+	Select a printer	יש לבחור מדפסת
+	select a shape first	יש לבחור קודם צורה
+	Select a shape, text box or drawing canvas to format its fill.	יש לבחור צורה, תיבת טקסט או בד ציור כדי לעצב את המילוי שלהם.
+	select a SmartArt graphic first	יש לבחור קודם גרפיקת SmartArt
+	select a text box first	יש לבחור קודם תיבת טקסט
+	select a text box linked to another first	יש לבחור קודם תיבת טקסט המקושרת לתיבה אחרת
+	Select Cell	בחירת תא
+	Select Column	בחירת עמודה
+	Select Heading and Content	בחירת כותרת ותוכן
+	Select Line	בחירת שורת טקסט
+	Select Paragraph	בחירת פסקה
+	Select Range	בחירת טווח
+	Select Recipients	בחירת נמענים
+	select recipients first	יש לבחור נמענים תחילה
+	Select recipients first to choose from their fields.	יש לבחור תחילה נמענים כדי לבחור מתוך השדות שלהם.
+	Select recipients first to match their fields.	יש לבחור תחילה נמענים כדי להתאים את השדות שלהם.
+	Select Row	בחירת שורה
+	Select Sentence	בחירת משפט
+	Select Table	בחירת טבלה
+	Select Table Cells by Clicking	בחירת תאי טבלה בלחיצה
+	Select Text	בחירת טקסט
+	Select Text with Similar Formatting	בחירת טקסט בעל עיצוב דומה
+	Select text, then tick who can still edit it.	יש לבחור טקסט ולסמן מי עדיין יכול לערוך אותו.
+	select two or more cells to merge	יש לבחור שני תאים או יותר כדי למזג
+	select two or more pictures or shapes first (Shift+click)	יש לבחור תחילה שתי תמונות או צורות או יותר (Shift+לחיצה)
+	Select Word	בחירת מילה
+	Select\nRecipients	בחירת\nנמענים
+	Selected Fields	שדות נבחרים
+	Selected text	הטקסט שנבחר
+	Selection Pane	חלונית הבחירה
+	Send the document straight to the system print dialog, or save a copy in another format below.	שליחת המסמך ישירות לתיבת הדו-שיח של ההדפסה במערכת, או שמירת עותק בתבנית אחרת למטה.
+	Sentence	משפט
+	Sentence case.	אות גדולה בתחילת משפט.
+	Separate text at	הפרדת הטקסט ב
+	Separator:	מפריד:
+	Sepia	ספיה
+	Sequence name:	שם הרצף:
+	Serbian (Cyrillic)	סרבית (קירילית)
+	Serbian (Latin)	סרבית (לטינית)
+	Series name	שם הסדרה
+	Series {n}	סדרה {n}
+	Set As Default	הגדרה כברירת מחדל
+	Set Caret	מיקום הסמן
+	Set Character Formatting	הגדרת עיצוב תווים
+	Set Date	הגדרת תאריך
+	Set Equation	הגדרת משוואה
+	Set Numbering Value	הגדרת ערך מספור
+	Set Paragraph Formatting	הגדרת עיצוב פסקה
+	Set Proofing Language…	הגדרת שפת הגהה…
+	Setting:	הגדרה:
+	Shading	הצללה
+	Shadow, glow and soft edges	צל, זוהר וקצוות רכים
+	Shape Fill	מילוי צורה
+	Shape Format	עיצוב צורה
+	Shape Outline	קו מתאר של צורה
+	Shape Styles	סגנונות צורה
+	Shift+Enter starts a new line without starting a new paragraph.	Shift+Enter מתחיל שורה חדשה בלי להתחיל פסקה חדשה.
+	Shift+Tab	Shift+Tab
+	Shipping labels	תוויות משלוח
+	Shortcut key:	מקש קיצור:
+	Show alignment guides when moving pictures and shapes	הצגת קווי יישור בעת הזזת תמונות וצורות
+	Show all formatting marks	הצגת כל סימני העיצוב
+	Show All Levels	הצגת כל הרמות
+	Show all revisions inline	הצגת כל השינויים בתוך הטקסט
+	Show changes at:	מיקום הצגת השינויים:
+	Show changes in:	הצגת השינויים ב:
+	Show Comments	הצגת הערות
+	Show documents with their colours inverted, like View › Switch Modes. Saving, printing and PDFs are unchanged.	הצגת מסמכים בצבעים הפוכים, כמו תצוגה › החלפת מצבים. השמירה, ההדפסה וקובצי ה-PDF אינם משתנים.
+	Show every bibliography field	הצגת כל שדות הביבליוגרפיה
+	Show First Line Only	הצגת השורה הראשונה בלבד
+	Show in the Styles gallery	הצגה בגלריית הסגנונות
+	Show its list number	הצגת מספר הרשימה שלו
+	Show its number relative to this field	הצגת המספר שלו ביחס לשדה זה
+	Show its number with all higher levels	הצגת המספר שלו עם כל הרמות הגבוהות יותר
+	Show KeyTips (Alt or F10)	הצגת רמזי מקשים (Alt או F10)
+	Show Level	הצגת רמה
+	Show Level 1	הצגת רמה 1
+	Show Level 2	הצגת רמה 2
+	Show Level 3	הצגת רמה 3
+	Show Level 4	הצגת רמה 4
+	Show Level 5	הצגת רמה 5
+	Show Level 6	הצגת רמה 6
+	Show Level 7	הצגת רמה 7
+	Show Level 8	הצגת רמה 8
+	Show Level 9	הצגת רמה 9
+	Show Markup	הצגת סימון
+	Show Notes	הצגת הערות שוליים
+	Show only comments and formatting in balloons	הצגת הערות ועיצוב בלבד בבלונים
+	Show only records that will be merged	הצגת הרשומות שימוזגו בלבד
+	Show or Hide Style	הצגה או הסתרה של סגנון
+	Show Quick Access Toolbar	הצגת סרגל הכלים לגישה מהירה
+	Show revisions in balloons	הצגת שינויים בבלונים
+	Show Text Formatting	הצגת עיצוב טקסט
+	Show the Assistant	הצגת העוזר
+	Show the community button in the title bar	הצגת לחצן הקהילה בשורת הכותרת
+	Show the equation in the line of text	הצגת המשוואה בתוך שורת הטקסט
+	Show the equation on a line of its own	הצגת המשוואה בשורה נפרדת
+	Show the mini toolbar when text is selected	הצגת סרגל הכלים המוקטן כשנבחר טקסט
+	Show the ribbon	הצגת רצועת הכלים
+	Show the Start screen when WordCraft starts	הצגת מסך הפתיחה עם הפעלת WordCraft
+	Show the tips you asked not to see again.	הצגת העצות שביקשת לא לראות שוב.
+	Show/Hide ¶	הצגה/הסתרה של ¶
+	Show/Hide ¶ (Ctrl+Shift+8) shows the spaces, tabs and breaks hiding in your text.	הצגה/הסתרה של ¶ (Ctrl+Shift+8) מראה את הרווחים, הטאבים והמעברים שמסתתרים בטקסט.
+	Show\nComments	הצגת\nהערות
+	Showing the first {count} items.	מוצגים {count} הפריטים הראשונים.
+	Shows a tree: each item below the item it belongs to.	מציג עץ: כל פריט מתחת לפריט שאליו הוא שייך.
+	Shows items around a central idea: the first item is the centre.	מציג פריטים סביב רעיון מרכזי: הפריט הראשון הוא המרכז.
+	Shows items of equal weight as blocks in rows.	מציג פריטים בעלי משקל שווה כגושים בשורות.
+	Shows overlapping ideas as overlapping circles.	מציג רעיונות חופפים כעיגולים חופפים.
+	Shows parts of a whole as quadrants.	מציג חלקים של שלם כרבעים.
+	Shows parts that build on each other, largest at the bottom.	מציג חלקים הנבנים זה על זה, הגדול ביותר בתחתית.
+	Shows steps in order, left to right, with arrows between them.	מציג שלבים לפי הסדר, משמאל לימין, עם חיצים ביניהם.
+	Shows steps that repeat, around a circle.	מציג שלבים שחוזרים על עצמם, סביב מעגל.
+	Shrink Font 1 Point	הקטנת הגופן בנקודה אחת
+	Shrink text	כיווץ טקסט
+	Side to Side	זה לצד זה
+	Side\nto Side	זה לצד\nזה
+	Sides of a right triangle	צלעות משולש ישר-זווית
+	Signature Line	שורת חתימה
+	Simple Frame	מסגרת פשוטה
+	Sine and cosine series of f(x)	טור סינוסים וקוסינוסים של f(x)
+	Sine Function	פונקציית סינוס
+	Sine theta	סינוס תטא
+	Single	יחיד
+	Single Brackets	סוגריים בודדים
+	Single Closing Quote	מירכה בודדת סוגרת
+	Single label	תווית בודדת
+	Single Left Angle	זווית שמאלית בודדת
+	Single Left Bar	קו שמאלי בודד
+	Single Left Brace	סוגר מסולסל שמאלי בודד
+	Single Left Bracket	סוגר מרובע שמאלי בודד
+	Single Left Parenthesis	סוגר עגול שמאלי בודד
+	Single Opening Quote	מירכה בודדת פותחת
+	Single Right Brace	סוגר מסולסל ימני בודד
+	Single Right Bracket	סוגר מרובע ימני בודד
+	Single Right Parenthesis	סוגר עגול ימני בודד
+	Single Spacing	ריווח בודד
+	SIST02	SIST02
+	Site name	שם האתר
+	Size (pt):	גודל (נק'):
+	Size and Crop…	גודל וחיתוך…
+	Sketchbook	מחברת סקיצות
+	Skewed Fraction	שבר נטוי
+	Skip citations & bibliography	דילוג על ציטוטים וביבליוגרפיה
+	Skip Citations and Bibliography	דילוג על ציטוטים וביבליוגרפיה
+	Skip Record If	דילוג על רשומה אם
+	Skip Record If…	דילוג על רשומה אם…
+	Slant Down	נטייה כלפי מטה
+	Slant Up	נטייה כלפי מעלה
+	Small caps	אותיות רישיות קטנות
+	Small change	שינוי קטן
+	Smart quotes instead of straight quotes	מירכאות חכמות במקום מירכאות ישרות
+	SmartArt	SmartArt
+	SmartArt Design	עיצוב SmartArt
+	SmartArt Styles	סגנונות SmartArt
+	Smooth scrolling and zooming, and menus and buttons that fade in. Off shows every change at once.	גלילה והגדלה חלקות, ותפריטים ולחצנים שמופיעים בהדרגה. כשהאפשרות כבויה, כל שינוי מוצג מיד.
+	Soft Edge	קצה רך
+	Soft Edges	קצוות רכים
+	Soft Glow	זוהר רך
+	Solid Accent	הדגשה מלאה
+	Solid fill	מילוי אחיד
+	Sometimes	לפעמים
+	Sort by:	מיון לפי:
+	Sort order:	סדר מיון:
+	Sort Recipients	מיון נמענים
+	Source code: github.com/storytold/wordcraft	קוד מקור: github.com/storytold/wordcraft
+	Source Manager	מנהל המקורות
+	Source type:	סוג המקור:
+	Sources in this document:	מקורות במסמך זה:
+	South	דרום
+	Space	רווח
+	Space after	ריווח אחרי
+	Space after: {pt} pt	ריווח אחרי: {pt} נק'
+	Space before	ריווח לפני
+	Space before/after:	ריווח לפני/אחרי:
+	Space before: {pt} pt	ריווח לפני: {pt} נק'
+	Spacing (pt):	ריווח (נק'):
+	Spanish (Latin America)	ספרדית (אמריקה הלטינית)
+	Spanish (Mexico)	ספרדית (מקסיקו)
+	Spanish (Spain)	ספרדית (ספרד)
+	Spanish (Uruguay)	ספרדית (אורוגוואי)
+	Sparse Matrices	מטריצות דלילות
+	Special Characters	תווים מיוחדים
+	Specify height:	ציון גובה:
+	Speech	דיבור
+	Spelling & Grammar	איות ודקדוק
+	Spelling &\nGrammar	איות\nודקדוק
+	Spelling and grammar are checked in English (United States).	האיות והדקדוק נבדקים באנגלית (ארצות הברית).
+	Spelling and grammar are checked in {language}.	האיות והדקדוק נבדקים ב{language}.
+	Spelling Suggestions	הצעות איות
+	Spike	אוסף גזירות
+	Split Cells	פיצול תאים
+	Split Table	פיצול טבלה
+	Spreadsheet Table	טבלת גיליון אלקטרוני
+	Square Root	שורש ריבועי
+	Square Root with Degree	שורש עם מעלה
+	Square Union	איחוד מרובע
+	Stack Object	אובייקט מוערם
+	Stack Object (Three)	אובייקט מוערם (שלושה)
+	Stacked Bar	פסים מוערמים
+	Stacked Column	עמודות מוערמות
+	Stacked Fraction	שבר מוערם
+	Stacked, no bar	מוערם, ללא קו
+	Standard Colors	צבעים סטנדרטיים
+	Start Enforcing Protection	התחלת אכיפת ההגנה
+	Start Mail Merge	התחלת מיזוג דואר
+	Start Mail\nMerge	התחלת מיזוג\nדואר
+	Start-up	הפעלה
+	State	מדינה
+	Statement   5.50" × 8.50"	Statement   5.50" × 8.50"
+	Still there? I can hear you thinking.	עדיין שם? אני שומע אותך חושב.
+	Stop Protection	הפסקת ההגנה
+	Stop Reading	הפסקת הקריאה
+	Stopped	נעצר
+	Straight Arrow Connector	מחבר חץ ישר
+	Straight Connector	מחבר ישר
+	Stroke {n} of {total}	משיחה {n} מתוך {total}
+	Strong	חזק
+	Structure Actions	פעולות מבנה
+	Structures	מבנים
+	Studio cover	כריכת סטודיו
+	Studio handbook (sample)	מדריך הסטודיו (דוגמה)
+	Style based on:	סגנון מבוסס על:
+	Style Inspector	בודק הסגנונות
+	Style name:	שם הסגנון:
+	Style Set	ערכת סגנונות
+	Style: APA	סגנון: APA
+	Style: {style}	סגנון: {style}
+	Styles Pane	חלונית הסגנונות
+	Styles:	סגנונות:
+	Subentry:	ערך משנה:
+	Submit print job	שליחת עבודת הדפסה
+	Submitting print job…	שולח עבודת הדפסה…
+	Subscript-Superscript	כתב תחתי-עילי
+	Subscripts and Superscripts	כתב תחתי וכתב עילי
+	Subset:	קבוצת משנה:
+	Subtle Emphasis	הדגשה עדינה
+	Subtle Reference	הפניה עדינה
+	Suggested	הצעות
+	Sum	סכום
+	Sum of cosines	סכום קוסינוסים
+	Sum or difference of sines	סכום או הפרש של סינוסים
+	Summation	סכימה
+	Summation from 0 to n	סכימה מ-0 עד n
+	Summation over binomials	סכימה על מקדמים בינומיים
+	Summation with Limits	סכימה עם גבולות
+	Summation with Lower Limit	סכימה עם גבול תחתון
+	Summation with Subscript Limit	סכימה עם גבול בכתב תחתי
+	Summation with Subscript-Superscript Limits	סכימה עם גבולות בכתב תחתי ועילי
+	Summations	סכימות
+	Suppress line numbers	ביטול מספרי שורות
+	Surface Integral	אינטגרל משטח
+	Surface Integral with Limits	אינטגרל משטח עם גבולות
+	Surface Integral with Stacked Limits	אינטגרל משטח עם גבולות מוערמים
+	Swap footnotes and endnotes	החלפה בין הערות שוליים להערות סיום
+	Swedish	שוודית
+	Switch Modes	החלפת מצבים
+	Switch\nModes	החלפת\nמצבים
+	Synonyms	מילים נרדפות
+numerals	System	לפי המערכת
+	Tab Character	תו טאב
+	Tab character	תו טאב
+	Tab characters	תווי טאב
+	Tab leader:	תו מוביל:
+	Tab stop position:	מיקום עצירת הטאב:
+	Tab stops to be cleared:	עצירות טאב לניקוי:
+	Table Column Width	רוחב עמודת טבלה
+	Table Design	עיצוב טבלה
+	Table direction:	כיוון הטבלה:
+	Table Grid	רשת טבלה
+	Table Layout	פריסת טבלה
+	Table of Authorities	טבלת מקורות משפטיים
+	Table of Contents	תוכן עניינים
+	Table of Contents Options	אפשרויות תוכן עניינים
+	Table of Contents Styles	סגנונות תוכן עניינים
+	Table of Figures	רשימת איורים
+	Table of\nContents	תוכן\nעניינים
+	Table Properties	מאפייני טבלה
+	Table Properties…	מאפייני טבלה…
+	Table Row Height	גובה שורת טבלה
+	Table size	גודל הטבלה
+	Table Style Options	אפשרויות סגנון טבלה
+	Table Styles	סגנונות טבלה
+	Tabloid   11.00" × 17.00"	Tabloid   11.00" × 17.00"
+	Tabs…	טאבים…
+	Tabular List	רשימה טבלאית
+	Tag	תג
+	Take the last match on the page	שימוש בהתאמה האחרונה בעמוד
+	Take your time. The page isn't going anywhere. Neither am I. Ever.	קחו את הזמן. הדף לא הולך לשום מקום. גם אני לא. אף פעם.
+	Tangent formula	נוסחת טנגנס
+	Tangent Function	פונקציית טנגנס
+	TC entry fields	שדות ערכי TC
+	Technology	טכנולוגיה
+	Templates and Add-ins	תבניות ותוספות
+	Templates you save in your templates folder show up here.	תבניות שנשמרות בתיקיית התבניות מופיעות כאן.
+	Text Box	תיבת טקסט
+	Text boxes	תיבות טקסט
+	text boxes can't go inside a text box	אי אפשר למקם תיבת טקסט בתוך תיבת טקסט
+	Text Direction	כיוון טקסט
+	Text Effects	אפקטים של טקסט
+	Text Effects and Typography	אפקטים של טקסט וטיפוגרפיה
+	Text Fill	מילוי טקסט
+	Text from File	טקסט מקובץ
+	Text Highlight Color	צבע סימון טקסט
+	Text indent at:	הזחת טקסט ב:
+	Text of the nearest paragraph with a given style (running headers)	הטקסט של הפסקה הקרובה בסגנון נתון (כותרות רצות)
+	Text Outline	קו מתאר של טקסט
+	Text over Colon Equal	טקסט מעל נקודתיים-שווה
+	Text over Equal	טקסט מעל שווה
+	Text Pane	חלונית טקסט
+	Text size	גודל טקסט
+	Text snaps to characters	הצמדת טקסט לתווים
+	Text to display:	טקסט להצגה:
+	Text Wrapping	גלישת טקסט
+	Text\nBox	תיבת\nטקסט
+	Text\nDirection	כיוון\nטקסט
+	That format doesn't keep everything, so the document is still open. Save it as a Word document (.docx) to go on.	תבנית זו אינה שומרת הכול, ולכן המסמך עדיין פתוח. כדי להמשיך, יש לשמור אותו כמסמך Word (.docx).
+	That password isn't right. Check it (passwords are case-sensitive) and try again.	הסיסמה שגויה. יש לבדוק אותה (בסיסמאות יש הבחנה בין אותיות רישיות לקטנות) ולנסות שוב.
+	The clipboard is empty.	הלוח ריק.
+	the Clipboard pane is empty	חלונית הלוח ריקה
+	the cursor isn't in a table	הסמן אינו נמצא בטבלה
+	The date it is today	התאריך של היום
+	The document has no bookmarks yet.	אין עדיין סימניות במסמך.
+	the document is protected	המסמך מוגן
+	The document is read only, except for regions marked editable.	המסמך לקריאה בלבד, מלבד אזורים שסומנו כניתנים לעריכה.
+	The document will be saved with a password. Save it to protect it.	המסמך יישמר עם סיסמה. יש לשמור אותו כדי להגן עליו.
+	The document you are editing keeps the names and dates; only the saved file leaves them out.	המסמך שבעריכה שומר על השמות והתאריכים; רק הקובץ השמור משמיט אותם.
+	The margins don't fit on a page this size; make the margins smaller first.	השוליים אינם נכנסים בעמוד בגודל זה; יש להקטין את השוליים תחילה.
+	The measurement must be between {min} and {max}.	המידה חייבת להיות בין {min} ל-{max}.
+	The new style takes the formatting of the current paragraph.	הסגנון החדש מקבל את העיצוב של הפסקה הנוכחית.
+	The number must be a divisor of {max}.	המספר חייב להיות מחלק של {max}.
+	The number must be between 1 and {max}.	המספר חייב להיות בין 1 ל-{max}.
+	the paragraph is empty	הפסקה ריקה
+	the paragraph starts with a space	הפסקה מתחילה ברווח
+	The password is optional; without it anyone can stop the protection.	הסיסמה אינה חובה; בלעדיה כל אחד יכול להפסיק את ההגנה.
+	The password is removed. Save the document to keep the change.	הסיסמה הוסרה. יש לשמור את המסמך כדי לשמור את השינוי.
+	The printer, two-sided printing and pages per sheet are chosen in that dialog.	המדפסת, ההדפסה הדו-צדדית ומספר העמודים לגיליון נבחרים בתיבת הדו-שיח הזו.
+	The recipient-list field that fills each part of an address block and greeting line.	השדה ברשימת הנמענים שממלא כל חלק של בלוק כתובת ושל שורת פתיחה.
+	The spelling and grammar check is complete.	בדיקת האיות והדקדוק הושלמה.
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	לא ניתן היה לקרוא את מילון האיות של {language}, ולכן האיות לא נבדק. קובץ: {file}. סיבה: {reason}
+	the Spike is empty	ה-Spike ריק
+	The system file dialog isn't available, so WordCraft shows its own. To get the system dialog, install a file chooser portal (such as xdg-desktop-portal-gtk) or zenity.	תיבת הדו-שיח של הקבצים במערכת אינה זמינה, ולכן WordCraft מציג תיבה משלו. כדי לקבל את תיבת הדו-שיח של המערכת, יש להתקין פורטל לבחירת קבצים (כגון xdg-desktop-portal-gtk) או את zenity.
+	The text at the insertion point is marked Do not check spelling or grammar.	הטקסט בנקודת ההוספה מסומן 'לא לבדוק איות או דקדוק'.
+	The time right now	השעה כעת
+	Theme Colors	צבעי ערכת נושא
+	Theme Fonts	גופני ערכת נושא
+	Theme List	רשימת ערכות נושא
+	Themes	ערכות נושא
+	Then by	ואחר כך לפי
+	Then insert:	ולאחר מכן להוסיף:
+	there is no ink to replay	אין דיו להפעלה חוזרת
+	there is nothing to undo	אין מה לבטל
+	there's no citation after the caret	אין ציטוט אחרי הסמן
+	Thesaurus	אוצר מילים
+	These marks show even when Show/Hide ¶ is off.	סימנים אלה מוצגים גם כשהצגה/הסתרה של ¶ כבויה.
+	These merge fields aren't in the recipient list:	שדות המיזוג האלה אינם ברשימת הנמענים:
+	These settings will be used for new documents.	הגדרות אלה ישמשו עבור מסמכים חדשים.
+	Thick	עבה
+	Thick Frame	מסגרת עבה
+	Thin	דק
+	This cannot be undone. Your original file stays unchanged.	אי אפשר לבטל את הפעולה. הקובץ המקורי נשאר ללא שינוי.
+	this chart was made in another program: WordCraft shows it but can't edit it	התרשים נוצר בתוכנה אחרת: WordCraft מציג אותו אבל לא יכול לערוך אותו
+	This document	מסמך זה
+	This field has no options.	לשדה זה אין אפשרויות.
+	This folder can't be read: {error}	לא ניתן לקרוא את התיקייה הזו: {error}
+	This font has no characters to show.	אין בגופן זה תווים להצגה.
+	this item is already at the top level	פריט זה כבר נמצא ברמה העליונה
+	This page	עמוד זה
+	This password type isn't supported.	סוג סיסמה זה אינו נתמך.
+	This point forward	מנקודה זו והלאה
+	This section	מקטע זה
+	this SmartArt was made in another program: WordCraft shows it but can't edit it	גרפיקת ה-SmartArt נוצרה בתוכנה אחרת: WordCraft מציג אותה אבל לא יכול לערוך אותה
+	this text box is already linked: break the link first	תיבת הטקסט כבר מקושרת: יש לנתק קודם את הקישור
+	Three	שלושה
+	Through	דרך
+	Tight	צמוד
+	Tilde	טילדה
+	Tip	עצה
+	Tips ({n})	עצות ({n})
+preview	Title	כותרת
+	Title Bar	שורת הכותרת
+	Title from the document properties	כותרת ממאפייני המסמך
+	Title:	כותרת:
+	To open Word documents with WordCraft by default: select one in Finder, choose File › Get Info, pick WordCraft under Open with, then click Change All.	כדי לפתוח מסמכי Word עם WordCraft כברירת מחדל: יש לבחור מסמך כזה ב-Finder, לבחור קובץ › קבלת מידע, לבחור ב-WordCraft תחת "פתיחה באמצעות" וללחוץ על "שינוי הכול".
+	To:	אל:
+	TOA Heading	כותרת טבלת מקורות משפטיים
+	TOC Heading	כותרת תוכן עניינים
+	TOC {n}	תוכן עניינים {n}
+	Today	היום
+	tOGGLE cASE	הפיכת רישיות
+	Toggle Check Box	החלפת מצב תיבת סימון
+	Toggle Field Codes	החלפת מצב קודי שדות
+	Toggle Unicode Character	החלפת מצב תו Unicode
+	Top and Bottom	למעלה ולמטה
+	Top Border	גבול עליון
+	Top Left Cell	תא שמאלי עליון
+	Top Margin	שוליים עליונים
+	Top of Page	ראש העמוד
+	Top of the Document	ראש המסמך
+	Top Right Cell	תא ימני עליון
+	Total Row	שורת סיכום
+	Track Changes	מעקב אחר שינויים
+	Track Changes Options	אפשרויות מעקב אחר שינויים
+	Track Changes: On	מעקב אחר שינויים: מופעל
+	Track formatting	מעקב אחר עיצוב
+	Track\nChanges	מעקב אחר\nשינויים
+	Track\nChanges ✓	מעקב אחר\nשינויים ✓
+	Tracked changes	שינויים במעקב
+	Trademark	סימן מסחרי
+	Trademark Sign	סמל סימן מסחרי
+	Transport	תחבורה
+	Triangle Down	משולש כלפי מטה
+	Triangle Up	משולש כלפי מעלה
+	Trigonometric Functions	פונקציות טריגונומטריות
+	Triple	קו משולש
+	Triple Dot	שלוש נקודות
+	Triple Integral	אינטגרל משולש
+	Triple Integral with Limits	אינטגרל משולש עם גבולות
+	Triple Integral with Stacked Limits	אינטגרל משולש עם גבולות מוערמים
+	Trust Center	מרכז האמון
+	Tue	ג'
+	Turabian	Turabian
+	Turkish	טורקית
+	Two	שניים
+	Two-sided printing	הדפסה דו-צדדית
+	Two-sided: long edge	דו-צדדית: הקצה הארוך
+	Two-sided: short edge	דו-צדדית: הקצה הקצר
+	Type +2 or -1 to move from the page you are on.	יש להקליד +2 או -1 כדי לזוז מהעמוד הנוכחי.
+	Type a command, e.g. "insert table"	יש להקליד פקודה, למשל "הוספת טבלה"
+	Type a New List…	הקלדת רשימה חדשה…
+	Type a page number, or +2 / -1.	יש להקליד מספר עמוד, או +2 / -1.
+	Type a size in any unit, such as 5 cm or 300 px. The other side follows, so the picture keeps its proportions.	יש להקליד גודל בכל יחידה, כגון 5 cm או 300 px. הצד השני משתנה בהתאם, כך שהתמונה שומרת על היחס בין מידותיה.
+	Type at least one recipient.	יש להקליד נמען אחד לפחות.
+	Type Character Code	הקלדת קוד תו
+	Type equations in LaTeX	הקלדת משוואות ב-LaTeX
+	Type equations in the linear format (UnicodeMath)	הקלדת משוואות בתבנית הליניארית (UnicodeMath)
+	Type in Equation	הקלדה במשוואה
+	Type normal (non-math) text in the equation	הקלדת טקסט רגיל (לא מתמטי) במשוואה
+	Type Text	הקלדת טקסט
+	Type the categories down the side and a column of values per series.	יש להקליד את הקטגוריות לאורך הצד ועמודת ערכים לכל סדרה.
+	Type the field's name and its switches, for example PAGE \\* roman.	יש להקליד את שם השדה ואת המתגים שלו, לדוגמה PAGE \\* roman.
+	Type the password to stop the protection.	יש להקליד את הסיסמה כדי להפסיק את ההגנה.
+	Type the recipients, or load them from a file.	יש להקליד את הנמענים או לטעון אותם מקובץ.
+	Typing replaces selected text	הקלדה מחליפה את הטקסט הנבחר
+	Ukrainian	אוקראינית
+	Unchecked symbol	סמל לא מסומן
+	Underbar	קו מתחת
+	Underbrace	סוגר מסולסל תחתון
+	Underline Color	צבע קו תחתון
+	Underline color	צבע קו תחתון
+	Underline Words Only	קו תחתון למילים בלבד
+	Undo 1 Action	ביטול פעולה אחת
+	Undo Actions	ביטול פעולות
+	Undo History	היסטוריית ביטול
+	Undo {n} Actions	ביטול {n} פעולות
+	Undo, undo, undo… we're time travelling now.	ביטול, ביטול, ביטול… עכשיו אנחנו נוסעים בזמן.
+	Unformatted Text	טקסט לא מעוצב
+	Union of intersections	איחוד של חיתוכים
+	Union with Limits	איחוד עם גבולות
+	Union with Lower Limit	איחוד עם גבול תחתון
+	Union with Plus	איחוד עם פלוס
+	Union with Subscript-Superscript Limits	איחוד עם גבולות בכתב תחתי ועילי
+	Unions and Intersections	איחודים וחיתוכים
+	Unlink Fields	ניתוק קישור שדות
+	Unlink\nCitations	ניתוק\nציטוטים
+	Unlock Fields	ביטול נעילת שדות
+	Up Diagonal Dots	נקודות באלכסון עולה
+	Up one level	רמה אחת למעלה
+	Update Field	עדכון שדה
+	Update fields before printing	עדכון שדות לפני הדפסה
+	Update Index	עדכון אינדקס
+	Update Style to Match Selection	עדכון הסגנון בהתאם לבחירה
+	Update Styles from Template	עדכון סגנונות מהתבנית
+	Update Table	עדכון טבלה
+	Update Table of Figures	עדכון רשימת האיורים
+	Update to Match	עדכון להתאמה
+	Update to Match Selection	עדכון בהתאם לבחירה
+	URGENT	דחוף
+	URL	URL
+	Use "a" before a consonant sound	שימוש ב-"a" לפני צליל עיצורי
+	Use "an" before a vowel sound	שימוש ב-"an" לפני צליל תנועה
+	Use an Existing List…	שימוש ברשימה קיימת…
+	Use system setting	שימוש בהגדרת המערכת
+	Use the browser's full screen (F11)	שימוש במסך המלא של הדפדפן (F11)
+	Use the Insert key to switch overtype on and off	שימוש במקש Insert להפעלה ולכיבוי של מצב החלפה
+	Use wildcards	שימוש בתווים כלליים
+	User Name	שם משתמש
+	User name:	שם משתמש:
+	User templates:	תבניות משתמש:
+	Vector A	וקטור A
+	Vector AB	וקטור AB
+	Version History	היסטוריית גרסאות
+	Version {version} ({build})	גרסה {version} ({build})
+	Vertical alignment:	יישור אנכי:
+	Vertical Bars	קווים אנכיים
+	Vertical Dots	נקודות אנכיות
+	View Alt Text…	הצגת טקסט חלופי…
+	View Gridlines	הצגת קווי רשת
+	View State	מצב תצוגה
+	View › Focus hides everything but your words. I'll wait outside.	תצוגה › מיקוד מסתירה הכול חוץ מהמילים שלך. אני אחכה בחוץ.
+	Views	תצוגות
+	Visual effects	אפקטים חזותיים
+	Vivid 200%	עז 200%
+	Volume	כרך
+	Volume Integral	אינטגרל נפח
+	Volume Integral with Limits	אינטגרל נפח עם גבולות
+	Volume Integral with Stacked Limits	אינטגרל נפח עם גבולות מוערמים
+	Wait for the print job to finish submitting before closing.	יש להמתין לסיום שליחת עבודת ההדפסה לפני הסגירה.
+	Waiting for the save to finish…	ממתין לסיום השמירה…
+	Waiting for Zotero…	ממתין ל-Zotero…
+	Warm Gradient with Outline	מעבר צבע חם עם קו מתאר
+	Warnings ({n})	אזהרות ({n})
+	Washout	דהוי
+	Weather	מזג אוויר
+	Web Layout	פריסת אינטרנט
+	Web page (*.html)	דף אינטרנט (*.html)
+	Web\nLayout	פריסת\nאינטרנט
+	Wed	ד'
+	West	מערב
+	When this document was first created	מתי מסמך זה נוצר לראשונה
+	When this document was most recently printed	מתי מסמך זה הודפס לאחרונה
+	When this document was most recently saved	מתי מסמך זה נשמר לאחרונה
+	White Space	רווח לבן
+	White space	רווח לבן
+	Who the document properties name as author	מי שמאפייני המסמך מציינים כמחבר
+	Whole document	המסמך כולו
+	Whole page	עמוד שלם
+	Whole Table	הטבלה כולה
+	Whole words	מילים שלמות
+	Wide	רחב
+	Widow/Orphan Control	בקרת שורות יתומות ואלמנות
+	Widow/Orphan control	בקרת שורות יתומות ואלמנות
+	Width and spacing	רוחב וריווח
+	Wildcards (regex)	תווים כלליים (ביטוי רגולרי)
+	With:	עם:
+	Word 2003 XML Document (*.xml)	מסמך XML של Word 2003 (*.xml)
+	Word Count	ספירת מילים
+	Word document	מסמך Word
+	Word document (*.docx)	מסמך Word (*.docx)
+	Word Left	מילה שמאלה
+	Word level	רמת מילה
+	Word Right	מילה ימינה
+	Word sources	מקורות Word
+	Word XML Document (*.xml)	מסמך Word XML (*.xml)
+	WordArt	WordArt
+	WordArt Styles	סגנונות WordArt
+	WordCraft	WordCraft
+	WordCraft is now the default app for Word documents.	WordCraft הוא כעת יישום ברירת המחדל למסמכי Word.
+	Words only	מילים בלבד
+	Wrap Text	גלישת טקסט
+	Wrap Text Sides	צדי גלישת הטקסט
+	Wrap\nText	גלישת\nטקסט
+	Write & Insert Fields	כתיבה והוספה של שדות
+	Write a reply	כתיבת תשובה
+	Writer's block? I find staring at the cursor helps. It's been blinking at me for years.	מחסום כתיבה? מבחינתי, לבהות בסמן עוזר. הוא מהבהב אליי כבר שנים.
+	x bar	x עם קו עליון
+	Year	שנה
+	Yields	מניב
+	You haven't saved in a while, and AutoSave is off. Save now?	עבר זמן מאז השמירה האחרונה, והשמירה האוטומטית כבויה. לשמור עכשיו?
+	You started a list. Press Enter twice to end it, or Backspace at the start of an item to turn it back into text.	התחלת רשימה. לחיצה כפולה על Enter מסיימת אותה, ו-Backspace בתחילת פריט הופך אותו חזרה לטקסט.
+	Your document is now the most saved document in history.	המסמך שלך הוא עכשיו המסמך השמור ביותר בהיסטוריה.
+	Your system doesn't report an animation setting, so animation effects stay on.	המערכת אינה מדווחת על הגדרת הנפשה, ולכן אפקטי ההנפשה נשארים מופעלים.
+	Your system has animation effects turned off.	אפקטי ההנפשה כבויים במערכת.
+	Your system has animation effects turned on.	אפקטי ההנפשה מופעלים במערכת.
+	Zotero	Zotero
+	Zotero: cancelled	Zotero: בוטל
+	Zotero: done	Zotero: הסתיים
+	{added}; {count} couldn't be read: {names}	{added}; לא ניתן היה לקרוא {count}: {names}
+	{added}; {n} skipped (limit {max})	{added}; דולגו {n} (המגבלה היא {max})
+	{cols}×{rows} Table	טבלה {cols}×{rows}
+	{contributors} contributors · {commits} commits	תורמים: {contributors} · שינויים: {commits}
+	{count} items highlighted	פריטים מסומנים: {count}
+	{count} of {total} pages will print	יודפסו {count} מתוך {total} עמודים
+	{count} of {total} recipients will be merged.	ימוזגו {count} מתוך {total} נמענים.
+	{group} settings	הגדרות {group}
+	{key}+Click to follow link	{key}+לחיצה למעבר לקישור
+	{kind}, {columns} × {rows}, {size} ({paper})	{kind}, {columns} × {rows}, {size} ({paper})
+	{language} (dictionary unreadable)	{language} (המילון לא קריא)
+	{language} (no dictionary)	{language} (אין מילון)
+	{language} is now the document's default language.	{language} היא כעת שפת ברירת המחדל של המסמך.
+	{language}: no dictionary found	{language}: לא נמצא מילון
+	{language}: WordCraft doesn't check spelling or grammar in this language yet.	{language}: WordCraft עדיין לא בודק איות או דקדוק בשפה הזו.
+	{language}: {file}	{language}: {file}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (לא קריא: {reason})
+	{names} and {n} more	{names} ועוד {n}
+	{name}   {height} × {width} in	{name}   {height} × {width} אינץ'
+	{name}   {height} × {width} mm	{name}   {height} × {width} מ"מ
+	{name} already exists. Choose Save again to replace it.	{name} כבר קיים. יש לבחור שוב "שמירה" כדי להחליף אותו.
+	{name} is protected with a password.	{name} מוגן בסיסמה.
+	{name} options	אפשרויות {name}
+	{name} wasn't found.	{name} לא נמצא.
+	{n} entries marked.	ערכים שסומנו: {n}.
+	{n} lines	שורות: {n}
+	{n} pt	{n} נק'
+#	{paper}   {width} × {height}	
+	{selected} of {words} words	מילים: {selected} מתוך {words}
+	{size} pt	{size} נק'
+	{width} × {height} mm	{width} × {height} מ"מ
+	{width} × {height} pixels	{width} × {height} פיקסלים
+	{words} words	מילים: {words}
+	{words} words and counting. Literally. I'm counting.	מילים: {words}, והמספר עולה. ממש. אני סופר.
+	{words} words! I'd throw confetti but I'd have to clean it up.	מילים: {words}! הייתי זורק קונפטי, אבל אז הייתי צריך לנקות.
+	{words} words. That's {words} more than I've written today.	מילים: {words}. זה {words} יותר ממה שאני כתבתי היום.
+	“{text}” ({row}, {series}) isn't a number.	“{text}” ({row}, {series}) אינו מספר.
+	✓ None	✓ ללא
+	➕ New comment	➕ הערה חדשה
+	📂  Browse…	📂  עיון…
