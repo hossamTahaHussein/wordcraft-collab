@@ -26,11 +26,13 @@ pub(crate) fn color_field(ui: &mut Ui, theme: &[wordcraft_doc::Rgb], value: &mut
         ui.painter().rect_stroke(r, 2.0, egui::Stroke::new(1.0, t.border_strong), egui::StrokeKind::Inside);
         let label = if c.is_some() { value.clone() } else { tl!(none_label).to_string() };
         ui.menu_button(label, |ui| {
-            if ui.button(tl!(none_label)).clicked() {
-                *value = none_value.to_string();
-                ui.close();
-            }
-            crate::colors::field_menu(ui, theme, id, value);
+            crate::widgets::menu_items(ui, |ui| {
+                if ui.button(tl!(none_label)).clicked() {
+                    *value = none_value.to_string();
+                    ui.close();
+                }
+                crate::colors::field_menu(ui, theme, id, value);
+            })
         });
     });
 }

@@ -45,15 +45,25 @@ pub(crate) fn ltr_block<R>(ui: &mut Ui, salt: impl std::hash::Hash + std::fmt::D
         return add(ui);
     }
     let id = ui.scope_id().with(("ltr_block", salt));
+    // The first time it has no size yet: that frame is laid out again at the size it took.
     let size = ui.data(|d| d.get_temp::<egui::Vec2>(id)).unwrap_or(egui::Vec2::ZERO);
     let shown = ui.allocate_ui_with_layout(size, egui::Layout::left_to_right(egui::Align::Min), add);
     let used = shown.response.rect.size();
     if (used - size).length() > 0.5 {
-        // First seen, or grown: lay the frame out again at the new size.
+        // First seen, grown or shrunk: lay the frame out again at the new size.
         ui.data_mut(|d| d.insert_temp(id, used));
         ui.ctx().request_discard("a left-to-right block changed size");
     }
     shown.inner
+}
+
+/// A menu's items, laid out from the reading start: right to left, each item's label sits at its
+/// right (egui's menus line them up on the left). Left to right it is `add` as is.
+pub(crate) fn menu_items<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> R {
+    if !craft_ui::direction::is_rtl(ui) {
+        return add(ui);
+    }
+    ui.with_layout(egui::Layout::top_down_justified(egui::Align::Max), add).inner
 }
 
 /// A top-aligned row in reading order (a ribbon group's controls, a gallery's thumbnails).
@@ -69,6 +79,8 @@ pub(crate) fn trailing_top(ui: &Ui) -> egui::Layout {
 
 /// [`Ui::vertical`] against the reading start: a stack of controls in a mirrored row (a ribbon
 /// group's columns) sits against the row's cursor, not at the far side of the space left.
+/// It follows the interface's direction, not its parent's: inside content kept left to right
+/// ([`ltr_block`], a grid cell) use [`Ui::vertical`] instead.
 pub(crate) fn column<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> egui::InnerResponse<R> {
     let layout = craft_ui::direction::column(ui);
     ui.scope_builder(egui::UiBuilder::new().layout(layout), add)

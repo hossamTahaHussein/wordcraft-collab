@@ -26,9 +26,11 @@ pub(super) fn insert(app: &mut WordApp, ui: &mut Ui) {
             mi_check(ui, app, "Draw Table", drawing, "table.draw", json!({}));
             mi(ui, app, "Convert Text to Table…", "table.fromText", json!({}));
             ui.menu_button(tl!("Quick Tables"), |ui| {
-                mi(ui, app, "Tabular List", "table.quick", json!({"kind": "tabular"}));
-                mi(ui, app, "Matrix", "table.quick", json!({"kind": "matrix"}));
-                mi(ui, app, "Calendar", "table.quick", json!({"kind": "calendar"}));
+                crate::widgets::menu_items(ui, |ui| {
+                    mi(ui, app, "Tabular List", "table.quick", json!({"kind": "tabular"}));
+                    mi(ui, app, "Matrix", "table.quick", json!({"kind": "matrix"}));
+                    mi(ui, app, "Calendar", "table.quick", json!({"kind": "calendar"}));
+                })
             });
         });
     });

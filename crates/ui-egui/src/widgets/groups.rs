@@ -136,15 +136,17 @@ fn collapsed_group(
         // full screen.
         app.escape_free = false;
         egui::Popup::menu(&resp).open_bool(&mut shown).close_behavior(egui::PopupCloseBehavior::IgnoreClicks).show(|ui| {
-            super::column(ui, |ui| {
-                ui.horizontal_top(|ui| {
-                    ui.set_min_height(CONTENT_H);
-                    ui.spacing_mut().item_spacing = vec2(1.0, 1.0);
-                    add(ui, app);
+            crate::widgets::menu_items(ui, |ui| {
+                super::column(ui, |ui| {
+                    ui.horizontal_top(|ui| {
+                        ui.set_min_height(CONTENT_H);
+                        ui.spacing_mut().item_spacing = vec2(1.0, 1.0);
+                        add(ui, app);
+                    });
+                    let (row, _) = ui.allocate_exact_size(vec2(ui.min_rect().width(), LABEL_H), Sense::hover());
+                    title_row(ui, row, id_title, title, launcher, app);
                 });
-                let (row, _) = ui.allocate_exact_size(vec2(ui.min_rect().width(), LABEL_H), Sense::hover());
-                title_row(ui, row, id_title, title, launcher, app);
-            });
+            })
         });
         if !shown && child_open && ui.input(|i| i.key_pressed(egui::Key::Escape)) {
             shown = true;
@@ -202,20 +204,22 @@ pub fn command_icon(id: &str) -> &str {
 /// open Customize Ribbon (#379).
 pub fn command_menu(resp: &Response, app: &mut WordApp, id: &str) {
     resp.context_menu(|ui| {
-        let known = app.session.registry.get(id).is_some();
-        let on_qat = app.session.ribbon.qat().contains(&id);
-        if known && !on_qat && ui.button(tl!("Add to Quick Access Toolbar")).clicked() {
-            let _ = app.run("tools.customizeRibbon", serde_json::json!({"qatAdd": id}));
-            ui.close();
-        }
-        if on_qat && ui.button(tl!("Remove from Quick Access Toolbar")).clicked() {
-            let _ = app.run("tools.customizeRibbon", serde_json::json!({"qatRemove": id}));
-            ui.close();
-        }
-        if known {
-            ui.separator();
-        }
-        customize_menu_items(ui, app);
+        crate::widgets::menu_items(ui, |ui| {
+            let known = app.session.registry.get(id).is_some();
+            let on_qat = app.session.ribbon.qat().contains(&id);
+            if known && !on_qat && ui.button(tl!("Add to Quick Access Toolbar")).clicked() {
+                let _ = app.run("tools.customizeRibbon", serde_json::json!({"qatAdd": id}));
+                ui.close();
+            }
+            if on_qat && ui.button(tl!("Remove from Quick Access Toolbar")).clicked() {
+                let _ = app.run("tools.customizeRibbon", serde_json::json!({"qatRemove": id}));
+                ui.close();
+            }
+            if known {
+                ui.separator();
+            }
+            customize_menu_items(ui, app);
+        })
     });
 }
 

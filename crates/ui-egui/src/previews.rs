@@ -569,14 +569,16 @@ pub fn style_gallery(app: &mut WordApp, ui: &mut Ui, state: &Value) {
         ui.painter().with_clip_rect(r).galley(label_pos, galley, t.text);
         // Right-click a tile: the same style actions as the Styles pane.
         resp.context_menu(|ui| {
-            if ui.button(tl!("Update to Match Selection")).clicked() {
-                let _ = app.run("styles.updateToMatch", json!({"style": id}));
-                ui.close();
-            }
-            if ui.button(tl!("Modify…")).clicked() {
-                app.dialog = crate::dialogs::Dialog::modify_style(app, id);
-                ui.close();
-            }
+            crate::widgets::menu_items(ui, |ui| {
+                if ui.button(tl!("Update to Match Selection")).clicked() {
+                    let _ = app.run("styles.updateToMatch", json!({"style": id}));
+                    ui.close();
+                }
+                if ui.button(tl!("Modify…")).clicked() {
+                    app.dialog = crate::dialogs::Dialog::modify_style(app, id);
+                    ui.close();
+                }
+            })
         });
         if resp.on_hover_text(name).clicked() {
             let _ = app.run("para.style", json!({"style": id}));

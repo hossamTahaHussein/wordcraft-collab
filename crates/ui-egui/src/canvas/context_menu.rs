@@ -95,17 +95,19 @@ pub(super) fn context_menu(app: &mut WordApp, ui: &mut Ui) {
     ui.separator();
     if let Some(syn) = app.canvas.context_synonyms.clone().and_then(|v| v.as_array().cloned()).filter(|a| !a.is_empty()) {
         ui.menu_button(tl!("Synonyms"), |ui| {
-            for w in syn.iter().filter_map(|x| x.as_str()) {
-                if ui.button(w).clicked() {
-                    let _ = app.run("select.word", json!({}));
-                    let (a, b) = app.session.sel.ordered();
-                    let trimmed = app.session.doc.para_at(&a).and_then(|p| p.text.get(a.off..b.off)).map(|t| t.trim_end().len()).unwrap_or(0);
-                    let end = wordcraft_doc::Pos { off: a.off + trimmed, ..b };
-                    app.session.sel = wordcraft_engine::Selection { anchor: a, focus: end };
-                    let _ = app.run("text.insert", json!({"text": w, "raw": true}));
-                    ui.close();
+            crate::widgets::menu_items(ui, |ui| {
+                for w in syn.iter().filter_map(|x| x.as_str()) {
+                    if ui.button(w).clicked() {
+                        let _ = app.run("select.word", json!({}));
+                        let (a, b) = app.session.sel.ordered();
+                        let trimmed = app.session.doc.para_at(&a).and_then(|p| p.text.get(a.off..b.off)).map(|t| t.trim_end().len()).unwrap_or(0);
+                        let end = wordcraft_doc::Pos { off: a.off + trimmed, ..b };
+                        app.session.sel = wordcraft_engine::Selection { anchor: a, focus: end };
+                        let _ = app.run("text.insert", json!({"text": w, "raw": true}));
+                        ui.close();
+                    }
                 }
-            }
+            })
         });
     }
     item(ui, app, "Font…", "ui.dialog", json!({"name": "font"}));
@@ -144,7 +146,7 @@ pub(super) fn context_menu(app: &mut WordApp, ui: &mut Ui) {
         item(ui, app, "Insert Caption…", "references.caption", json!({}));
     }
     if object {
-        ui.menu_button(tl!("Wrap Text"), |ui| crate::ribbon::wrap_text_items(ui, app));
+        ui.menu_button(tl!("Wrap Text"), |ui| crate::widgets::menu_items(ui, |ui| crate::ribbon::wrap_text_items(ui, app)));
     }
     if crate::widgets::enabled(app, "shape.fill") {
         item(ui, app, "Format Shape…", "view.formatShapePane", json!({"value": true}));
@@ -154,18 +156,22 @@ pub(super) fn context_menu(app: &mut WordApp, ui: &mut Ui) {
         let pick = table_pick(&app.session);
         ui.separator();
         ui.menu_button(tl!("Insert"), |ui| {
-            item(ui, app, "Insert Columns to the Left", "table.insertColumnLeft", json!({}));
-            item(ui, app, "Insert Columns to the Right", "table.insertColumnRight", json!({}));
-            item(ui, app, "Insert Rows Above", "table.insertRowAbove", json!({}));
-            item(ui, app, "Insert Rows Below", "table.insertRowBelow", json!({}));
+            crate::widgets::menu_items(ui, |ui| {
+                item(ui, app, "Insert Columns to the Left", "table.insertColumnLeft", json!({}));
+                item(ui, app, "Insert Columns to the Right", "table.insertColumnRight", json!({}));
+                item(ui, app, "Insert Rows Above", "table.insertRowAbove", json!({}));
+                item(ui, app, "Insert Rows Below", "table.insertRowBelow", json!({}));
+            })
         });
         // Every Delete is there whatever is selected, as on Word's Delete button: with the caret
         // in a cell, Delete Table is how the table goes (#1198).
         ui.menu_button(tl!("Delete"), |ui| {
-            item(ui, app, "Delete Cells", "table.deleteCells", json!({}));
-            item(ui, app, "Delete Columns", "table.deleteColumn", json!({}));
-            item(ui, app, "Delete Rows", "table.deleteRow", json!({}));
-            item(ui, app, "Delete Table", "table.deleteTable", json!({}));
+            crate::widgets::menu_items(ui, |ui| {
+                item(ui, app, "Delete Cells", "table.deleteCells", json!({}));
+                item(ui, app, "Delete Columns", "table.deleteColumn", json!({}));
+                item(ui, app, "Delete Rows", "table.deleteRow", json!({}));
+                item(ui, app, "Delete Table", "table.deleteTable", json!({}));
+            })
         });
         if pick == TablePick::Cell {
             item(ui, app, "Split Cells", "table.split", json!({}));
@@ -179,9 +185,11 @@ pub(super) fn context_menu(app: &mut WordApp, ui: &mut Ui) {
         }
         if pick == TablePick::Table {
             ui.menu_button(tl!("AutoFit"), |ui| {
-                item(ui, app, "AutoFit Contents", "table.autofit", json!({"mode": "contents"}));
-                item(ui, app, "AutoFit Window", "table.autofit", json!({"mode": "window"}));
-                item(ui, app, "Fixed Column Width", "table.autofit", json!({"mode": "fixed"}));
+                crate::widgets::menu_items(ui, |ui| {
+                    item(ui, app, "AutoFit Contents", "table.autofit", json!({"mode": "contents"}));
+                    item(ui, app, "AutoFit Window", "table.autofit", json!({"mode": "window"}));
+                    item(ui, app, "Fixed Column Width", "table.autofit", json!({"mode": "fixed"}));
+                })
             });
         }
         item(ui, app, "Text Direction", "table.textDirection", json!({}));

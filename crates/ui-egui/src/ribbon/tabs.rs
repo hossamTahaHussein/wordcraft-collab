@@ -33,37 +33,43 @@ pub(super) fn reading_toolbar(app: &mut WordApp, ui: &mut Ui, t: Tokens) {
                     _ => "Page",
                 };
                 ui.menu_button(format!("{}: {}", tl!("Column width"), tl!(active)), |ui| {
-                    for (name, value) in [("Auto", "auto"), ("Narrow", "narrow"), ("Medium", "medium"), ("Wide", "wide"), ("Page", "page")] {
-                        if ui.selectable_label(active == name, tl!(name)).clicked() {
-                            let _ = app.run("view.readColumnWidth", json!({"value": value}));
-                            ui.close();
+                    crate::widgets::menu_items(ui, |ui| {
+                        for (name, value) in [("Auto", "auto"), ("Narrow", "narrow"), ("Medium", "medium"), ("Wide", "wide"), ("Page", "page")] {
+                            if ui.selectable_label(active == name, tl!(name)).clicked() {
+                                let _ = app.run("view.readColumnWidth", json!({"value": value}));
+                                ui.close();
+                            }
                         }
-                    }
+                    })
                 });
                 ui.separator();
                 let pct = (app.session.view.read_zoom * 100.0).round() as u32;
                 ui.menu_button(format!("{}: {pct}%", tl!("Text size")), |ui| {
-                    for percent in [75, 90, 100, 110, 125, 150] {
-                        if ui.selectable_label(pct == percent, format!("{percent}%")).clicked() {
-                            let _ = app.run("view.readTextSize", json!({"value": percent}));
-                            ui.close();
+                    crate::widgets::menu_items(ui, |ui| {
+                        for percent in [75, 90, 100, 110, 125, 150] {
+                            if ui.selectable_label(pct == percent, format!("{percent}%")).clicked() {
+                                let _ = app.run("view.readTextSize", json!({"value": percent}));
+                                ui.close();
+                            }
                         }
-                    }
+                    })
                 });
                 ui.separator();
                 let spacing = app.session.view.read_line_spacing;
                 let label = spacing.map_or_else(|| tl!("Document").to_owned(), |v| format!("{v}×"));
                 ui.menu_button(format!("{}: {}", tl!("Line spacing"), label), |ui| {
-                    if ui.selectable_label(spacing.is_none(), tl!("Document")).clicked() {
-                        let _ = app.run("view.readLineSpacing", json!({"value": "document"}));
-                        ui.close();
-                    }
-                    for value in [1.0, 1.25, 1.5, 2.0] {
-                        if ui.selectable_label(spacing == Some(value), format!("{value}×")).clicked() {
-                            let _ = app.run("view.readLineSpacing", json!({"value": value}));
+                    crate::widgets::menu_items(ui, |ui| {
+                        if ui.selectable_label(spacing.is_none(), tl!("Document")).clicked() {
+                            let _ = app.run("view.readLineSpacing", json!({"value": "document"}));
                             ui.close();
                         }
-                    }
+                        for value in [1.0, 1.25, 1.5, 2.0] {
+                            if ui.selectable_label(spacing == Some(value), format!("{value}×")).clicked() {
+                                let _ = app.run("view.readLineSpacing", json!({"value": value}));
+                                ui.close();
+                            }
+                        }
+                    })
                 });
                 ui.separator();
                 use wordcraft_engine::cmd::view::ReadPageColor;
@@ -72,12 +78,14 @@ pub(super) fn reading_toolbar(app: &mut WordApp, ui: &mut Ui, t: Tokens) {
                 let current = app.session.view.read_page_color;
                 let name = colors.iter().find(|c| c.0 == current).map_or("None", |c| c.1);
                 ui.menu_button(format!("{}: {}", tl!("Page color"), tl!(name)), |ui| {
-                    for (color, name, value) in colors {
-                        if ui.selectable_label(current == color, tl!(name)).clicked() {
-                            let _ = app.run("view.readPageColor", json!({"value": value}));
-                            ui.close();
+                    crate::widgets::menu_items(ui, |ui| {
+                        for (color, name, value) in colors {
+                            if ui.selectable_label(current == color, tl!(name)).clicked() {
+                                let _ = app.run("view.readPageColor", json!({"value": value}));
+                                ui.close();
+                            }
                         }
-                    }
+                    })
                 });
                 ui.separator();
                 // Headings to jump to, in the Navigation pane beside the columns (Outline view

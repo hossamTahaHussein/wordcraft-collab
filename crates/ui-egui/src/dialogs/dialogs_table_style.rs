@@ -551,15 +551,17 @@ pub fn body(app: &mut WordApp, ui: &mut Ui, f: Form) -> bool {
                 color_menu(ui, &theme, &mut pen.color);
             });
             ui.menu_button(format!("{} ▾", tl!("Borders")), |ui| {
-                for (label, edges) in EDGES {
-                    ui.horizontal(|ui| {
-                        edge_glyph(ui, edges);
-                        if ui.selectable_label(edges_on(&r.borders, edges), tl!(label)).clicked() {
-                            pick_edges(&mut r.borders, edges, pen);
-                            ui.close();
-                        }
-                    });
-                }
+                crate::widgets::menu_items(ui, |ui| {
+                    for (label, edges) in EDGES {
+                        ui.horizontal(|ui| {
+                            edge_glyph(ui, edges);
+                            if ui.selectable_label(edges_on(&r.borders, edges), tl!(label)).clicked() {
+                                pick_edges(&mut r.borders, edges, pen);
+                                ui.close();
+                            }
+                        });
+                    }
+                })
             });
         });
         ui.horizontal(|ui| {

@@ -9,6 +9,9 @@ use wordcraft_doc::StoryRef;
 use wordcraft_engine::Selection;
 use wordcraft_ui_egui::WordApp;
 
+/// The most of a selection's text `selectionchange` sends (its `length` is the whole).
+pub const SELECTION_TEXT_MAX: usize = 1000;
+
 /// The formats `getDocument` writes.
 const FORMATS: [&str; 7] = ["docx", "odt", "rtf", "pdf", "html", "md", "txt"];
 
@@ -23,6 +26,9 @@ pub struct Reply {
 /// `setReadOnly`). Commands go through [`WordApp::execute`], the script path: they never ask
 /// first, and while co-editing they sync like typed edits.
 pub fn call(app: &mut WordApp, method: &str, params: &Value) -> Result<Reply, String> {
+    if !params.is_object() {
+        return Err(format!("{method}: params must be an object"));
+    }
     let text = |key: &str| params.get(key).and_then(Value::as_str).ok_or_else(|| format!("`{key}` required"));
     let result = match method {
         "run" => app.execute(text("command")?, params.get("params").cloned().unwrap_or_else(|| json!({})))?,
@@ -41,7 +47,9 @@ pub fn call(app: &mut WordApp, method: &str, params: &Value) -> Result<Reply, St
                 return Err(format!("unsupported format `{format}` (one of {})", FORMATS.join(", ")));
             }
             let name = format!("{}.{format}", app.title_stem());
-            let bytes = wordcraft_engine::io::save_bytes(&name, &app.session.doc)?;
+            // Word documents carry the document's password, as a Save writes them.
+            let password = app.session.password.as_ref().map(wordcraft_engine::io::Password::as_str);
+            let bytes = wordcraft_engine::io::save_bytes_with(&name, &app.session.doc, password, &Default::default())?;
             return Ok(Reply { result: json!({"name": name}), file: Some((name, bytes)) });
         }
         other => return Err(format!("unknown method `{other}`")),
@@ -53,6 +61,9 @@ pub fn call(app: &mut WordApp, method: &str, params: &Value) -> Result<Reply, St
 #[derive(Default)]
 pub struct Watcher {
     seen: bool,
+    /// The document the page was told about: another one (New, Open, joining a shared one) is
+    /// recorded afresh, not reported as edits.
+    document: u64,
     rev: u64,
     sel: Selection,
     /// Each comment and whether it is resolved.
@@ -70,13 +81,16 @@ impl Watcher {
         let s = &app.session;
         let comments: BTreeMap<u32, bool> = s.doc.comments.iter().map(|(id, c)| (*id, c.resolved)).collect();
         let mut out = Vec::new();
-        if self.seen {
+        let document = s.document_id();
+        if self.seen && document == self.document {
             if rev != self.rev {
                 let author = edited_by.last().cloned().unwrap_or_else(|| s.author.clone());
                 out.push(("change", json!({"rev": rev, "author": author})));
             }
             if s.sel != self.sel {
-                out.push(("selectionchange", json!({"text": s.selected_text(), "empty": s.sel.is_collapsed()})));
+                let text = s.selected_text();
+                let shown: String = text.chars().take(SELECTION_TEXT_MAX).collect();
+                out.push(("selectionchange", json!({"text": shown, "length": text.chars().count(), "empty": s.sel.is_collapsed()})));
             }
             for (id, resolved) in &comments {
                 let action = match self.comments.get(id) {
@@ -102,6 +116,7 @@ impl Watcher {
             }
         }
         self.seen = true;
+        self.document = document;
         self.rev = rev;
         self.sel = s.sel.clone();
         self.comments = comments;
@@ -208,7 +223,7 @@ mod tests {
         ok(&mut a, "select", json!({"text": "world"}));
         let ev = w.events(&a, a.session.rev(), &[], &[]);
         let sel = ev.iter().find(|e| e.0 == "selectionchange").expect("selectionchange");
-        assert_eq!(sel.1, json!({"text": "world", "empty": false}));
+        assert_eq!(sel.1, json!({"text": "world", "length": 5, "empty": false}));
         ok(&mut a, "run", json!({"command": "review.newComment", "params": {"text": "Note"}}));
         let ev = w.events(&a, a.session.rev(), &[], &[]);
         let added = ev.iter().find(|e| e.0 == "comment").expect("comment").1.clone();
@@ -241,5 +256,61 @@ mod lock_tests {
         assert!(call(&mut a, "insertText", &json!({"text": "x"})).is_err());
         call(&mut a, "setReadOnly", &json!({"on": false})).unwrap();
         call(&mut a, "insertText", &json!({"text": "x"})).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod review_tests {
+    use serde_json::{Value, json};
+    use wordcraft_ui_egui::{Services, WordApp};
+
+    use super::{Watcher, call};
+
+    fn app() -> WordApp {
+        WordApp::new(wordcraft_engine::Session::new(wordcraft_doc::Document::new()), Services::default())
+    }
+
+    #[test]
+    fn opening_another_document_is_not_an_edit() {
+        let mut a = app();
+        let mut w = Watcher::default();
+        w.events(&a, a.session.rev(), &[], &[]);
+        a.execute("file.new", json!({})).unwrap();
+        let ev = w.events(&a, a.session.rev(), &[], &[]);
+        assert!(!ev.iter().any(|e| e.0 == "change"), "a new document is no change: {ev:?}");
+        call(&mut a, "insertText", &json!({"text": "x"})).unwrap();
+        assert!(w.events(&a, a.session.rev(), &[], &[]).iter().any(|e| e.0 == "change"));
+    }
+
+    #[test]
+    fn params_must_be_an_object() {
+        let mut a = app();
+        assert!(call(&mut a, "getText", &Value::Null).unwrap_err().contains("object"));
+        assert!(call(&mut a, "insertText", &json!("x")).unwrap_err().contains("object"));
+    }
+
+    #[test]
+    fn get_document_keeps_the_documents_password() {
+        let mut a = app();
+        call(&mut a, "insertText", &json!({"text": "secret"})).unwrap();
+        a.session.password = Some(wordcraft_engine::io::Password::new("pw"));
+        let (_, bytes) = call(&mut a, "getDocument", &json!({"format": "docx"})).unwrap().file.unwrap();
+        assert!(bytes.starts_with(&[0xD0, 0xCF, 0x11, 0xE0]), "encrypted like a Save");
+        let (_, pdf) = call(&mut a, "getDocument", &json!({"format": "pdf"})).unwrap().file.unwrap();
+        assert!(pdf.starts_with(b"%PDF"), "a copy in another format is written as it is");
+    }
+
+    #[test]
+    fn a_long_selection_is_sent_shortened() {
+        let mut a = app();
+        let long = "word ".repeat(1000);
+        call(&mut a, "insertText", &json!({"text": long})).unwrap();
+        let mut w = Watcher::default();
+        w.events(&a, a.session.rev(), &[], &[]);
+        a.execute("select.all", json!({})).unwrap();
+        let ev = w.events(&a, a.session.rev(), &[], &[]);
+        let sel = &ev.iter().find(|e| e.0 == "selectionchange").expect("selectionchange").1;
+        assert!(sel["text"].as_str().unwrap().chars().count() <= super::SELECTION_TEXT_MAX, "{}", sel["text"].as_str().unwrap().len());
+        assert_eq!(sel["length"], json!(long.chars().count()), "the full length is given");
     }
 }

@@ -126,9 +126,11 @@ pub(super) fn home(app: &mut WordApp, ui: &mut Ui) {
                     let theme = app.session.doc.settings.theme_colors.clone();
                     crate::wordart_menus::style_gallery(ui, app, "format.textEffects");
                     ui.separator();
-                    ui.menu_button(tl!("Text Fill"), |ui| crate::wordart_menus::fill_menu(ui, app, &theme));
+                    ui.menu_button(tl!("Text Fill"), |ui| crate::widgets::menu_items(ui, |ui| crate::wordart_menus::fill_menu(ui, app, &theme)));
                     let outline = crate::wordart_menus::current_outline(app);
-                    ui.menu_button(tl!("Text Outline"), |ui| crate::wordart_menus::outline_menu(ui, app, &theme, outline));
+                    ui.menu_button(tl!("Text Outline"), |ui| {
+                        crate::widgets::menu_items(ui, |ui| crate::wordart_menus::outline_menu(ui, app, &theme, outline))
+                    });
                     crate::wordart_menus::effects_menu(ui, app, &theme, false);
                     ui.separator();
                     mi(ui, app, "Outline", "format.outline", json!({}));

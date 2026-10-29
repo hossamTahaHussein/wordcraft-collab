@@ -106,19 +106,21 @@ const SPECIAL_REPLACE: &[(&str, &str)] = &[
 pub(super) fn special_menu(ui: &mut Ui, extra: &FindExtra) -> Option<&'static str> {
     let mut picked = None;
     ui.menu_button(format!("{} ▾", tl!("Special")), |ui| {
-        let wild_replace: &[(&str, &str)] = &[("Find What Expression", "\\1")];
-        let lists: [&[(&str, &str)]; 2] = match (extra.to_replace, extra.wildcards) {
-            (false, false) => [SPECIAL_FIND, &[]],
-            (false, true) => [SPECIAL_FIND_WILD, &[]],
-            (true, false) => [SPECIAL_REPLACE, &[]],
-            (true, true) => [wild_replace, SPECIAL_REPLACE],
-        };
-        for (name, code) in lists.into_iter().flatten() {
-            if ui.button(format!("{}   {code}", tl!(name))).clicked() {
-                picked = Some(*code);
-                ui.close();
+        crate::widgets::menu_items(ui, |ui| {
+            let wild_replace: &[(&str, &str)] = &[("Find What Expression", "\\1")];
+            let lists: [&[(&str, &str)]; 2] = match (extra.to_replace, extra.wildcards) {
+                (false, false) => [SPECIAL_FIND, &[]],
+                (false, true) => [SPECIAL_FIND_WILD, &[]],
+                (true, false) => [SPECIAL_REPLACE, &[]],
+                (true, true) => [wild_replace, SPECIAL_REPLACE],
+            };
+            for (name, code) in lists.into_iter().flatten() {
+                if ui.button(format!("{}   {code}", tl!(name))).clicked() {
+                    picked = Some(*code);
+                    ui.close();
+                }
             }
-        }
+        })
     });
     picked
 }

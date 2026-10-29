@@ -4107,6 +4107,22 @@ fn host_saves_go_back_to_the_opened_file() {
     assert!(got.iter().all(|(_, _, len)| *len > 0));
 }
 
+/// While co-editing, Save As hands this person a copy: the shared document keeps its file, so
+/// the next Save (and autosave) still goes back to it, not to the copy.
+#[test]
+fn co_editing_save_as_is_a_copy() {
+    let (mut a, got) = host_app(false);
+    host_open(&mut a, "shared.docx");
+    a.session.set_collab(true);
+    a.execute("file.saveAs", json!({"path": "My copy.docx"})).unwrap();
+    assert!(a.session.dirty, "the shared document isn't saved by a copy");
+    a.execute("file.save", json!({})).unwrap();
+    let got = got.borrow();
+    let calls: Vec<(&str, bool)> = got.iter().map(|(n, s, _)| (n.as_str(), *s)).collect();
+    assert_eq!(calls, [("My copy.docx", false), ("shared.docx", false)]);
+    assert_eq!(a.session.path.as_deref(), Some(std::path::Path::new("shared.docx")));
+}
+
 /// A Markdown file goes back as Markdown, which doesn't keep everything: the document stays
 /// unsaved, as on the desktop.
 #[test]

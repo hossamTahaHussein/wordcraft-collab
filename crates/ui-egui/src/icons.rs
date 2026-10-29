@@ -34,13 +34,20 @@ impl Pen<'_> {
         let v: Vec<Pos2> = pts.iter().map(|&(x, y)| self.pt(x, y)).collect();
         self.p.add(Shape::line(v, self.stroke(c)));
     }
+    /// The points in drawing order: mirrored, reversed, so a polygon keeps its winding (the
+    /// anti-aliasing feathers outwards).
+    fn pts(&self, pts: &[(f32, f32)]) -> Vec<Pos2> {
+        let mut v: Vec<Pos2> = pts.iter().map(|&(x, y)| self.pt(x, y)).collect();
+        if self.flip {
+            v.reverse();
+        }
+        v
+    }
     fn closed(&self, pts: &[(f32, f32)], c: Color32) {
-        let v: Vec<Pos2> = pts.iter().map(|&(x, y)| self.pt(x, y)).collect();
-        self.p.add(Shape::closed_line(v, self.stroke(c)));
+        self.p.add(Shape::closed_line(self.pts(pts), self.stroke(c)));
     }
     fn fill(&self, pts: &[(f32, f32)], c: Color32) {
-        let v: Vec<Pos2> = pts.iter().map(|&(x, y)| self.pt(x, y)).collect();
-        self.p.add(Shape::convex_polygon(v, c, Stroke::NONE));
+        self.p.add(Shape::convex_polygon(self.pts(pts), c, Stroke::NONE));
     }
     fn rect(&self, x0: f32, y0: f32, x1: f32, y1: f32, c: Color32) {
         self.p.rect_stroke(Rect::from_two_pos(self.pt(x0, y0), self.pt(x1, y1)), 1.0, self.stroke(c), egui::StrokeKind::Middle);

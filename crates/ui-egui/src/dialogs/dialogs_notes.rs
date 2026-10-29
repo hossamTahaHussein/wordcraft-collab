@@ -100,13 +100,16 @@ pub fn note_options(app: &mut WordApp, ui: &mut Ui, f: &mut NoteForm) -> bool {
             ui.end_row();
             ui.label("");
             ui.menu_button(format!("{}…", tl!("Convert")), |ui| {
-                for (to, l) in [("endnote", "Footnotes to endnotes"), ("footnote", "Endnotes to footnotes"), ("swap", "Swap footnotes and endnotes")]
-                {
-                    if ui.button(tl!(l)).clicked() {
-                        convert = Some(to);
-                        ui.close();
+                crate::widgets::menu_items(ui, |ui| {
+                    for (to, l) in
+                        [("endnote", "Footnotes to endnotes"), ("footnote", "Endnotes to footnotes"), ("swap", "Swap footnotes and endnotes")]
+                    {
+                        if ui.button(tl!(l)).clicked() {
+                            convert = Some(to);
+                            ui.close();
+                        }
                     }
-                }
+                })
             });
             ui.end_row();
         })

@@ -164,12 +164,14 @@ impl WordApp {
             }
             // An export is a copy, and so is a save in a format that doesn't keep everything (a
             // page image, plain text): the document itself still has unsaved changes.
-            let marked_saved = matches!(id, "file.save" | "file.saveAs") && keeps_everything(&name);
             // Save As tells the host page the document is now this file, which it only is when the
             // save marks it saved. A Save under a name the page never sent (an untitled document,
             // an imported .doc saved as .docx) is a new file too, never an overwrite.
             let opened_name = self.session.path.as_ref().and_then(|p| p.file_name()).map(|n| n.to_string_lossy().to_string());
             let new_file = id == "file.saveAs" || opened_name.as_deref() != Some(name.as_str());
+            // While co-editing, the shared document keeps its file: another file is this person's copy.
+            let copy = self.session.collab() && opened_name.is_some() && new_file;
+            let marked_saved = matches!(id, "file.save" | "file.saveAs") && keeps_everything(&name) && !copy;
             let delivered = match (&self.services.host_save, &self.services.download) {
                 (Some(host), _) => host(&name, &bytes, marked_saved && new_file),
                 (None, Some(download)) => download(&name, &bytes),

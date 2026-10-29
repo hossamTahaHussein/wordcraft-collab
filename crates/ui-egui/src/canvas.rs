@@ -1211,24 +1211,26 @@ fn finish_canvas_frame(finish: CanvasFinish<'_>, out: egui::scroll_area::ScrollA
     let with_toolbar = crate::mini_toolbar::context_menu_visible(app);
     let menu = if with_toolbar { menu.frame(egui::Frame::NONE).close_behavior(egui::PopupCloseBehavior::IgnoreClicks) } else { menu };
     menu.show(|ui| {
-        if with_toolbar {
-            crate::mini_toolbar::show_in_context_menu(app, ui);
-            ui.add_space(4.0);
-            // The command panel keeps its own width, not the toolbar's: the popup's justified
-            // layout would stretch it, so it takes the width egui measures in its sizing pass.
-            let width_id = ui.scope_id().with("context_menu_width");
-            let width = ui.data(|d| d.get_temp::<f32>(width_id)).filter(|_| !ui.is_sizing_pass());
-            let size = egui::vec2(width.unwrap_or(ui.available_width()), ui.available_height());
-            let rect = egui::Rect::from_min_size(ui.cursor().min, size);
-            let panel = ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
-                egui::Frame::popup(ui.style()).show(ui, |ui| context_menu(app, ui)).response.rect.width()
-            });
-            if ui.is_sizing_pass() {
-                ui.data_mut(|d| d.insert_temp(width_id, panel.inner));
+        crate::widgets::menu_items(ui, |ui| {
+            if with_toolbar {
+                crate::mini_toolbar::show_in_context_menu(app, ui);
+                ui.add_space(4.0);
+                // The command panel keeps its own width, not the toolbar's: the popup's justified
+                // layout would stretch it, so it takes the width egui measures in its sizing pass.
+                let width_id = ui.scope_id().with("context_menu_width");
+                let width = ui.data(|d| d.get_temp::<f32>(width_id)).filter(|_| !ui.is_sizing_pass());
+                let size = egui::vec2(width.unwrap_or(ui.available_width()), ui.available_height());
+                let rect = egui::Rect::from_min_size(ui.cursor().min, size);
+                let panel = ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
+                    egui::Frame::popup(ui.style()).show(ui, |ui| context_menu(app, ui)).response.rect.width()
+                });
+                if ui.is_sizing_pass() {
+                    ui.data_mut(|d| d.insert_temp(width_id, panel.inner));
+                }
+            } else {
+                context_menu(app, ui);
             }
-        } else {
-            context_menu(app, ui);
-        }
+        })
     });
     // Escape closes the child list first; a second Escape closes the context menu.
     if open && !shown && child_open && ui.input(|i| i.key_pressed(egui::Key::Escape)) {

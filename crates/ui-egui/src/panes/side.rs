@@ -95,20 +95,22 @@ pub(super) fn styles(app: &mut WordApp, ui: &mut Ui) {
                     app.canvas.want_focus = true;
                 }
                 r.context_menu(|ui| {
-                    if ui.button(tl!("Modify…")).clicked() {
-                        app.dialog = crate::dialogs::Dialog::modify_style(app, &id);
-                        ui.close();
-                    }
-                    if ui.button(tl!("Update to Match Selection")).clicked() {
-                        let _ = app.run("styles.updateToMatch", json!({"style": id}));
-                        app.canvas.want_focus = true;
-                        ui.close();
-                    }
-                    if ui.add_enabled(!builtin, egui::Button::new(tl!("Delete"))).clicked() {
-                        let _ = app.run("styles.delete", json!({"style": id}));
-                        app.canvas.want_focus = true;
-                        ui.close();
-                    }
+                    crate::widgets::menu_items(ui, |ui| {
+                        if ui.button(tl!("Modify…")).clicked() {
+                            app.dialog = crate::dialogs::Dialog::modify_style(app, &id);
+                            ui.close();
+                        }
+                        if ui.button(tl!("Update to Match Selection")).clicked() {
+                            let _ = app.run("styles.updateToMatch", json!({"style": id}));
+                            app.canvas.want_focus = true;
+                            ui.close();
+                        }
+                        if ui.add_enabled(!builtin, egui::Button::new(tl!("Delete"))).clicked() {
+                            let _ = app.run("styles.delete", json!({"style": id}));
+                            app.canvas.want_focus = true;
+                            ui.close();
+                        }
+                    })
                 });
             });
         }

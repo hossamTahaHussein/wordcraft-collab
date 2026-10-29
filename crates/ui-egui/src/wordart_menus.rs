@@ -133,10 +133,12 @@ pub fn outline_menu(ui: &mut Ui, app: &mut WordApp, theme: &[Rgb], current: Opti
     }
     ui.separator();
     ui.menu_button(crate::tl!("Weight"), |ui| {
-        let color = current.map_or(Rgb::BLACK, |c| c.0).hex();
-        for w in [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0] {
-            mi(ui, app, &format!("{w} pt"), "format.textEffects", json!({"outline": {"color": color, "width": w}}));
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            let color = current.map_or(Rgb::BLACK, |c| c.0).hex();
+            for w in [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0] {
+                mi(ui, app, &format!("{w} pt"), "format.textEffects", json!({"outline": {"color": color, "width": w}}));
+            }
+        })
     });
 }
 
@@ -161,35 +163,43 @@ fn paint_warp(p: &egui::Painter, r: Rect, preset: &str, c: Color32) {
 /// Text Effects: Shadow, Glow and Reflection (and Transform, for a shape's text).
 pub fn effects_menu(ui: &mut Ui, app: &mut WordApp, theme: &[Rgb], transform: bool) {
     ui.menu_button(crate::tl!("Shadow"), |ui| {
-        mi(ui, app, "No Shadow", "format.textEffects", json!({"shadow": null}));
-        ui.separator();
-        for (id, label) in wordcraft_doc::effects::SHADOW_PRESETS {
-            mi(ui, app, label, "format.textEffects", json!({"shadow": id}));
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Shadow", "format.textEffects", json!({"shadow": null}));
+            ui.separator();
+            for (id, label) in wordcraft_doc::effects::SHADOW_PRESETS {
+                mi(ui, app, label, "format.textEffects", json!({"shadow": id}));
+            }
+        })
     });
     ui.menu_button(crate::tl!("Glow"), |ui| {
-        mi(ui, app, "No Glow", "format.textEffects", json!({"glow": null}));
-        ui.separator();
-        for size in [3.0, 5.0, 8.0, 11.0] {
-            mi(ui, app, &format!("{size} pt"), "format.textEffects", json!({"glow": size}));
-        }
-        ui.separator();
-        ui.menu_button(crate::tl!("Glow Colors"), |ui| {
-            if let Some(hex) = color_grid(ui, theme) {
-                let _ = app.run("format.textEffects", json!({"glow": {"color": hex, "size": 5.0}}));
-                ui.close();
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Glow", "format.textEffects", json!({"glow": null}));
+            ui.separator();
+            for size in [3.0, 5.0, 8.0, 11.0] {
+                mi(ui, app, &format!("{size} pt"), "format.textEffects", json!({"glow": size}));
             }
-        });
+            ui.separator();
+            ui.menu_button(crate::tl!("Glow Colors"), |ui| {
+                crate::widgets::menu_items(ui, |ui| {
+                    if let Some(hex) = color_grid(ui, theme) {
+                        let _ = app.run("format.textEffects", json!({"glow": {"color": hex, "size": 5.0}}));
+                        ui.close();
+                    }
+                })
+            });
+        })
     });
     ui.menu_button(crate::tl!("Reflection"), |ui| {
-        mi(ui, app, "No Reflection", "format.textEffects", json!({"reflection": null}));
-        ui.separator();
-        for size in [25.0, 50.0, 90.0] {
-            mi(ui, app, &format!("{size:.0}%"), "format.textEffects", json!({"reflection": {"size": size}}));
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Reflection", "format.textEffects", json!({"reflection": null}));
+            ui.separator();
+            for size in [25.0, 50.0, 90.0] {
+                mi(ui, app, &format!("{size:.0}%"), "format.textEffects", json!({"reflection": {"size": size}}));
+            }
+        })
     });
     if transform {
-        ui.menu_button(crate::tl!("Transform"), |ui| transform_menu(ui, app));
+        ui.menu_button(crate::tl!("Transform"), |ui| crate::widgets::menu_items(ui, |ui| transform_menu(ui, app)));
     }
 }
 

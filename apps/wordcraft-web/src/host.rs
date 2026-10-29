@@ -136,7 +136,8 @@ impl Bridge {
 
     /// Answer API call `id`; a file goes as a transferred `ArrayBuffer`.
     pub fn post_result(&self, id: f64, reply: Result<crate::api::Reply, String>) {
-        let id = JsValue::from_f64(id);
+        let id_value = JsValue::from_f64(id);
+        let id = id_value.clone();
         let sent = match reply {
             Ok(crate::api::Reply { result, file }) => {
                 let result = js_sys::JSON::parse(&result.to_string()).unwrap_or(JsValue::NULL);
@@ -155,7 +156,14 @@ impl Bridge {
             Err(error) => self.send(&[("type", "wordcraft:result".into()), ("id", id), ("ok", false.into()), ("error", error.as_str().into())]),
         };
         if !sent {
+            // The page still hears that the call failed, instead of waiting for its timeout.
             log::warn!("api: couldn't answer a call");
+            let _ = self.send(&[
+                ("type", "wordcraft:result".into()),
+                ("id", id_value),
+                ("ok", false.into()),
+                ("error", "couldn't send the result".into()),
+            ]);
         }
     }
 
@@ -203,13 +211,17 @@ impl Bridge {
                 Some("wordcraft:call") => {
                     let id = js_sys::Reflect::get(&data, &JsValue::from_str("id")).ok().and_then(|v| v.as_f64());
                     let method = string(&data, "method");
-                    let params = js_sys::Reflect::get(&data, &JsValue::from_str("params"))
-                        .ok()
-                        .filter(|p| p.is_object())
-                        .and_then(|p| js_sys::JSON::stringify(&p).ok())
-                        .and_then(|p| p.as_string())
-                        .and_then(|p| serde_json::from_str(&p).ok())
-                        .unwrap_or_else(|| serde_json::json!({}));
+                    // No params is `{}`; anything but an object (or something that can't be read as
+                    // JSON) is passed on as null, which the call refuses.
+                    let params = match js_sys::Reflect::get(&data, &JsValue::from_str("params")) {
+                        Ok(p) if p.is_undefined() || p.is_null() => serde_json::json!({}),
+                        Ok(p) if p.is_object() && !js_sys::Array::is_array(&p) => js_sys::JSON::stringify(&p)
+                            .ok()
+                            .and_then(|p| p.as_string())
+                            .and_then(|p| serde_json::from_str(&p).ok())
+                            .unwrap_or(serde_json::Value::Null),
+                        _ => serde_json::Value::Null,
+                    };
                     if let (Some(id), Some(method)) = (id, method) {
                         calls.borrow_mut().push_back((id, method, params));
                         ctx.request_repaint();

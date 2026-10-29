@@ -165,8 +165,13 @@ impl Exporter<'_> {
         let vowel = |p: &(u32, f32, f32, std::ops::Range<usize>)| {
             face.advance(p.0) <= 0.0 && txt.get(p.3.clone()).is_some_and(|t| !t.is_empty() && t.chars().all(is_arabic_mark))
         };
-        let marks: Vec<(u32, f32, f32)> = placed.iter().filter(|p| p.3.is_empty() || vowel(p)).map(|p| (p.0, p.1, p.2)).collect();
-        placed.retain(|p| !p.3.is_empty() && !vowel(p));
+        // A colour font's marks stay glyphs: as shapes they would lose their colours.
+        let colour = face.has_color_glyphs();
+        let marks: Vec<(u32, f32, f32)> =
+            if colour { Vec::new() } else { placed.iter().filter(|p| p.3.is_empty() || vowel(p)).map(|p| (p.0, p.1, p.2)).collect() };
+        if !colour {
+            placed.retain(|p| !p.3.is_empty() && !vowel(p));
+        }
         // A letter whose text holds its vowels too (one glyph group) keeps only the letter.
         for p in &mut placed {
             if let Some(t) = txt.get(p.3.clone()) {

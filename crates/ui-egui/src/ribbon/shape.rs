@@ -63,7 +63,7 @@ pub(super) fn shape_format(app: &mut WordApp, ui: &mut Ui) {
                     mi(ui, app, "No Color", "shape.fill", json!({"color": null}));
                     crate::colors::menu(ui, app, &theme, Target::cmd("shape.fill"));
                     ui.separator();
-                    ui.menu_button(tl!("Gradient"), |ui| gradient_menu(ui, app, fill.as_ref()));
+                    ui.menu_button(tl!("Gradient"), |ui| crate::widgets::menu_items(ui, |ui| gradient_menu(ui, app, fill.as_ref())));
                 },
             );
             menu_button(
@@ -75,10 +75,12 @@ pub(super) fn shape_format(app: &mut WordApp, ui: &mut Ui) {
                     crate::colors::menu(ui, app, &theme, Target::cmd("shape.outline"));
                     ui.separator();
                     ui.menu_button(tl!("Weight"), |ui| {
-                        let color = stroke.unwrap_or(wordcraft_doc::Rgb::BLACK).hex();
-                        for w in [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0, 4.5, 6.0] {
-                            mi(ui, app, &format!("{w} pt"), "shape.outline", json!({"color": color, "width": w}));
-                        }
+                        crate::widgets::menu_items(ui, |ui| {
+                            let color = stroke.unwrap_or(wordcraft_doc::Rgb::BLACK).hex();
+                            for w in [0.25, 0.5, 0.75, 1.0, 1.5, 2.25, 3.0, 4.5, 6.0] {
+                                mi(ui, app, &format!("{w} pt"), "shape.outline", json!({"color": color, "width": w}));
+                            }
+                        })
                     });
                 },
             );
@@ -97,9 +99,11 @@ pub(super) fn shape_format(app: &mut WordApp, ui: &mut Ui) {
                 mi(ui, app, "Fit", "canvas.fit", json!({}));
                 mi(ui, app, "Expand", "canvas.expand", json!({}));
                 ui.menu_button(tl!("Scale Drawing"), |ui| {
-                    for pct in [50, 75, 125, 150, 200] {
-                        mi(ui, app, &format!("{pct}%"), "canvas.scale", json!({"factor": pct as f32 / 100.0}));
-                    }
+                    crate::widgets::menu_items(ui, |ui| {
+                        for pct in [50, 75, 125, 150, 200] {
+                            mi(ui, app, &format!("{pct}%"), "canvas.scale", json!({"factor": pct as f32 / 100.0}));
+                        }
+                    })
                 });
             });
         });
@@ -220,29 +224,37 @@ pub(super) fn alt_text_group(ui: &mut Ui, app: &mut WordApp) {
 /// Shape Format › Shape Effects: Shadow, Glow and Soft Edges, each with presets and a "No …" entry.
 fn shape_effects_menu(ui: &mut Ui, app: &mut WordApp, theme: &[wordcraft_doc::Rgb], glow_size: Option<f32>) {
     ui.menu_button(tl!("Shadow"), |ui| {
-        mi(ui, app, "No Shadow", "shape.effects", json!({"shadow": null}));
-        ui.separator();
-        for (id, label) in wordcraft_doc::effects::SHADOW_PRESETS {
-            mi(ui, app, label, "shape.effects", json!({"shadow": id}));
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Shadow", "shape.effects", json!({"shadow": null}));
+            ui.separator();
+            for (id, label) in wordcraft_doc::effects::SHADOW_PRESETS {
+                mi(ui, app, label, "shape.effects", json!({"shadow": id}));
+            }
+        })
     });
     ui.menu_button(tl!("Glow"), |ui| {
-        mi(ui, app, "No Glow", "shape.effects", json!({"glow": null}));
-        ui.separator();
-        for size in [5.0, 8.0, 11.0, 18.0] {
-            mi(ui, app, &format!("{size} pt"), "shape.effects", json!({"glow": size}));
-        }
-        ui.separator();
-        ui.menu_button(tl!("Glow Colors"), |ui| {
-            let target = Target::at("shape.effects", json!({"glow": {"color": null, "size": glow_size.unwrap_or(8.0)}}), "/glow/color");
-            crate::colors::menu(ui, app, theme, target);
-        });
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Glow", "shape.effects", json!({"glow": null}));
+            ui.separator();
+            for size in [5.0, 8.0, 11.0, 18.0] {
+                mi(ui, app, &format!("{size} pt"), "shape.effects", json!({"glow": size}));
+            }
+            ui.separator();
+            ui.menu_button(tl!("Glow Colors"), |ui| {
+                crate::widgets::menu_items(ui, |ui| {
+                    let target = Target::at("shape.effects", json!({"glow": {"color": null, "size": glow_size.unwrap_or(8.0)}}), "/glow/color");
+                    crate::colors::menu(ui, app, theme, target);
+                })
+            });
+        })
     });
     ui.menu_button(tl!("Soft Edges"), |ui| {
-        mi(ui, app, "No Soft Edges", "shape.effects", json!({"softEdge": null}));
-        ui.separator();
-        for r in [1.0, 2.5, 5.0, 10.0, 25.0, 50.0] {
-            mi(ui, app, &format!("{r} pt"), "shape.effects", json!({"softEdge": r}));
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            mi(ui, app, "No Soft Edges", "shape.effects", json!({"softEdge": null}));
+            ui.separator();
+            for r in [1.0, 2.5, 5.0, 10.0, 25.0, 50.0] {
+                mi(ui, app, &format!("{r} pt"), "shape.effects", json!({"softEdge": r}));
+            }
+        })
     });
 }

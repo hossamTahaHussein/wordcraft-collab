@@ -117,9 +117,11 @@ fn gallery_pen(ui: &mut Ui, app: &mut WordApp, i: usize, pen: wordcraft_engine::
         let _ = app.run(pen_command(pen.kind), json!({"color": pen.color.hex(), "width": pen.width}));
     }
     resp.context_menu(|ui| {
-        if ui.button(tl!("Remove Pen")).clicked() {
-            let _ = app.run("draw.removePen", json!({"index": i}));
-            ui.close();
-        }
+        crate::widgets::menu_items(ui, |ui| {
+            if ui.button(tl!("Remove Pen")).clicked() {
+                let _ = app.run("draw.removePen", json!({"index": i}));
+                ui.close();
+            }
+        })
     });
 }

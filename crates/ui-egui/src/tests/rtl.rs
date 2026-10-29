@@ -419,3 +419,59 @@ fn a_mirrored_ribbon_scrolls_to_its_far_end() {
     }
     assert!(visible(&shapes, last), "the left chevron reaches the last group");
 }
+
+/// Mirrored icons keep their polygons' winding, so their edges feather outwards as left to right.
+#[test]
+fn mirrored_icon_polygons_keep_their_winding() {
+    fn areas(rtl: bool, name: &str) -> Vec<bool> {
+        let ctx = egui::Context::default();
+        craft_ui::direction::apply(&ctx, if rtl { craft_ui::direction::Direction::Rtl } else { craft_ui::direction::Direction::Ltr });
+        let r = egui::Rect::from_min_size(egui::pos2(100.0, 100.0), egui::vec2(20.0, 20.0));
+        let mut out =
+            ctx.run_ui(egui::RawInput::default(), |ui| crate::icons::paint(ui.painter(), r, name, egui::Color32::BLACK, egui::Color32::RED));
+        out.textures_delta.clear();
+        let mut signs = Vec::new();
+        for c in &out.shapes {
+            if let Shape::Path(p) = &c.shape
+                && p.closed
+                && p.points.len() > 2
+            {
+                let a: f32 = p.points.iter().zip(p.points.iter().cycle().skip(1)).map(|(a, b)| a.x * b.y - b.x * a.y).sum();
+                signs.push(a > 0.0);
+            }
+        }
+        signs
+    }
+    for name in ["bullets", "multilevel", "outdent", "indent"] {
+        let ltr = areas(false, name);
+        if !ltr.is_empty() {
+            assert_eq!(areas(true, name), ltr, "{name}");
+        }
+    }
+}
+
+/// A menu's items read from the right in a right-to-left interface.
+#[test]
+fn menu_items_read_from_the_right() {
+    for (lang, right) in [("ar", true), ("en", false)] {
+        let (mut app, ctx) = app_in(lang);
+        frame(&mut app, &ctx, 1280.0);
+        let more = ctx.read_response(crate::chrome::qat_menu_button_id()).expect("the … button");
+        let popup = egui::Popup::default_response_id(&more);
+        egui::Popup::open_id(&ctx, popup);
+        let shapes = frame(&mut app, &ctx, 1280.0);
+        let area = ctx.memory(|m| m.area_rect(popup)).expect("menu shown");
+        let labels: Vec<egui::Rect> = shapes
+            .iter()
+            // The menu's own text is clipped to the screen; the ribbon under it to its strips.
+            .filter(|c| c.clip_rect == ctx.content_rect())
+            .filter_map(|c| if let Shape::Text(t) = &c.shape { Some(t.visual_bounding_rect()) } else { None })
+            .filter(|r| area.contains_rect(*r) && r.width() > 12.0)
+            .collect();
+        assert!(!labels.is_empty(), "{lang}: menu labels");
+        for r in labels {
+            let near_right = area.max.x - r.max.x < r.min.x - area.min.x;
+            assert_eq!(near_right, right, "{lang}: {r:?} in {area:?}");
+        }
+    }
+}

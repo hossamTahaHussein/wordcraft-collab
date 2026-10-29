@@ -202,24 +202,26 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                         // Read only set by the page that embeds the editor: only it lifts it.
                         let locked = app.session.viewing_locked;
                         egui::Popup::menu(&mode).show(|ui| {
-                            if locked {
-                                ui.disable();
-                            }
-                            // Editing and Reviewing end Viewing first: tracking is a change Viewing refuses.
-                            if ui.selectable_label(!track && !viewing, tl!(tl!("Editing — edit the document directly"))).clicked() {
-                                let _ = app.run("view.viewing", json!({"value": false}));
-                                let _ = app.run("review.trackChanges", json!({"value": false}));
-                                ui.close();
-                            }
-                            if ui.selectable_label(track && !viewing, tl!(tl!("Reviewing — edits become suggestions"))).clicked() {
-                                let _ = app.run("view.viewing", json!({"value": false}));
-                                let _ = app.run("review.trackChanges", json!({"value": true}));
-                                ui.close();
-                            }
-                            if ui.selectable_label(viewing, tl!(tl!("Viewing — read without changing anything"))).clicked() {
-                                let _ = app.run("view.viewing", json!({"value": true}));
-                                ui.close();
-                            }
+                            crate::widgets::menu_items(ui, |ui| {
+                                if locked {
+                                    ui.disable();
+                                }
+                                // Editing and Reviewing end Viewing first: tracking is a change Viewing refuses.
+                                if ui.selectable_label(!track && !viewing, tl!(tl!("Editing — edit the document directly"))).clicked() {
+                                    let _ = app.run("view.viewing", json!({"value": false}));
+                                    let _ = app.run("review.trackChanges", json!({"value": false}));
+                                    ui.close();
+                                }
+                                if ui.selectable_label(track && !viewing, tl!(tl!("Reviewing — edits become suggestions"))).clicked() {
+                                    let _ = app.run("view.viewing", json!({"value": false}));
+                                    let _ = app.run("review.trackChanges", json!({"value": true}));
+                                    ui.close();
+                                }
+                                if ui.selectable_label(viewing, tl!(tl!("Viewing — read without changing anything"))).clicked() {
+                                    let _ = app.run("view.viewing", json!({"value": true}));
+                                    ui.close();
+                                }
+                            })
                         });
                         ui.add_space(4.0);
                         let comments_button = if plan.buttons == 0 {
@@ -287,7 +289,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             if resp.double_clicked() && tab != "File" {
                                 let _ = app.run("ui.collapseRibbon", json!({}));
                             }
-                            resp.context_menu(|ui| crate::widgets::customize_menu_items(ui, app));
+                            resp.context_menu(|ui| crate::widgets::menu_items(ui, |ui| crate::widgets::customize_menu_items(ui, app)));
                         }
                         let left_out: Vec<(&str, &str)> = tabs
                             .iter()
@@ -306,7 +308,8 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             ui.painter().text(
                                 r.center(),
                                 Align2::CENTER_CENTER,
-                                "»",
+                                // Pointing to the end of the strip, where the tabs went.
+                                if craft_ui::direction::is_rtl(ui) { "«" } else { "»" },
                                 medium(12.5),
                                 if holds_active { t.accent_text } else { t.text },
                             );
@@ -315,12 +318,14 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                             resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, more));
                             let resp = resp.on_hover_text(more);
                             egui::Popup::menu(&resp).show(|ui| {
-                                for (tab, shown) in left_out {
-                                    if ui.selectable_label(app.ui.tab == tab, shown).clicked() {
-                                        let _ = app.run("ui.tab", json!({"tab": tab}));
-                                        ui.close();
+                                crate::widgets::menu_items(ui, |ui| {
+                                    for (tab, shown) in left_out {
+                                        if ui.selectable_label(app.ui.tab == tab, shown).clicked() {
+                                            let _ = app.run("ui.tab", json!({"tab": tab}));
+                                            ui.close();
+                                        }
                                     }
-                                }
+                                })
                             });
                         }
                     });
@@ -343,7 +348,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                 ui.disable();
             }
             let bg = ui.interact(ui.max_rect(), ui.scope_id().with("ribbon_background"), Sense::click());
-            bg.context_menu(|ui| crate::widgets::customize_menu_items(ui, app));
+            bg.context_menu(|ui| crate::widgets::menu_items(ui, |ui| crate::widgets::customize_menu_items(ui, app)));
             let entry = user_tabs.iter().find(|e| e.name == app.ui.tab);
             crate::ribbon_fit::begin(ui.ctx(), &app.ui.tab, ui.available_width() - 4.0);
             // 0.37 keeps the scroll offset private: an edge-chevron click leaves a one-frame

@@ -206,8 +206,10 @@ pub fn split(
         return;
     }
     egui::Popup::menu(&aresp).show(|ui| {
-        ui.set_min_width(180.0);
-        menu(ui, app);
+        crate::widgets::menu_items(ui, |ui| {
+            ui.set_min_width(180.0);
+            menu(ui, app);
+        })
     });
 }
 
@@ -278,7 +280,9 @@ pub fn menu_button(ui: &mut Ui, app: &mut WordApp, options: MenuButtonOptions<'_
         return;
     }
     egui::Popup::menu(&resp).show(|ui| {
-        ui.set_min_width(200.0);
-        menu(ui, app);
+        crate::widgets::menu_items(ui, |ui| {
+            ui.set_min_width(200.0);
+            menu(ui, app);
+        })
     });
 }

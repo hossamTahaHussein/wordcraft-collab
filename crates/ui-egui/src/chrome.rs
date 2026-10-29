@@ -94,8 +94,10 @@ fn quick_access(ui: &mut Ui, app: &mut WordApp) {
     icons::paint(ui.painter(), Rect::from_center_size(r.center(), vec2(16.0, 16.0)), "more", t.icon, t.accent);
     let resp = resp.on_hover_text(tl!("Customize Quick Access Toolbar"));
     egui::Popup::menu(&resp).show(|ui| {
-        ui.set_min_width(220.0);
-        qat_menu(ui, app);
+        crate::widgets::menu_items(ui, |ui| {
+            ui.set_min_width(220.0);
+            qat_menu(ui, app);
+        })
     });
 }
 
@@ -144,7 +146,7 @@ fn undo_list_button(ui: &mut Ui, app: &mut WordApp, enabled: bool) {
     let c = if enabled { t.icon } else { t.text_disabled };
     icons::paint(ui.painter(), Rect::from_center_size(r.center(), vec2(9.0, 9.0)), "dropdown", c, c);
     let resp = resp.on_hover_text(tl!("Undo History"));
-    egui::Popup::menu(&resp).show(|ui| undo_list(ui, app));
+    egui::Popup::menu(&resp).show(|ui| crate::widgets::menu_items(ui, |ui| undo_list(ui, app)));
 }
 
 /// The Undo list (#701): recent steps, newest first. Hovering a row highlights it and every newer
@@ -645,8 +647,10 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                 let tip = dictionary_problem(&lang, &unreadable, missing).unwrap_or_else(|| tl!("Language").to_string());
                 let resp = st(ui, &shown).on_hover_text(tip);
                 egui::Popup::menu(&resp).show(|ui| {
-                    ui.set_min_width(200.0);
-                    crate::ribbon::language_menu(ui, app);
+                    crate::widgets::menu_items(ui, |ui| {
+                        ui.set_min_width(200.0);
+                        crate::ribbon::language_menu(ui, app);
+                    })
                 });
                 if app.session.doc.settings.track_changes {
                     st(ui, tl!("Track Changes: On"));

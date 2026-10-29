@@ -272,6 +272,9 @@ impl WordApp {
         if self.applied_theme != Some(effective) {
             theme::apply(ctx, effective);
             self.applied_theme = Some(effective);
+            // The same frame keeps the interface's direction, whatever the theme installed.
+            let dir = craft_ui::direction::resolve(i18n::Lang::from_pref(&self.ui.language).code(), craft_ui::direction::Setting::Language);
+            craft_ui::direction::apply(ctx, dir);
         }
         // Interface size (#475, #822): egui's zoom factor multiplies the display scale the system
         // reports (native pixels per point). Auto keeps that scale; a chosen size divides it back

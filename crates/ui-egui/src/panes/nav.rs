@@ -170,7 +170,10 @@ pub(super) fn nav_heading(ui: &mut Ui, level: u8, text: &str, selected: bool, co
             let col = ui.visuals().text_color();
             // Collapsed, it points along the reading direction (left, right to left).
             let f = craft_ui::direction::forward(ui);
-            let pts = if c {
+            // Mirrored, the points go the other way round, keeping the triangle's winding.
+            let pts = if c && f < 0.0 {
+                vec![ctr + vec2(2.5, 4.0), ctr + vec2(2.5, -4.0), ctr + vec2(-3.0, 0.0)]
+            } else if c {
                 vec![ctr + vec2(-2.5 * f, -4.0), ctr + vec2(-2.5 * f, 4.0), ctr + vec2(3.0 * f, 0.0)]
             } else {
                 vec![ctr + vec2(-4.0, -2.5), ctr + vec2(4.0, -2.5), ctr + vec2(0.0, 3.0)]

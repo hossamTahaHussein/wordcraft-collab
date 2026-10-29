@@ -157,7 +157,7 @@ fn color_field(ui: &mut Ui, theme: &[Rgb], id: Id, c: &mut Rgb) -> bool {
         let (r, _) = ui.allocate_exact_size(vec2(18.0, 14.0), Sense::hover());
         ui.painter().rect_filled(r, 2.0, crate::theme::c32(*c));
         ui.painter().rect_stroke(r, 2.0, Stroke::new(1.0, Tokens::get(ui.ctx()).border), egui::StrokeKind::Inside);
-        ui.menu_button("▾", |ui| crate::colors::field_menu(ui, theme, id, &mut hex));
+        ui.menu_button("▾", |ui| crate::widgets::menu_items(ui, |ui| crate::colors::field_menu(ui, theme, id, &mut hex)));
     });
     match Rgb::parse(&hex) {
         Some(n) if n != *c => {
@@ -220,10 +220,12 @@ fn gradient(app: &mut WordApp, ui: &mut Ui, theme: &[Rgb], g: &Gradient) {
         egui::Grid::new("format_shape.gradient").num_columns(2).spacing(vec2(8.0, 6.0)).show(ui, |ui| {
             ui.label(tl!("Preset gradients"));
             ui.menu_button("▾", |ui| {
-                if let Some(f) = presets_gallery(ui, theme) {
-                    apply(app, ui, Some(&f), None);
-                    ui.close();
-                }
+                crate::widgets::menu_items(ui, |ui| {
+                    if let Some(f) = presets_gallery(ui, theme) {
+                        apply(app, ui, Some(&f), None);
+                        ui.close();
+                    }
+                })
             });
             ui.end_row();
 
@@ -249,10 +251,12 @@ fn gradient(app: &mut WordApp, ui: &mut Ui, theme: &[Rgb], g: &Gradient) {
             if t != 3 {
                 ui.label(tl!("Direction"));
                 ui.menu_button("▾", |ui| {
-                    if let Some(kind) = directions(ui, g, t) {
-                        apply(app, ui, Some(&with(g, |g| set_kind(g, kind))), None);
-                        ui.close();
-                    }
+                    crate::widgets::menu_items(ui, |ui| {
+                        if let Some(kind) = directions(ui, g, t) {
+                            apply(app, ui, Some(&with(g, |g| set_kind(g, kind))), None);
+                            ui.close();
+                        }
+                    })
                 });
                 ui.end_row();
             }
