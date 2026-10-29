@@ -54,7 +54,9 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
     }
     route_f6(app, ui.ctx());
     let states: Vec<(Pane, PaneState)> = open.iter().map(|pane| (*pane, pane_state(app, *pane))).collect();
+    // Right to left the reading start (where the Navigation pane docks) is the right.
     let out = PaneHost::new(app.window_id(HOST))
+        .rtl(craft_ui::direction::is_rtl(ui))
         .policy(SidePolicy::Columns)
         .f6(false)
         .labels(labels())

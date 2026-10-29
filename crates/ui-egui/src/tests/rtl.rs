@@ -124,3 +124,27 @@ fn group_dialog_launchers_sit_in_the_bottom_left_corner() {
         crate::widgets::LAUNCHERS.with(|l| l.borrow().iter().rev().find(|(id, _, _)| id == "Font").map(|(_, a, b)| (*a, *b))).expect("Font launcher");
     assert!(launcher.center().x < row.center().x, "at the group's left: {launcher:?} in {row:?}");
 }
+
+#[test]
+fn docked_panes_open_on_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("view.navigationPane", serde_json::json!({"value": true})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let nav = text_rect(&shapes, crate::tl!("Navigation")).expect("pane title");
+    assert!(nav.center().x > 900.0, "the Navigation pane docks at the reading start, the right: {nav:?}");
+    let (mut app, ctx) = app_in("en");
+    app.run("view.navigationPane", serde_json::json!({"value": true})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    assert!(text_rect(&shapes, "Navigation").unwrap().center().x < 400.0, "English unchanged");
+}
+
+#[test]
+fn the_file_page_menu_is_on_the_right() {
+    let (mut app, ctx) = app_in("ar");
+    app.run("ui.backstage", serde_json::json!({"value": true, "page": "home"})).unwrap();
+    let shapes = frame(&mut app, &ctx, 1280.0);
+    let open = text_rect(&shapes, crate::tl!("Open")).expect("Open in the File menu");
+    assert!(open.center().x > 1080.0, "{open:?}");
+    // As in English 52 pt from the menu's left edge (the icon before it), 52 pt from its right.
+    assert!((open.max.x - (1280.0 - 52.0)).abs() < 2.0, "the label reads from the menu's right edge: {open:?}");
+}

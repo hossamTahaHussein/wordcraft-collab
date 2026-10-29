@@ -39,7 +39,11 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
         app.ui.backstage_page = "home".into();
     }
     let mac = app.integrated_titlebar;
-    egui::Panel::left("backstage_nav")
+    // Right to left the menu is at the right, and reads from its right edge.
+    let rtl = craft_ui::direction::is_rtl(ui);
+    let from_start = |r: Rect, d: f32| if rtl { r.max.x - d } else { r.min.x + d };
+    let text_align = craft_ui::direction::align2(ui, Align2::LEFT_CENTER);
+    craft_ui::direction::start_panel(ui, "backstage_nav")
         .exact_size(200.0)
         // Fixed width, as in Word: without this egui shows a resize handle that does nothing (#502).
         .resizable(false)
@@ -63,9 +67,11 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                 // the row reads as plain sidebar background next to it, so clicking there must
                 // not also close the File page, same as the macOS chevron fix (#2972) below.
                 let (r, _) = ui.allocate_exact_size(vec2(200.0, 40.0), Sense::hover());
-                let c = pos2(r.min.x + 26.0, r.center().y);
+                let c = pos2(from_start(r, 26.0), r.center().y);
                 let resp = ui.interact(Rect::from_center_size(c, vec2(22.0, r.height())), ui.scope_id().with("backstage_back"), Sense::click());
-                icons::paint(ui.painter(), Rect::from_center_size(c, vec2(18.0, 18.0)), "chevronLeft", egui::Color32::WHITE, egui::Color32::WHITE);
+                // Back points to the reading start.
+                let chevron = if rtl { "chevronRight" } else { "chevronLeft" };
+                icons::paint(ui.painter(), Rect::from_center_size(c, vec2(18.0, 18.0)), chevron, egui::Color32::WHITE, egui::Color32::WHITE);
                 resp
             };
             // Escape in the built-in file browser closes only the browser.
@@ -86,10 +92,10 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     ui.painter().rect_filled(r, 0.0, egui::Color32::from_white_alpha(26));
                 }
                 let ink = if on { egui::Color32::WHITE } else { egui::Color32::from_white_alpha(110) };
-                icons::paint(ui.painter(), Rect::from_center_size(pos2(r.min.x + 31.0, r.center().y), vec2(18.0, 18.0)), icon, ink, ink);
+                icons::paint(ui.painter(), Rect::from_center_size(pos2(from_start(r, 31.0), r.center().y), vec2(18.0, 18.0)), icon, ink, ink);
                 ui.painter().text(
-                    pos2(r.min.x + 52.0, r.center().y),
-                    Align2::LEFT_CENTER,
+                    pos2(from_start(r, 52.0), r.center().y),
+                    text_align,
                     tl!(label),
                     if active { semibold(14.0) } else { medium(14.0) },
                     ink,
@@ -130,7 +136,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     if resp.hovered() {
                         ui.painter().rect_filled(r, 0.0, egui::Color32::from_white_alpha(26));
                     }
-                    ui.painter().text(pos2(r.min.x + 22.0, r.center().y), Align2::LEFT_CENTER, tl!(label), regular(13.0), egui::Color32::WHITE);
+                    ui.painter().text(pos2(from_start(r, 22.0), r.center().y), text_align, tl!(label), regular(13.0), egui::Color32::WHITE);
                     if resp.clicked() {
                         if id == "discord" {
                             let _ = app.run("ui.discord", json!({}));
