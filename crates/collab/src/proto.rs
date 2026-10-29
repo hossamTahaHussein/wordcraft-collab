@@ -1,0 +1,211 @@
+//! The messages between a replica and the relay (see the co-editing spec, §3 and §8). Each is a
+//! JSON object whose `t` names its type; field names are camelCase. The host page carries them
+//! as strings, so a replica only ever sees `decode_inbound` and `serde_json::to_string`.
+
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use wordcraft_doc::StoryRef;
+use wordcraft_engine::RunCtx;
+
+/// The largest message that isn't a snapshot, in bytes.
+pub const MAX_OP_BYTES: usize = 256 * 1024;
+/// The largest message carrying a snapshot (`Welcome`, `Resync`), in bytes.
+pub const MAX_SNAPSHOT_BYTES: usize = 50 * 1024 * 1024;
+
+/// A selection as story offsets (`wordcraft_doc::offsets`).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Anchor {
+    pub story: StoryRef,
+    pub anchor: usize,
+    pub head: usize,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum OpKind {
+    #[default]
+    Cmd,
+    Undo,
+    Redo,
+    Restore,
+}
+
+/// One edit: a command, the selection it ran at and the context it ran under.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Op {
+    /// The replica that made it.
+    pub client: String,
+    /// Its number among that replica's edits.
+    pub seq: u64,
+    /// The last relay revision its replica had applied.
+    pub base: u64,
+    pub kind: OpKind,
+    pub cmd: String,
+    #[serde(default)]
+    pub params: Value,
+    pub sel: Anchor,
+    pub ctx: RunCtx,
+    /// Set by the relay: the edit's place in the document's history.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rev: Option<u64>,
+    /// Set by the relay: who made it (the join token's name).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user: Option<String>,
+}
+
+/// Relay → replica.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "t")]
+pub enum Inbound {
+    /// After joining: the document at `rev` (a native JSON snapshot, or none when this is the
+    /// first person and their editor provides the document), the edits after it, and this
+    /// replica's client id.
+    Welcome {
+        rev: u64,
+        snapshot: Option<String>,
+        ops: Vec<Op>,
+        you: String,
+    },
+    Op(Box<Op>),
+    /// Upload a snapshot of the confirmed document.
+    SnapshotRequest,
+    /// Start again from this snapshot and the edits after it.
+    Resync {
+        rev: u64,
+        snapshot: String,
+        ops: Vec<Op>,
+    },
+    /// Save the document now (autosave).
+    Save,
+}
+
+/// Replica → relay.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "t")]
+pub enum Outbound {
+    Op(Box<Op>),
+    /// The confirmed document's fingerprint at `rev` (`hash::doc_hash`).
+    Hash {
+        rev: u64,
+        h: String,
+    },
+    Snapshot {
+        rev: u64,
+        doc: String,
+    },
+    Saved {
+        rev: u64,
+    },
+    /// This replica missed edits after `have`.
+    ResyncRequest {
+        have: u64,
+    },
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ProtoError {
+    #[error("message too large: {size} bytes (limit {limit})")]
+    TooLarge { size: usize, limit: usize },
+    #[error("bad message: {0}")]
+    Json(#[from] serde_json::Error),
+}
+
+/// Parse a relay message, refusing one over its size limit.
+pub fn decode_inbound(json: &str) -> Result<Inbound, ProtoError> {
+    if json.len() > MAX_SNAPSHOT_BYTES {
+        return Err(ProtoError::TooLarge { size: json.len(), limit: MAX_SNAPSHOT_BYTES });
+    }
+    let message: Inbound = serde_json::from_str(json)?;
+    let carries_snapshot = matches!(message, Inbound::Welcome { .. } | Inbound::Resync { .. });
+    if !carries_snapshot && json.len() > MAX_OP_BYTES {
+        return Err(ProtoError::TooLarge { size: json.len(), limit: MAX_OP_BYTES });
+    }
+    Ok(message)
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+    use wordcraft_doc::StoryRef;
+    use wordcraft_engine::RunCtx;
+
+    use super::*;
+
+    fn op() -> Op {
+        Op {
+            client: "c1".into(),
+            seq: 42,
+            base: 1187,
+            kind: OpKind::Cmd,
+            cmd: "text.insert".into(),
+            params: json!({"text": "a"}),
+            sel: Anchor { story: StoryRef::Body, anchor: 5120, head: 5120 },
+            ctx: RunCtx { author: "Jane Doe".into(), ..RunCtx::default() },
+            rev: None,
+            user: None,
+        }
+    }
+
+    #[test]
+    fn op_round_trips_json() {
+        let text = serde_json::to_string(&Outbound::Op(Box::new(op()))).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        assert_eq!(v["t"], "Op");
+        assert_eq!(v["cmd"], "text.insert");
+        assert_eq!(v["sel"]["anchor"], 5120);
+        assert_eq!(v["ctx"]["author"], "Jane Doe");
+        let back = decode_inbound(&text).unwrap();
+        assert_eq!(back, Inbound::Op(Box::new(op())));
+    }
+
+    #[test]
+    fn relay_stamped_op_keeps_rev_and_user() {
+        let mut v = serde_json::to_value(Outbound::Op(Box::new(op()))).unwrap();
+        v["rev"] = json!(1188);
+        v["user"] = json!("Jane Doe");
+        let Inbound::Op(o) = decode_inbound(&v.to_string()).unwrap() else { panic!("not an op") };
+        assert_eq!((o.rev, o.user.as_deref()), (Some(1188), Some("Jane Doe")));
+    }
+
+    #[test]
+    fn welcome_and_resync_decode() {
+        let w = decode_inbound(r#"{"t":"Welcome","rev":3,"snapshot":null,"ops":[],"you":"c1"}"#).unwrap();
+        assert_eq!(w, Inbound::Welcome { rev: 3, snapshot: None, ops: vec![], you: "c1".into() });
+        assert_eq!(decode_inbound(r#"{"t":"Save"}"#).unwrap(), Inbound::Save);
+        assert_eq!(decode_inbound(r#"{"t":"SnapshotRequest"}"#).unwrap(), Inbound::SnapshotRequest);
+        let r = decode_inbound(r#"{"t":"Resync","rev":9,"snapshot":"{}","ops":[]}"#).unwrap();
+        assert!(matches!(r, Inbound::Resync { rev: 9, .. }));
+    }
+
+    #[test]
+    fn outbound_messages_have_their_tags() {
+        let t = |m: &Outbound| serde_json::to_value(m).unwrap()["t"].as_str().unwrap().to_string();
+        assert_eq!(t(&Outbound::Hash { rev: 50, h: "ab".into() }), "Hash");
+        assert_eq!(t(&Outbound::Snapshot { rev: 1, doc: "{}".into() }), "Snapshot");
+        assert_eq!(t(&Outbound::Saved { rev: 1 }), "Saved");
+        assert_eq!(serde_json::to_value(Outbound::ResyncRequest { have: 7 }).unwrap(), json!({"t": "ResyncRequest", "have": 7}));
+    }
+
+    #[test]
+    fn oversized_op_rejected() {
+        let mut o = op();
+        o.params = json!({"text": "x".repeat(MAX_OP_BYTES)});
+        let text = serde_json::to_string(&Outbound::Op(Box::new(o))).unwrap();
+        assert!(matches!(decode_inbound(&text), Err(ProtoError::TooLarge { .. })));
+    }
+
+    #[test]
+    fn large_snapshot_is_allowed_up_to_its_own_limit() {
+        let doc = "x".repeat(MAX_OP_BYTES * 2);
+        let text = serde_json::json!({"t": "Resync", "rev": 1, "snapshot": doc, "ops": []}).to_string();
+        assert!(decode_inbound(&text).is_ok());
+    }
+
+    #[test]
+    fn unknown_type_is_error() {
+        assert!(matches!(decode_inbound(r#"{"t":"Nope"}"#), Err(ProtoError::Json(_))));
+        assert!(matches!(decode_inbound("not json"), Err(ProtoError::Json(_))));
+    }
+}
