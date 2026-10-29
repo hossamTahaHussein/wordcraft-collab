@@ -110,7 +110,7 @@ pub(super) fn mi_icon(ui: &mut Ui, app: &mut WordApp, icon: &str, label: &str, i
 pub(super) fn mi_text(ui: &mut Ui, app: &mut WordApp, text: &str, id: &str, params: Value) {
     let sc = crate::widgets::shortcut_text(app, id);
     let enabled = crate::widgets::enabled(app, id);
-    let resp = ui.add_enabled(enabled, egui::Button::new(text).shortcut_text(sc).min_size(vec2(200.0, 0.0)));
+    let resp = ui.add_enabled(enabled, crate::widgets::shortcut_button(ui, text, sc).min_size(vec2(200.0, 0.0)));
     if resp.clicked() {
         crate::widgets::run_from_ribbon(app, id, params);
         ui.close();

@@ -1462,6 +1462,7 @@ mod offline_tests {
         assert!(s.run("text.insert", &json!({"text": "!"})).is_ok(), "editing offline is fine for a while");
         let out = super::edits_only(link.tick(&mut s, 1000.0 + OFFLINE_LIMIT_MS));
         assert!(link.offline_locked());
+        assert!(!link.online());
         assert!(s.run("text.insert", &json!({"text": "?"})).is_err());
         assert_eq!(link.take_note().as_deref(), Some("Reconnecting…"));
         link.on_message(r#"{"t":"Connection","online":true}"#, &mut s);

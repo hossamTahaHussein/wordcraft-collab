@@ -66,6 +66,17 @@ pub(crate) fn menu_items<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> R {
     ui.with_layout(egui::Layout::top_down_justified(egui::Align::Max), add).inner
 }
 
+/// A menu item's button with its keyboard shortcut at the far side: right to left the label
+/// sits at the right and the shortcut at the left, as in a mirrored Word.
+pub(crate) fn shortcut_button<'a>(ui: &Ui, label: impl Into<egui::WidgetText>, shortcut: impl Into<String>) -> egui::Button<'a> {
+    let shortcut = shortcut.into();
+    if craft_ui::direction::is_rtl(ui) {
+        egui::Button::new(label.into()).left_text(egui::RichText::new(shortcut).weak())
+    } else {
+        egui::Button::new(label.into()).shortcut_text(shortcut)
+    }
+}
+
 /// A top-aligned row in reading order (a ribbon group's controls, a gallery's thumbnails).
 pub(crate) fn row_top(ui: &Ui) -> egui::Layout {
     if craft_ui::direction::is_rtl(ui) { egui::Layout::right_to_left(egui::Align::Min) } else { egui::Layout::left_to_right(egui::Align::Min) }

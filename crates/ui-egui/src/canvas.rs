@@ -1220,7 +1220,9 @@ fn finish_canvas_frame(finish: CanvasFinish<'_>, out: egui::scroll_area::ScrollA
                 let width_id = ui.scope_id().with("context_menu_width");
                 let width = ui.data(|d| d.get_temp::<f32>(width_id)).filter(|_| !ui.is_sizing_pass());
                 let size = egui::vec2(width.unwrap_or(ui.available_width()), ui.available_height());
-                let rect = egui::Rect::from_min_size(ui.cursor().min, size);
+                // Right to left the panel hangs from the toolbar's right edge, its reading start.
+                let left = if craft_ui::direction::is_rtl(ui) { ui.max_rect().right() - size.x } else { ui.cursor().min.x };
+                let rect = egui::Rect::from_min_size(egui::pos2(left, ui.cursor().min.y), size);
                 let panel = ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
                     egui::Frame::popup(ui.style()).show(ui, |ui| context_menu(app, ui)).response.rect.width()
                 });

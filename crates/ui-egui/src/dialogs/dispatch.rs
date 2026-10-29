@@ -1033,7 +1033,7 @@ fn commands_dialog(app: &mut WordApp, ui: &mut Ui, d: &mut Dialog) -> bool {
     for c in &hits {
         let sc = crate::widgets::shortcut_text(app, c.id);
         let label = format!("{}   —   {}", tl!(c.label), crate::i18n::location(c.location));
-        if ui.add(egui::Button::new(label).shortcut_text(sc).min_size(vec2(380.0, 0.0))).clicked() {
+        if ui.add(crate::widgets::shortcut_button(ui, label, sc).min_size(vec2(380.0, 0.0))).clicked() {
             run = Some(c.id);
         }
     }
