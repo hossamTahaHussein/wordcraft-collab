@@ -276,4 +276,48 @@ fn a_suggester_only_suggests() {
     for id in ["review.trackChanges", "review.acceptAll", "review.reject"] {
         assert!(matches!(s.run(id, &json!({"value": false})), Err(CmdError::Disabled(m)) if m.contains("only suggest")), "{id}");
     }
+    // Changes Track Changes doesn't record would be real edits for everyone.
+    for (id, params) in [
+        ("layout.margins", json!({"top": 2})),
+        ("review.restrict", json!({"mode": "none", "stop": true})),
+        ("insert.table", json!({"rows": 2, "cols": 2})),
+    ] {
+        assert!(matches!(s.run(id, &params), Err(CmdError::Disabled(m)) if m.contains("only suggest")), "{id}");
+    }
+    s.run("review.newComment", &json!({"text": "A note"})).unwrap();
+}
+
+/// Each command a suggester may run is one Reject All takes back whole: a suggestion.
+#[test]
+fn every_suggester_command_is_a_suggestion() {
+    use crate::outbox::SUGGEST_COMMANDS;
+    let params = |id: &str| match id {
+        "text.insert" => json!({"text": "new "}),
+        "edit.replace" | "edit.replaceAll" => json!({"text": "o", "with": "0"}),
+        "insert.symbol" => json!({"char": "★"}),
+        "format.color" => json!({"color": "FF0000"}),
+        "format.highlight" => json!({"value": "yellow"}),
+        "format.font" => json!({"name": "Arial"}),
+        "format.size" => json!({"size": 20}),
+        "format.underline" => json!({"value": "single"}),
+        "format.changeCase" => json!({"mode": "upper"}),
+        "format.charStyle" => json!({"style": "Strong"}),
+        "format.spacing" | "format.position" => json!({"points": 2}),
+        "format.scale" => json!({"percent": 150}),
+        _ if id.starts_with("format.") => json!({"value": true}),
+        _ => json!({}),
+    };
+    for id in SUGGEST_COMMANDS {
+        let mut s = Session::new(wordcraft_doc::Document::new());
+        s.run("text.insert", &json!({"text": "Hello world"})).unwrap();
+        s.run("select.all", &json!({})).unwrap();
+        s.run("edit.copy", &json!({})).unwrap();
+        s.run("caret.docStart", &json!({})).unwrap();
+        s.run("select.word", &json!({})).unwrap();
+        let before = serde_json::to_value(&s.doc.body).unwrap();
+        s.doc.settings.track_changes = true;
+        s.run(id, &params(id)).unwrap_or_else(|e| panic!("{id}: {e}"));
+        s.run("review.rejectAll", &json!({})).unwrap();
+        assert_eq!(serde_json::to_value(&s.doc.body).unwrap(), before, "{id}: Reject All takes it back");
+    }
 }

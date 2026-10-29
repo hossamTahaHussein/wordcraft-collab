@@ -188,3 +188,40 @@ fn a_run_of_typing_is_one_undo() {
     relay.settle(&mut [&mut a, &mut b]);
     assert_eq!(b.text(), "Start two words.");
 }
+
+/// A resync from the stored snapshot (older than the replica's rev) replays an undo whose
+/// target is in the replayed tail.
+#[test]
+fn resync_from_older_snapshot_replays_undo() {
+    let mut relay = Relay::new(doc_with("x"));
+    let base = relay.base.clone();
+    let mut a = Peer::join("a", "Ann", &relay);
+    let mut b = Peer::join("b", "Bob", &relay);
+    end(&mut a);
+    a.type_text("y");
+    relay.settle(&mut [&mut a, &mut b]);
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a, &mut b]);
+    assert_eq!(a.confirmed_text(), "x");
+    assert_eq!(b.confirmed_text(), "x");
+    // b is resynced from the stored snapshot at rev 0 with the log after it.
+    let tail = relay.log.clone();
+    b.replica.resume(0, Some((base.clone(), Vec::new())), tail, None, &mut b.visible).unwrap();
+    assert_eq!(b.confirmed_text(), "x", "after resync b must still have the undo applied");
+}
+
+/// Same for the undoer itself.
+#[test]
+fn resync_of_the_undoer() {
+    let mut relay = Relay::new(doc_with("x"));
+    let base = relay.base.clone();
+    let mut a = Peer::join("a", "Ann", &relay);
+    end(&mut a);
+    a.type_text("y");
+    relay.settle(&mut [&mut a]);
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a]);
+    let tail = relay.log.clone();
+    a.replica.resume(0, Some((base.clone(), Vec::new())), tail, None, &mut a.visible).unwrap();
+    assert_eq!(a.confirmed_text(), "x", "after resync a must still have the undo applied");
+}

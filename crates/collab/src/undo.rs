@@ -46,10 +46,13 @@ impl UndoLog {
         UndoLog { checkpoints: VecDeque::from([(rev, doc.clone())]), entries: VecDeque::new(), excluded: BTreeSet::new() }
     }
 
-    /// The same edits undone, from a new starting document (after a resync).
+    /// Start again from a new document (after a resync). What was undone is forgotten too: the
+    /// snapshot already holds the undos up to `rev`, and the edits replayed after it (undos
+    /// included) set the rest again.
     pub fn restart(&mut self, rev: u64, doc: &Document) {
         self.checkpoints = VecDeque::from([(rev, doc.clone())]);
         self.entries.clear();
+        self.excluded.clear();
     }
 
     /// The oldest revision an undo can reach is the one after this.

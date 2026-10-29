@@ -35,6 +35,59 @@ pub const COLLAB_UNDO: &[&str] = &["edit.undo", "edit.redo"];
 /// What a suggester may not do: decide on suggestions, or put back a whole version.
 pub const SUGGESTER_REFUSED: &[&str] = &["review.accept", "review.acceptAll", "review.reject", "review.rejectAll"];
 
+/// What a suggester may change besides comments (the relay's `suggest-commands.json`): the
+/// commands whose whole effect Track Changes records, so Reject All takes it back.
+pub const SUGGEST_COMMANDS: &[&str] = &[
+    "text.insert",
+    "text.backspace",
+    "text.delete",
+    "text.deleteWordBack",
+    "text.deleteWordForward",
+    "text.newParagraph",
+    "text.lineBreak",
+    "text.tab",
+    "text.insertTab",
+    "text.nbsp",
+    "text.nbHyphen",
+    "text.optionalHyphen",
+    "text.emDash",
+    "text.ellipsis",
+    "text.copyright",
+    "text.registered",
+    "text.trademark",
+    "text.columnBreak",
+    "text.pageBreak",
+    "edit.cut",
+    "edit.paste",
+    "edit.pasteText",
+    "edit.replace",
+    "edit.replaceAll",
+    "insert.symbol",
+    "insert.pageBreak",
+    "insert.dateTime",
+    "format.bold",
+    "format.italic",
+    "format.underline",
+    "format.strikethrough",
+    "format.doubleStrikethrough",
+    "format.subscript",
+    "format.superscript",
+    "format.color",
+    "format.highlight",
+    "format.font",
+    "format.size",
+    "format.growFont",
+    "format.shrinkFont",
+    "format.allCaps",
+    "format.smallCaps",
+    "format.hidden",
+    "format.changeCase",
+    "format.charStyle",
+    "format.spacing",
+    "format.position",
+    "format.scale",
+];
+
 /// What a commenter may change while co-editing (the relay's `comment-commands.json`).
 pub const COMMENT_COMMANDS: &[&str] = &["review.newComment", "review.reply", "review.editComment", "review.deleteComment", "review.resolveComment"];
 
@@ -209,7 +262,9 @@ impl Session {
         if !mutates || !person {
             return run(self);
         }
-        if self.collab.role == CollabRole::Suggest && SUGGESTER_REFUSED.contains(&id) {
+        if self.collab.role == CollabRole::Suggest
+            && (SUGGESTER_REFUSED.contains(&id) || !(SUGGEST_COMMANDS.contains(&id) || COMMENT_COMMANDS.contains(&id)))
+        {
             return Err(CmdError::Disabled(format!("{id}: You can only suggest changes in this document")));
         }
         if self.collab.role == CollabRole::Comment && !COMMENT_COMMANDS.contains(&id) {
