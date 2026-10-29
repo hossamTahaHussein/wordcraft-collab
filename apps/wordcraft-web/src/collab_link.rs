@@ -1117,3 +1117,39 @@ mod api_tests {
         assert!(link.take_edited_by().is_empty(), "taken once");
     }
 }
+
+#[cfg(test)]
+mod viewing_replay_tests {
+    use serde_json::json;
+    use wordcraft_doc::{Document, StoryRef};
+    use wordcraft_engine::Session;
+
+    use super::CollabLink;
+
+    /// Edits made before Viewing was turned on, still waiting for the relay, survive another
+    /// person's edit arriving: they are replayed, not refused as new edits.
+    #[test]
+    fn viewing_keeps_this_persons_unconfirmed_edits() {
+        let mut base = Session::new(Document::new());
+        base.run("text.insert", &json!({"text": "Hello"})).unwrap();
+        let snap = String::from_utf8(wordcraft_engine::io::save_bytes("d.json", &base.doc).unwrap()).unwrap();
+        let mut link = CollabLink::new(None);
+        let mut s = Session::new(Document::new());
+        link.on_message(&json!({"t": "Welcome", "rev": 0, "snapshot": snap, "ops": [], "you": "me", "peers": [{"client": "a", "user": "Ann", "color": 1}]}).to_string(), &mut s);
+        link.tick(&mut s, 0.0);
+        s.run("caret.docEnd", &json!({})).unwrap();
+        for t in [" a", " b", " c"] {
+            s.run("text.insert", &json!({"text": t})).unwrap();
+            link.tick(&mut s, 1.0);
+        }
+        s.run("view.viewing", &json!({"value": true})).unwrap();
+        // Ann types at the start before the relay confirms anything of ours.
+        let ann = json!({"t": "Op", "client": "a", "seq": 1, "base": 0, "kind": "cmd", "cmd": "text.insert", "params": {"text": ">"},
+            "sel": {"story": "body", "anchor": 0, "head": 0}, "ctx": {}, "rev": 1});
+        link.on_message(&ann.to_string(), &mut s);
+        link.tick(&mut s, 2.0);
+        assert_eq!(s.doc.plain_text(StoryRef::Body), ">Hello a b c");
+        assert!(s.viewing, "still viewing");
+        assert!(link.take_note().is_none(), "nothing reported as dropped");
+    }
+}

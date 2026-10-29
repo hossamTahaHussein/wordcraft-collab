@@ -411,6 +411,8 @@ impl Replica {
         self.scratch.doc = before;
         visible.doc = self.confirmed.doc.clone();
         visible.set_recording(false);
+        // Edits made before Viewing was turned on are replayed, not refused as new ones.
+        let viewing = std::mem::replace(&mut visible.viewing, false);
         let mut kept = VecDeque::new();
         let mut dropped = 0;
         for (i, mut op) in std::mem::take(&mut self.pending).into_iter().enumerate() {
@@ -438,6 +440,7 @@ impl Replica {
             }
         }
         visible.set_recording(true);
+        visible.viewing = viewing;
         self.pending = kept;
         if let Some(a) = caret {
             let moved = crate::mapping::diff_near(&linear_text(&old_visible, a.story), &linear_text(&visible.doc, a.story), a.story, hint);
