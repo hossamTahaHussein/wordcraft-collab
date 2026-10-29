@@ -73,6 +73,14 @@ pub fn specs() -> Vec<CommandSpec> {
         CommandSpec::new("view.zoom", "Zoom", "View › Zoom", zoom)
             .params(r#"{"value": percent (10-500) | "pageWidth" | "onePage" | "multiplePages"}"#)
             .pure(),
+        CommandSpec::new("view.viewing", "Viewing", "Editing mode", |s, v| {
+            if let Some(on) = v.get("value").and_then(Value::as_bool) {
+                s.viewing = on;
+            }
+            Ok(json!({"viewing": s.viewing}))
+        })
+        .params(r#"{"value"?: bool} → {"viewing": bool} (read only for this person: edits are refused)"#)
+        .pure(),
         CommandSpec::new("view.zoom100", "100%", "View › Zoom", |s, _| zoom(s, &json!({"value": 100}))).pure(),
         CommandSpec::new("view.zoomIn", "Zoom In", "View › Zoom", |s, _| {
             let z = ((s.view.zoom * 10.0).round() / 10.0 + 0.1).min(5.0);

@@ -11109,3 +11109,30 @@ fn scale_font_sizes_reaches_char_table_and_cs_sizes_and_unset_default() {
     assert_eq!(grid.header_chr.size, Some(16.0));
     assert_eq!(grid.regions.get(&TablePart::Band2Horz).unwrap().chr.size, Some(10.0));
 }
+
+/// Viewing (the JavaScript API's read-only mode, Word's Editing › Viewing): this person's edits
+/// are refused, reading, selecting, viewing and saving are not.
+#[test]
+fn viewing_mode_refuses_edits_but_not_reading_or_saving() {
+    let mut s = s();
+    run(&mut s, "text.insert", json!({"text": "Hello"}));
+    run(&mut s, "view.viewing", json!({"value": true}));
+    assert!(s.viewing);
+    let refused = s.run("text.insert", &json!({"text": "!"})).unwrap_err().to_string();
+    assert!(refused.contains("open for viewing"), "{refused}");
+    assert!(s.why_disabled("text.insert").is_some_and(|w| w.contains("open for viewing")));
+    assert!(s.run("edit.undo", &json!({})).is_err(), "undo would change the document");
+    run(&mut s, "select.text", json!({"text": "Hello"}));
+    assert_eq!(run(&mut s, "document.text", json!({}))["text"], "Hello");
+    run(&mut s, "view.zoom", json!({"value": 120}));
+    let dir = std::env::temp_dir().join(format!("wc-viewing-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("v.docx");
+    run(&mut s, "file.saveAs", json!({"path": path.to_string_lossy()}));
+    assert!(path.exists(), "saving is reading");
+    run(&mut s, "view.viewing", json!({"value": false}));
+    run(&mut s, "caret.docEnd", json!({}));
+    run(&mut s, "text.insert", json!({"text": "!"}));
+    assert_eq!(run(&mut s, "document.text", json!({}))["text"], "Hello!");
+    let _ = std::fs::remove_dir_all(dir);
+}

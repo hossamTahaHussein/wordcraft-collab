@@ -145,6 +145,7 @@ impl Session {
             // A preference for new documents, like `prefs`: not part of this document.
             editing_lang: _,
             editing_lang_bidi: _,
+            viewing: _,
             // Equation editing mode, like `view`: not part of the document or its history.
             math: _,
             math_latex: _,
@@ -252,7 +253,10 @@ impl Session {
     /// Restrict Editing refuses outright. `None` when it can run (or doesn't exist).
     pub fn why_disabled(&self, id: &str) -> Option<&'static str> {
         let spec = self.registry.get(id)?;
-        (spec.enabled)(self).or_else(|| if spec.mutates { crate::cmd::protect::greyed_out(self, id, || self.protect_facts()) } else { None })
+        let viewing = self.viewing && crate::cmd::protect::viewing_refuses(id, spec.mutates, &serde_json::Value::Null);
+        (spec.enabled)(self)
+            .or_else(|| viewing.then_some(crate::cmd::protect::VIEWING))
+            .or_else(|| if spec.mutates { crate::cmd::protect::greyed_out(self, id, || self.protect_facts()) } else { None })
     }
 
     /// Put the revision back to `rev` after a command that changed nothing or failed. What the

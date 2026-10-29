@@ -203,6 +203,9 @@ pub struct Session {
     /// it unset, which proofs Arabic-script words as Arabic. Set with
     /// [`Session::set_editing_bidi_language`] (a Persian interface writes Persian).
     pub editing_lang_bidi: Option<String>,
+    /// Viewing (Editing › Viewing, the page API's read-only mode): this person can read, select,
+    /// view and save, but not change the document ([`crate::cmd::protect::viewing_refuses`]).
+    pub viewing: bool,
     /// Editing inside an equation: which one and the caret in it.
     pub math: Option<MathEdit>,
     /// Equations are typed in LaTeX rather than the linear format.

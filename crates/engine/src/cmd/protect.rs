@@ -246,6 +246,22 @@ fn always_allowed(id: &str, params: &Value) -> bool {
     }
 }
 
+/// What Viewing lets command `id` do although it changes something: the file commands that only
+/// read the document (save, export, print), as Restrict Editing allows them; not undo and redo,
+/// which would change it.
+pub(crate) fn viewing_allows(id: &str, params: &Value) -> bool {
+    id.starts_with("view.") || (id.starts_with("file.") && always_allowed(id, params))
+}
+
+/// Does Viewing refuse command `id` (`mutates`: whether its spec changes the document)? Undo,
+/// redo and repeat change it whatever their specs say.
+pub(crate) fn viewing_refuses(id: &str, mutates: bool, params: &Value) -> bool {
+    (mutates || matches!(id, "edit.undo" | "edit.redo" | "edit.repeat")) && !viewing_allows(id, params)
+}
+
+/// Why a command is refused while viewing.
+pub(crate) const VIEWING: &str = "the document is open for viewing";
+
 /// The user name (`file.setAuthor`) is the identity a named exception range is checked against,
 /// and the author recorded on new revisions and comments: it can't change while the document is
 /// protected. Word lets the user name change under protection (it is a preference there); this
