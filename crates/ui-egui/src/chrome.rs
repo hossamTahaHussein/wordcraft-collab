@@ -356,6 +356,27 @@ pub fn title_bar(app: &mut WordApp, ui: &mut Ui) {
                         let _ = app.run("ui.backstage", json!({"value": true, "page": "options", "pane": "general"}));
                     }
                     ui.add_space(8.0);
+                    // Co-editing: the other people here, newest leftmost; a click goes to them.
+                    let (shown, more) = crate::canvas::peers::avatars(&app.peers);
+                    if more > 0 {
+                        let label = format!("+{more}");
+                        let (r, _) = ui.allocate_exact_size(vec2(26.0, 22.0), Sense::hover());
+                        ui.painter().text(r.center(), Align2::CENTER_CENTER, label, semibold(10.5), t.text_dim);
+                    }
+                    for (i, (initials, color)) in shown.iter().enumerate().rev() {
+                        let fill = t.peer_colors.get(usize::from(*color) % 12).copied().unwrap_or(t.accent);
+                        let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
+                        ui.painter().circle_filled(r.center(), 11.0, fill);
+                        ui.painter().text(r.center(), Align2::CENTER_CENTER, initials, semibold(10.0), egui::Color32::WHITE);
+                        let name = app.peers.get(i).map(|p| p.name.clone()).unwrap_or_default();
+                        resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, &name));
+                        if resp.on_hover_text(crate::i18n::fmt(tl!("Go to {name}"), &[("name", &name)])).clicked() {
+                            let _ = app.run("ui.jumpToPeer", json!({"index": i}));
+                        }
+                    }
+                    if !shown.is_empty() {
+                        ui.add_space(8.0);
+                    }
                     if app.ui.show_discord {
                         let (r, resp) = ui.allocate_exact_size(vec2(84.0, 22.0), Sense::click());
                         ui.painter().rect_filled(r, 11.0, if resp.hovered() { t.accent_text } else { t.accent });
@@ -591,6 +612,9 @@ pub fn status_bar(app: &mut WordApp, ui: &mut Ui) {
                 };
                 if st(ui, &wtxt).clicked() {
                     let _ = app.run("ui.dialog", json!({"name": "wordCount"}));
+                }
+                if let Some(people) = crate::canvas::peers::people_label(app.peers.len()) {
+                    st(ui, &people);
                 }
                 if app.session.sel.focus.story != StoryRef::Body && !crate::canvas::in_text_box(app) {
                     let label = match crate::canvas::part_kind(app, app.session.sel.focus.story) {

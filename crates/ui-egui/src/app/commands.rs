@@ -735,6 +735,17 @@ impl WordApp {
                 self.canvas.open_url = Some("https://github.com/hossamTahaHussein/wordcraft-collab/discussions".into());
                 json!({})
             }
+            "ui.jumpToPeer" => {
+                // Co-editing: go to where someone else is working (their avatar in the title bar).
+                let i = p.get("index").and_then(Value::as_u64).and_then(|i| usize::try_from(i).ok());
+                let Some(peer) = i.and_then(|i| self.peers.get(i)) else {
+                    return Some(Err("no such person in this document".into()));
+                };
+                self.session.sel = wordcraft_engine::Selection::caret(peer.sel.focus.clone());
+                self.session.clamp_selection();
+                self.canvas.scroll_to_caret = true;
+                json!({})
+            }
             "ui.caretAnimation" => {
                 // File › Options › Advanced › Animation: `value` true or false turns the caret's
                 // glide and fading blink on or off; no value reads it.

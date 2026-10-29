@@ -73,6 +73,29 @@ pub(crate) fn peer_marks(app: &mut WordApp, rects: &[Rect], scale: f32, hover: O
         .collect()
 }
 
+/// The title bar's avatars: up to five (initials and colour), and how many more there are.
+pub(crate) fn avatars(peers: &[RemotePeer]) -> (Vec<(String, u8)>, usize) {
+    const SHOWN: usize = 5;
+    let shown = peers.iter().take(SHOWN).map(|p| (initials(&p.name), p.color)).collect();
+    (shown, peers.len().saturating_sub(SHOWN))
+}
+
+/// The first letter of the first and last words of a name ("Ann Lee" → "AL").
+fn initials(name: &str) -> String {
+    let words: Vec<&str> = name.split_whitespace().collect();
+    let first = |w: &&str| w.chars().next();
+    let mut out: String = words.first().and_then(first).into_iter().collect();
+    if words.len() > 1 {
+        out.extend(words.last().and_then(first));
+    }
+    out.to_uppercase()
+}
+
+/// The status bar's count of people in the document, this person included.
+pub(crate) fn people_label(peers: usize) -> Option<String> {
+    (peers > 0).then(|| crate::i18n::fmt(crate::tl!("{n} people editing"), &[("n", &(peers + 1).to_string())]))
+}
+
 /// Paint the peers' marks: selections under carets, flags on top.
 pub(crate) fn paint_peers(painter: &Painter, marks: &[PeerMark], colors: &[Color32; 12]) {
     let color = |i: u8| colors.get(usize::from(i) % colors.len()).copied().unwrap_or(Color32::GRAY);
@@ -211,5 +234,52 @@ mod tests {
         let marks = peer_marks(&mut app, &r, SCALE, None);
         assert_eq!(marks.len(), 20);
         assert!(std::sync::Arc::ptr_eq(&before, &app.session.layout()), "painting peers never lays the document out again");
+    }
+}
+
+#[cfg(test)]
+mod chrome_tests {
+    use serde_json::json;
+    use wordcraft_doc::{Document, Pos};
+    use wordcraft_engine::{Selection, Session};
+
+    use super::*;
+    use crate::WordApp;
+
+    fn peers(n: usize) -> Vec<RemotePeer> {
+        (0..n).map(|i| RemotePeer { name: format!("Person {i}"), color: i as u8, sel: Selection::caret(Pos::body(0, i)), typing: false }).collect()
+    }
+
+    #[test]
+    fn avatars_show_up_to_five_and_a_count() {
+        let (shown, more) = avatars(&peers(3));
+        assert_eq!(shown.len(), 3);
+        assert_eq!(more, 0);
+        assert_eq!(shown[0], ("P0".to_string(), 0));
+        let (shown, more) = avatars(&peers(8));
+        assert_eq!((shown.len(), more), (5, 3));
+        let ann = vec![RemotePeer { name: "Ann Lee".into(), color: 4, sel: Selection::caret(Pos::body(0, 0)), typing: false }];
+        assert_eq!(avatars(&ann).0[0], ("AL".to_string(), 4));
+        let arabic = vec![RemotePeer { name: "حسام طه".into(), color: 1, sel: Selection::caret(Pos::body(0, 0)), typing: false }];
+        assert_eq!(avatars(&arabic).0[0].0, "حط");
+    }
+
+    #[test]
+    fn status_bar_counts_people() {
+        assert_eq!(people_label(0), None);
+        assert_eq!(people_label(1).as_deref(), Some("2 people editing"));
+        assert_eq!(people_label(19).as_deref(), Some("20 people editing"));
+    }
+
+    #[test]
+    fn jump_to_peer_moves_the_view_to_its_caret() {
+        let mut app = WordApp::new(Session::new(Document::from_text("Hello world")), crate::Services::default());
+        app.peers = peers(1);
+        app.peers[0].sel = Selection::caret(Pos::body(0, 7));
+        app.canvas.scroll_to_caret = false;
+        app.run("ui.jumpToPeer", json!({"index": 0})).unwrap();
+        assert_eq!(app.session.sel.focus, Pos::body(0, 7));
+        assert!(app.canvas.scroll_to_caret);
+        assert!(app.run("ui.jumpToPeer", json!({"index": 5})).is_err(), "no such person");
     }
 }
