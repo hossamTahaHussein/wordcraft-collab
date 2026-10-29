@@ -1,12 +1,17 @@
 # WordCraft Collab
 
-**A Word-style word processor in Rust that runs in the browser, with real-time co-editing.**
+**A Word-style word processor in Rust that runs in the browser, with real-time co-editing,
+Arabic done properly, and AI agents as collaborators.**
+
+Version 1.0.0, by [Hossam Taha](https://hossamtaha.me).
 
 Several people can edit the same document at once: each person's typing appears instantly on
 their own screen, everyone else's within a network round trip, and the document saves itself.
 Embed it in any website with the companion package
 [wordcraft-embed](https://github.com/hossamTahaHussein/wordcraft-embed), which includes the
-co-editing relay server.
+co-editing relay server, the JavaScript SDK and the server-side API.
+
+<img src="docs/images/coediting.png" alt="Three people in one document: Bob Diaz types with his name flag above his caret, Cara Ng has two words selected in green, their avatars and All changes saved sit in the header, and the status bar says 3 people editing" width="100%">
 
 This project is a modified version of [WordCraft](https://github.com/storytold/wordcraft) by the
 ArtCraft team. It is independent: not made, sponsored or endorsed by the ArtCraft team.
@@ -16,13 +21,38 @@ ArtCraft team. It is independent: not made, sponsored or endorsed by the ArtCraf
 | | |
 |---|---|
 | How it syncs | Every edit is a WordCraft command. Each browser applies its own edits at once; a small relay server puts everyone's edits in one order, and every copy replays them and re-applies its unconfirmed ones on top. |
-| Features | Cursors, names and who is present; Undo and Redo of your own edits for everyone; edit, comment-only and view-only roles; version history with preview and restore; read only with "Save my copy" after five minutes offline; the relay's HTTP API and webhooks; AI agents as participants (`wordcraft-cli collab-mcp`) |
+| Features | Cursors, names and who is present; "Saving…" and "All changes saved" in the header; Undo and Redo of your own edits for everyone (a run of typing is one step); Suggesting per person; edit, suggest, comment and view roles; version history with preview and restore; read only with "Save my copy" after five minutes offline or 1,000 waiting edits; the relay's HTTP API and signed webhooks; AI agents as participants (`wordcraft-cli collab-mcp`) |
 | Code | `crates/collab` (replicas, rebasing, position mapping, selective undo, protocol), `crates/engine/src/outbox.rs` and `run_ctx.rs` (recording edits, replaying them identically, roles), `apps/wordcraft-web/src/collab_link.rs` (browser bridge), `crates/ui-egui/src/collab_ui.rs` (Version history, offline notice), `apps/wordcraft-cli/src/collab_agent.rs` (agents) |
 | Relay and SDK | [wordcraft-embed](https://github.com/hossamTahaHussein/wordcraft-embed) (`relay/`, `src/wordcraft-embed.js`) |
 | Tested | Randomised multi-user convergence tests (with undo and redo), unit tests, end-to-end tests with three browsers and a relay restart, and an agent against the real relay |
 
 Build the browser app with co-editing: `cd apps/wordcraft-web && trunk build --release`
 (output in `dist/web`), then serve it with wordcraft-embed's demo (`EDITOR_DIR=…/dist/web npm start`).
+The [1.0.0 release](https://github.com/hossamTahaHussein/wordcraft-collab/releases/tag/v1.0.0)
+has the same build as a zip, which wordcraft-embed's `npm run fetch-editor` downloads.
+
+<img src="docs/images/suggesting.png" alt="Bob Diaz's suggested rewrite shown in magenta with the old sentence struck through, and his comment in a balloon in the margin" width="100%">
+
+## Arabic and right to left
+
+<img src="docs/images/arabic.png" alt="The Arabic interface: the ribbon, rulers and status bar mirrored, an Arabic document with headings and a bulleted list, and Sara Hassan's caret with her name in Arabic" width="100%">
+
+| | |
+|---|---|
+| Interface | Fully translated into Arabic, and mirrored: the ribbon, menus, dialogs, panes, rulers and status bar read from the right (`?lang=ar`, or the system language) |
+| Writing | Right-to-left paragraphs, tables and sections; mixed Arabic and English lines in the right order; Kashida justification; Arabic spell checking |
+| Files | Right to left kept in .docx, HTML, ODT and RTF; PDFs whose Arabic text you can search and copy (vowel marks are left out of the copied text, so searches match the plain words) |
+| Fonts and spelling | Noto Sans Arabic and the Ayaspell Arabic dictionary are bundled, so Arabic looks right and is checked without anything installed |
+
+## Integrations
+
+| | |
+|---|---|
+| In the page | A JavaScript SDK: `run(command, params)` for any of the 649 commands, `getText`, `getDocument(format)`, `inspect`, `insertText`, `select`, `setReadOnly`, and `change`, `selectionchange`, `presence` and `comment` events |
+| On your server | The relay's HTTP API (document info, the document as .docx, PDF or text, commands as live edits, remove a person, close a document) and HMAC-signed webhooks (`joined`, `left`, `saved`, `edited`, `commented`, `restored`) |
+| AI agents | `wordcraft-cli collab-mcp` joins a shared document as a named participant over MCP; it suggests by default, and has `who_is_here`, `wait_for_changes`, `comment` and `reply` beside every editor command |
+
+Details, with examples: [wordcraft-embed's README](https://github.com/hossamTahaHussein/wordcraft-embed#api).
 
 ## A tour
 
@@ -61,7 +91,7 @@ Every screenshot below is WordCraft itself, rendered offscreen by its own UI tes
 | **References** | Table of contents, footnotes and endnotes, citations and bibliography (APA, MLA, Chicago, IEEE), captions, table of figures, cross-references, index, table of authorities |
 | **Review** | Spelling and grammar with suggestions (English, Arabic, Polish and more, by each run's language; Arabic words in the right-to-left language), thesaurus, word count, comments in margin balloons or a pane, track changes, accept/reject, compare documents, restrict editing, accessibility checker, document inspector |
 | **Mailings** | Mail merge from CSV, merge fields, address block, greeting line, rules, preview, finish to a document; envelopes and labels |
-| **View** | Print layout, web layout, draft, read mode, focus, zoom, one/multiple pages, page width, Navigation pane, rulers, gridlines, dark mode; interface in English, 简体中文, 繁體中文, 日本語, Português (Brasil), Español, Українська, Српски / Srpski, Eesti, Türkçe, Русский, Italiano, Deutsch, Polski, Čeština, Magyar, Français, Български, Tiếng Việt, 한국어, Svenska, Hrvatski or Slovenščina (follows the system language by default) |
+| **View** | Print layout, web layout, draft, read mode, focus, zoom, one/multiple pages, page width, Navigation pane, rulers, gridlines, dark mode; interface in English, العربية, 简体中文, 繁體中文, 日本語, Português (Brasil), Español, Українська, Српски / Srpski, Eesti, Türkçe, Русский, Italiano, Deutsch, Polski, Čeština, Magyar, Français, Български, Tiếng Việt, 한국어, Svenska, Hrvatski or Slovenščina (follows the system language by default) |
 | **Files** | .docx read/write, legacy 97-2003 .doc import, PDF export, .odt, .rtf, .html, .md, .tex, .txt import/export, page images |
 
 The honest picture, area by area, is in [ROADMAP.md](ROADMAP.md), the
@@ -71,8 +101,8 @@ The honest picture, area by area, is in [ROADMAP.md](ROADMAP.md), the
 ## Quick start
 
 ```sh
-git clone https://github.com/storytold/wordcraft
-cd wordcraft
+git clone https://github.com/hossamTahaHussein/wordcraft-collab
+cd wordcraft-collab
 cargo run --release -p wordcraft -- --sample        # the desktop app with the sample document
 cargo run --release -p wordcraft -- report.docx     # open a document
 ```
@@ -134,8 +164,8 @@ covers every target starting with it (`wordcraft*=debug`). The logger is
 | L1 | `wordcraft-doc`, `wordcraft-fonts`, `wordcraft-proof` | document model and editing; fonts and shaping; spelling, grammar, hyphenation |
 | L2 | `wordcraft-layout`, `wordcraft-docx`, `wordcraft-formats` | line breaking, pagination, tables, notes, hit testing; OOXML; ODT/RTF/HTML/Markdown/TXT |
 | L3 | `wordcraft-render`, `wordcraft-pdf` | rasteriser (vello_cpu); PDF ([craft-pdf](docs/shared-pdf.md), Krilla) |
-| L4 | `wordcraft-engine` | session, undo, 422 commands, document feature catalog |
-| L5 | `wordcraft-mcp` | MCP server |
+| L4 | `wordcraft-engine` | session, undo, 649 commands, document feature catalog |
+| L5 | `wordcraft-mcp`, `wordcraft-collab` | MCP server; co-editing replicas, rebasing, selective undo, protocol |
 | L6 | `wordcraft-ui-egui` | the word processor front end (swappable) |
 | apps | `wordcraft`, `wordcraft-cli`, `wordcraft-web` | desktop, command line, browser |
 
@@ -148,8 +178,10 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your 
 WordCraft. Required notices are in [NOTICE](NOTICE); bundled fonts, icons and other assets keep
 their own open licenses, listed in [ATTRIBUTION.md](ATTRIBUTION.md).
 
-Based on WordCraft, Copyright (c) 2026 ArtCraft Team and the WordCraft contributors. The ArtCraft
-name and logos are trademarks of the ArtCraft Team and are not used in this project.
+WordCraft Collab (co-editing, Arabic and right to left, the integrations and the agents) is by
+[Hossam Taha](https://hossamtaha.me). Based on WordCraft, Copyright (c) 2026 ArtCraft Team and
+the WordCraft contributors. The ArtCraft name and logos are trademarks of the ArtCraft Team and are
+not used in this project.
 
 <sub>Microsoft and Microsoft Word are trademarks of the Microsoft group of companies. This project
 is not affiliated with, sponsored by or endorsed by Microsoft Corporation.</sub>
