@@ -35,6 +35,7 @@ pub(crate) use chars::{caps_char, push_caps};
 #[cfg(test)]
 pub(crate) use chars::{ligature_features, remap_range, thai_run_face};
 pub use grid::{Exclusion, Grid, is_east_asian};
+pub use justify::TATWEEL;
 #[cfg(test)]
 use lines::break_lines;
 pub use model::{CellText, ClKind, Cluster, Enclosed, Glyph, Label, LabelRun, Line, LineEnd, PARA_MARK_WIDTH, ParaEnv, RubyLayout, StyleRun, VisCl};
@@ -94,6 +95,10 @@ pub struct ParaLayout {
     /// Room after a cluster between Asian text and Latin text or digits ([`auto_space`]), by
     /// cluster index, sorted. It is part of the cluster's advance, but takes no room at a line's end.
     pub auto_space: Vec<(usize, f32)>,
+    /// Where a justified right-to-left line may stretch a word with kashida: the clusters whose
+    /// Arabic letter is joined from the letter before it (a tatweel can go between them), by
+    /// cluster index, sorted ([`justify::kashida_points`]).
+    pub kashida_at: Vec<u32>,
 }
 
 impl ParaLayout {

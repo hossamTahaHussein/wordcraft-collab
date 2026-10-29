@@ -1,4 +1,4 @@
-use super::model::ClKind;
+use super::model::{ClKind, Cluster, StyleRun};
 use super::proof::{ProofRun, lang_at};
 use super::{ParaLayout, SOFT_HYPHEN};
 
@@ -132,4 +132,100 @@ pub(super) fn hyphenation_points(
         .collect();
     out.dedup();
     out
+}
+
+/// The Arabic tatweel (kashida), drawn across a stretched join.
+pub const TATWEEL: char = '\u{0640}';
+
+/// How far one kashida may stretch a word, as a share of its font size; a justified line's room
+/// beyond that goes to its spaces.
+const MAX_KASHIDA: f32 = 1.0;
+
+/// Does an Arabic-script letter join the letter after it (a dual-joining letter, or the
+/// tatweel)? Right-joining letters (alef, dal, reh, waw…) and hamza don't.
+fn joins_next(c: char) -> bool {
+    joins_prev(c)
+        && !matches!(c,
+            '\u{0622}'..='\u{0625}' | '\u{0627}' | '\u{0629}' | '\u{062F}'..='\u{0632}' | '\u{0648}' | '\u{0671}'..='\u{0673}'
+            | '\u{0675}'..='\u{0677}' | '\u{0688}'..='\u{0699}' | '\u{06C0}' | '\u{06C3}'..='\u{06CB}' | '\u{06CD}' | '\u{06CF}'
+            | '\u{06D2}' | '\u{06D3}' | '\u{06EE}' | '\u{06EF}')
+}
+
+/// Is `c` an Arabic-script letter joined from the letter before it (any joining letter or the
+/// tatweel; not hamza, which joins nothing)?
+fn joins_prev(c: char) -> bool {
+    matches!(c, '\u{0620}'..='\u{064A}' | '\u{066E}'..='\u{066F}' | '\u{0671}'..='\u{06D3}' | '\u{06D5}' | '\u{06EE}'..='\u{06EF}' | '\u{06FA}'..='\u{06FC}' | '\u{06FF}')
+        && c != '\u{0621}'
+}
+
+/// An Arabic diacritic (harakat, shadda, superscript alef, Quranic marks).
+fn is_arabic_mark(c: char) -> bool {
+    matches!(c, '\u{0610}'..='\u{061A}' | '\u{064B}'..='\u{065F}' | '\u{0670}' | '\u{06D6}'..='\u{06DC}' | '\u{06DF}'..='\u{06E4}' | '\u{06E7}' | '\u{06E8}' | '\u{06EA}'..='\u{06ED}' | '\u{08D3}'..='\u{08FF}')
+}
+
+/// The clusters a kashida may widen (see [`super::ParaLayout::kashida_at`]): a text cluster
+/// whose first letter is joined from the last letter of the cluster before it, in one style
+/// whose font has a tatweel.
+pub(super) fn kashida_points(text: &str, clusters: &[Cluster], styles: &[StyleRun]) -> Vec<u32> {
+    let letter = |c: &&Cluster, last: bool| -> Option<char> {
+        let t = text.get(c.start..c.end)?;
+        // Diacritics ride on their letter: the letter decides.
+        if last { t.chars().rev().find(|ch| !is_arabic_mark(*ch)) } else { t.chars().next() }
+    };
+    let mut tatweel: Vec<Option<bool>> = vec![None; styles.len()];
+    let mut out = Vec::new();
+    for (k, pair) in clusters.windows(2).enumerate() {
+        let [a, b] = pair else { continue };
+        if a.kind != ClKind::Text || b.kind != ClKind::Text || a.end != b.start || a.style != b.style {
+            continue;
+        }
+        if !letter(&a, true).is_some_and(joins_next) || !letter(&b, false).is_some_and(joins_prev) {
+            continue;
+        }
+        let Some(has) = tatweel.get_mut(a.style as usize) else { continue };
+        if *has.get_or_insert_with(|| styles.get(a.style as usize).is_some_and(|s| s.face.glyph_for(TATWEEL) != 0)) {
+            out.push(k as u32 + 1);
+        }
+    }
+    out
+}
+
+/// The kashida of a justified line `c0..c1` (from `align_from`, before `content_end`), taking up
+/// to `slack`: one per word, at its last join, each at most [`MAX_KASHIDA`] of its font size.
+pub(super) fn line_kashida(
+    pl: &super::ParaLayout,
+    xs: &[f32],
+    (c0, c1, align_from): (usize, usize, usize),
+    (content_end, slack): (f32, f32),
+) -> Vec<(usize, f32)> {
+    let lo = pl.kashida_at.partition_point(|&k| (k as usize) < align_from.max(c0 + 1));
+    let hi = pl.kashida_at.partition_point(|&k| (k as usize) < c1);
+    let cands: Vec<usize> = pl
+        .kashida_at
+        .get(lo..hi)
+        .unwrap_or_default()
+        .iter()
+        .map(|&k| k as usize)
+        .filter(|&k| xs.get(k - c0).is_some_and(|x| *x < content_end - 0.01))
+        .collect();
+    // The last join of each word: the next candidate is in another word when something other
+    // than text comes between them.
+    let mut picked: Vec<usize> = Vec::new();
+    for (i, &k) in cands.iter().enumerate() {
+        let next_same_word = cands.get(i + 1).is_some_and(|&n| (k..n).all(|j| pl.clusters.get(j).is_some_and(|c| c.kind == ClKind::Text)));
+        if !next_same_word {
+            picked.push(k);
+        }
+    }
+    if picked.is_empty() || slack <= 0.0 {
+        return Vec::new();
+    }
+    let per = slack / picked.len() as f32;
+    picked
+        .into_iter()
+        .map(|k| {
+            let size = pl.clusters.get(k).and_then(|c| pl.styles.get(c.style as usize)).map_or(12.0, |s| s.size);
+            (k, per.min(size * MAX_KASHIDA))
+        })
+        .collect()
 }

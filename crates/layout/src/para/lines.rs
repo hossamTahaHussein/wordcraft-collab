@@ -95,6 +95,8 @@ struct Scan {
     has_tab: bool,
     /// The first word doesn't fit a span narrowed by a floating object: it moves on whole.
     skip: bool,
+    /// The kashida justification gave the line ([`Line::kashida`]).
+    kashida: Vec<(usize, f32)>,
 }
 
 /// Whether anything but markers (a bookmark, say) is among the clusters `c0..j`: an empty line
@@ -279,6 +281,7 @@ impl<'e> Breaker<'e> {
             space_w: 0.0,
             has_tab: false,
             skip: false,
+            kashida: Vec::new(),
         }
     }
 
@@ -365,6 +368,7 @@ impl<'e> Breaker<'e> {
             beside: sc.beside,
             vis: Vec::new(),
             rtl: self.rtl_para,
+            kashida: sc.kashida,
         };
         if self.bidi {
             reorder_line(pl, &mut line, self.width);
@@ -529,7 +533,14 @@ impl<'e> Breaker<'e> {
         if shrink {
             shrink_line_spaces(pl, &mut sc.xs, c0, c1, content_end, slack);
         } else if justify && slack > 0.0 {
-            justify_line(pl, &mut sc.xs, (c0, c1, align_from), (content_end, slack), rp.align == Align::Distribute);
+            // Arabic words of a justified right-to-left line stretch with kashida first, as Word's.
+            let kashida = if self.rtl_para && rp.align == Align::Justify {
+                super::justify::line_kashida(pl, &sc.xs, (c0, c1, align_from), (content_end, slack))
+            } else {
+                Vec::new()
+            };
+            justify_line(pl, &mut sc.xs, (c0, c1, align_from), (content_end, slack), rp.align == Align::Distribute, &kashida);
+            sc.kashida = kashida;
         }
     }
 
@@ -586,6 +597,7 @@ impl<'e> Breaker<'e> {
             beside: false,
             vis: Vec::new(),
             rtl: self.rtl_para,
+            kashida: Vec::new(),
         });
         self.top += h;
     }
@@ -664,11 +676,42 @@ fn content_end(pl: &ParaLayout, sc: &Scan, c1: usize) -> f32 {
 
 /// Stretch the line to its right edge: its spaces widen by `slack` between them, or all its
 /// clusters by an equal share when `distribute` (or there are no spaces).
-fn justify_line(pl: &ParaLayout, xs: &mut [f32], (c0, c1, align_from): (usize, usize, usize), (content_end, slack): (f32, f32), distribute: bool) {
+/// Spread `slack` over the line: `kashida` widen their clusters first, the rest goes to the
+/// spaces (or, for `distribute`, between all clusters).
+fn justify_line(
+    pl: &ParaLayout,
+    xs: &mut [f32],
+    (c0, c1, align_from): (usize, usize, usize),
+    (content_end, slack): (f32, f32),
+    distribute: bool,
+    kashida: &[(usize, f32)],
+) {
     // Spaces inside the content (after the last tab).
     let spaces: Vec<usize> = (align_from..c1)
         .filter(|k| pl.clusters.get(*k).is_some_and(|c| c.kind == ClKind::Space) && xs.get(k - c0).copied().unwrap_or(f32::MAX) < content_end - 0.01)
         .collect();
+    let stretched: f32 = kashida.iter().map(|k| k.1).sum();
+    let slack = slack - stretched;
+    if !kashida.is_empty() {
+        // A cluster's kashida is room after it (its right, in right-to-left text).
+        let per = if spaces.is_empty() || slack <= 0.01 { 0.0 } else { slack / spaces.len() as f32 };
+        let mut add = 0.0;
+        for k in align_from..c1 {
+            if let Some(v) = xs.get_mut(k - c0) {
+                *v += add;
+            }
+            if spaces.binary_search(&k).is_ok() {
+                add += per;
+            }
+            if let Some((_, w)) = kashida.iter().find(|(kk, _)| *kk == k) {
+                add += w;
+            }
+        }
+        if let Some(v) = xs.last_mut() {
+            *v += add;
+        }
+        return;
+    }
     if distribute || spaces.is_empty() {
         let cnt = (c1 - align_from).saturating_sub(1).max(1) as f32;
         if distribute {

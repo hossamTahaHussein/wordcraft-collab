@@ -184,6 +184,10 @@ pub struct Line {
     pub vis: Vec<VisCl>,
     /// The paragraph reads right to left (its start edge is on the right).
     pub rtl: bool,
+    /// Kashida of a justified Arabic line: the cluster whose box was widened, and by how much.
+    /// The room is on the cluster's right, joining it to the letter before it; a tatweel is
+    /// drawn across it.
+    pub kashida: Vec<(usize, f32)>,
 }
 
 /// Where a cluster of a bidirectional line is drawn.

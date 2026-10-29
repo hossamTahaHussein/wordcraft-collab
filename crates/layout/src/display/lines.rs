@@ -178,10 +178,43 @@ fn collect_glyph_run(
                 glyphs.push((g.gid, cx + g.dx, base - st.shift - g.dy));
                 ranges.push(a..b);
             }
+            if let Some(&(_, w)) = line.kashida.iter().find(|(kk, _)| *kk == k) {
+                tatweel(st, x + line.cl_right(k).unwrap_or(0.0), w, base - st.shift, a..b, &mut glyphs, &mut ranges);
+            }
         }
         k += 1;
     }
     (k, glyphs, text, ranges)
+}
+
+/// Fill a kashida, the `w` points left of `right`, with tatweel glyphs of the run's font (the
+/// last overlapping the others where `w` isn't a whole number of them). They stand for the
+/// cluster's own text (`range`), adding none.
+fn tatweel(
+    st: &crate::para::StyleRun,
+    right: f32,
+    w: f32,
+    y: f32,
+    range: std::ops::Range<usize>,
+    glyphs: &mut Vec<(u32, f32, f32)>,
+    ranges: &mut Vec<std::ops::Range<usize>>,
+) {
+    let gid = st.face.glyph_for(crate::para::TATWEEL);
+    let upem = st.face.units_per_em();
+    if gid == 0 || upem <= 0.0 {
+        return;
+    }
+    let adv = (st.face.advance(gid) / upem) as f32 * st.size;
+    // NaN widths fail these too.
+    if adv.is_nan() || adv <= 0.1 || w.is_nan() || w <= 0.0 {
+        return;
+    }
+    let n = (w / adv).ceil().min(64.0) as usize;
+    for i in 0..n {
+        let gx = (right - w + i as f32 * adv).min(right - adv);
+        glyphs.push((gid, gx, y));
+        ranges.push(range.clone());
+    }
 }
 
 fn draw_glyph_runs(ctx: &LineContext<'_, '_, '_>, out: &mut Vec<Draw>) {

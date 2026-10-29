@@ -638,3 +638,89 @@ fn list_label_after_leading_page_break_uses_its_text_lines_alignment() {
         }
     }
 }
+
+/// A justified right-to-left paragraph long enough to wrap.
+fn justified(text: &str, align: Align, rtl: bool) -> Document {
+    let mut d = doc_of(&[(text, rtl)]);
+    let at = Pos::body(0, 0);
+    d.format_paragraphs(&at, &at, &|p: &mut ParaProps| p.align = Some(align)).unwrap();
+    d
+}
+
+const ARABIC: &str =
+    "يكتب الطلاب واجباتهم في المكتبة الكبيرة كل مساء ثم يذهبون إلى البيت ويقرؤون الكتب الجديدة مع أصدقائهم في الحديقة القريبة من المدرسة";
+
+/// Justified Arabic lines stretch with kashida inside words, at most one per word, where the
+/// letters join, instead of widening the spaces; the line still fills its width.
+#[test]
+fn justified_arabic_stretches_words_with_kashida() {
+    let text = [ARABIC; 3].join(" ");
+    let l = lay(&justified(&text, Align::Justify, true));
+    let (pl, _) = first_line(&l, 0);
+    assert!(pl.lines.len() > 2, "wraps");
+    let stretched: Vec<&crate::para::Line> = pl.lines.iter().filter(|line| !line.kashida.is_empty()).collect();
+    assert!(!stretched.is_empty(), "kashida on the justified Arabic lines that need stretching");
+    for line in stretched {
+        // The line fills its width: its clusters reach from one edge to the other.
+        // Spaces aside: the one ending the line hangs past its edge.
+        let inner = |k: &usize| pl.clusters[*k].kind != crate::para::ClKind::Space;
+        let lo = (line.c0..line.c1).filter(inner).filter_map(|k| line.cl_left(k)).fold(f32::MAX, f32::min);
+        let hi = (line.c0..line.c1).filter(inner).filter_map(|k| line.cl_right(k)).fold(0.0, f32::max);
+        assert!((hi - lo - (line.right - line.left)).abs() < 1.0, "fills the line: {lo}..{hi} in {}..{}", line.left, line.right);
+        // Each kashida sits after a letter that joins the next one, inside a word.
+        for &(k, w) in &line.kashida {
+            assert!(w > 0.0);
+            let (a, b) = (&pl.clusters[k - 1], &pl.clusters[k]);
+            assert_eq!((a.kind, b.kind), (crate::para::ClKind::Text, crate::para::ClKind::Text));
+            assert_eq!(a.end, b.start, "neighbours");
+            let before = text[..a.end].chars().last().unwrap();
+            assert!(!"اأإآدذرزوؤةء".contains(before), "{before} doesn't join the next letter");
+        }
+        // At most one per word.
+        let words: Vec<usize> = line.kashida.iter().map(|&(k, _)| text[..pl.clusters[k].start].matches(' ').count()).collect();
+        let mut unique = words.clone();
+        unique.dedup();
+        assert_eq!(words, unique, "one kashida per word");
+    }
+    // The last line isn't justified.
+    assert!(pl.lines.last().unwrap().kashida.is_empty());
+}
+
+#[test]
+fn only_justified_right_to_left_lines_get_kashida() {
+    for d in [justified(ARABIC, Align::Left, true), justified(ARABIC, Align::Justify, false)] {
+        let l = lay(&d);
+        let (pl, _) = first_line(&l, 0);
+        assert!(pl.lines.iter().all(|line| line.kashida.is_empty()));
+    }
+    let english = "The quick brown fox jumps over the lazy dog again and again until the line is long enough to wrap around twice over";
+    let l = lay(&justified(english, Align::Justify, true));
+    assert!(first_line(&l, 0).0.lines.iter().all(|line| line.kashida.is_empty()), "Latin words have no kashida");
+}
+
+/// The kashida are drawn: tatweel glyphs of the run's font fill each widened join.
+#[test]
+fn kashida_are_drawn_as_tatweel() {
+    let d = justified(&[ARABIC; 3].join(" "), Align::Justify, true);
+    let l = lay(&d);
+    let (pl, x) = first_line(&l, 0);
+    let line = pl.lines.iter().find(|line| !line.kashida.is_empty()).expect("a stretched line");
+    let face = pl.styles[pl.clusters[line.c0].style as usize].face;
+    let tatweel = face.glyph_for('\u{0640}');
+    assert_ne!(tatweel, 0, "the Arabic font has a tatweel");
+    let draws = crate::display::page_display(&d, &l.pages[0], &Default::default());
+    let xs: Vec<f32> = draws
+        .iter()
+        .filter_map(|dr| if let crate::display::Draw::Glyphs { glyphs, .. } = dr { Some(glyphs) } else { None })
+        .flatten()
+        .filter(|g| g.0 == tatweel)
+        .map(|g| g.1)
+        .collect();
+    let size = pl.styles[pl.clusters[line.c0].style as usize].size;
+    let adv = (face.advance(tatweel) / face.units_per_em()) as f32 * size;
+    for &(k, w) in &line.kashida {
+        // Tatweels cover the gap; a gap narrower than one is covered by one ending at its edge.
+        let right = x + line.cl_right(k).unwrap();
+        assert!(xs.iter().any(|&gx| gx < right && gx + adv > right - w), "a tatweel across the gap {}..{right}: {xs:?}", right - w);
+    }
+}
