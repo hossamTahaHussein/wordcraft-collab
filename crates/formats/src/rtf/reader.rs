@@ -35,6 +35,8 @@ pub(super) struct Reader {
     pub(super) cell_side: Option<char>,
     /// Each table row's cell right edges (`\cellx`, twips), for the table's column grid.
     table_rights: Vec<Vec<i32>>,
+    /// A row of the current table was right to left (`\rtlrow`).
+    pub(super) table_rtl: bool,
     pub(super) colors: Vec<Option<Rgb>>,
     pub(super) color_cur: (u8, u8, u8, bool),
     pub(super) styles: HashMap<i32, String>,
@@ -108,6 +110,7 @@ impl Reader {
         std::mem::swap(&mut o.row_header, &mut self.row_header);
         std::mem::swap(&mut o.rule_pending, &mut self.rule_pending);
         std::mem::swap(&mut o.table_rights, &mut self.table_rights);
+        std::mem::swap(&mut o.table_rtl, &mut self.table_rtl);
         o
     }
 
@@ -405,7 +408,8 @@ impl Reader {
             let rights = std::mem::take(&mut self.table_rights);
             let widths = column_grid(&mut rows, &rights);
             // Word draws only the borders the cells name: no grid style, each cell its own.
-            self.body.push(FBlock::Table(FTable { rows, widths, borderless: true }));
+            let rtl = std::mem::take(&mut self.table_rtl);
+            self.body.push(FBlock::Table(FTable { rows, widths, borderless: true, rtl }));
         }
     }
 }

@@ -28,6 +28,7 @@ pub fn char_props(f: &Fmt) -> CharProps {
         size: f.size.filter(|s| s.is_finite() && *s >= 1.0 && *s <= 1638.0),
         font: if f.code { Some(MONO_FONT.to_string()) } else { f.font.as_deref().filter(|s| !s.is_empty()).map(str::to_string) },
         shading: f.background,
+        rtl: on(f.rtl),
         ..Default::default()
     }
 }
@@ -93,6 +94,9 @@ fn para_props(p: &Para, list_num: Option<u32>) -> ParaProps {
         out.numbering = Some(NumRef { num, level: li.level.min(8) });
     }
     out.align = p.align;
+    if p.rtl {
+        out.bidi = Some(true);
+    }
     let sp = p.spacing;
     out.space_before = sp.before;
     out.space_after = sp.after;
@@ -354,6 +358,7 @@ impl<'a> Builder<'a> {
         if t.borderless {
             tb.props.style = None;
         }
+        tb.props.bidi_visual = t.rtl;
         if t.widths.len() == cols && t.widths.iter().all(|w| w.is_finite() && *w > 1.0) {
             tb.grid = t.widths.iter().map(|w| w.clamp(6.0, 1584.0)).collect();
         }

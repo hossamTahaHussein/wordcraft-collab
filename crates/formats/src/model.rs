@@ -52,8 +52,12 @@ mod tests {
     fn insert_covered_is_bounded_on_hostile_rowspan() {
         // Many rows each carrying the maximum rowspan would be O(rows × rowspan) covered cells;
         // the work cap must keep insertion bounded (and quick) instead of exhausting memory.
-        let mut t =
-            FTable { rows: (0..20_000).map(|_| vec![Cell { rowspan: 1000, ..Default::default() }]).collect(), widths: Vec::new(), borderless: false };
+        let mut t = FTable {
+            rows: (0..20_000).map(|_| vec![Cell { rowspan: 1000, ..Default::default() }]).collect(),
+            widths: Vec::new(),
+            borderless: false,
+            rtl: false,
+        };
         t.insert_covered();
         assert!(t.rows.iter().all(|r| r.len() <= 64), "a row grew past the column cap");
     }
@@ -103,6 +107,7 @@ mod tests {
             rows: vec![vec![Cell { rowspan: 2, ..Default::default() }, Cell::default()], vec![Cell::default()]],
             widths: vec![],
             borderless: false,
+            rtl: false,
         };
         t.insert_covered();
         assert_eq!(t.rows[1].len(), 2);

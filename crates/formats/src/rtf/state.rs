@@ -92,6 +92,7 @@ pub(super) struct Output {
     pub(super) row_header: bool,
     pub(super) rule_pending: bool,
     pub(super) table_rights: Vec<Vec<i32>>,
+    pub(super) table_rtl: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -113,6 +114,8 @@ pub(super) struct St {
     pub(super) hidden: bool,
     // Paragraph properties.
     pub(super) align: Option<Align>,
+    /// `\rtlpar`: a right-to-left paragraph.
+    pub(super) rtl_par: bool,
     pub(super) style: i32,
     pub(super) intbl: bool,
     pub(super) ls: Option<i32>,
@@ -150,6 +153,7 @@ impl Default for St {
             uc: 1,
             hidden: false,
             align: None,
+            rtl_par: false,
             style: 0,
             intbl: false,
             ls: None,

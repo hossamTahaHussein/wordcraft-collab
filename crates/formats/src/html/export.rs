@@ -19,9 +19,12 @@ pub fn esc(s: &str) -> String {
     o
 }
 
-fn align_css(a: Option<Align>) -> Option<&'static str> {
+/// CSS for a paragraph's alignment. A right-to-left paragraph's Left and Right are its start and
+/// end, so its end is CSS's left (its start is the default under `dir="rtl"`).
+fn align_css(a: Option<Align>, rtl: bool) -> Option<&'static str> {
     match a? {
         Align::Center => Some("text-align:center"),
+        Align::Right if rtl => Some("text-align:left"),
         Align::Right => Some("text-align:right"),
         Align::Justify | Align::Distribute => Some("text-align:justify"),
         Align::Left => None,
@@ -80,6 +83,9 @@ fn fmt_tags(f: &Fmt) -> (String, Vec<&'static str>) {
     }
     if f.code {
         tag("<code>", "</code>");
+    }
+    if f.rtl {
+        tag("<span dir=\"rtl\">", "</span>");
     }
     let mut css = Vec::new();
     if let Some(c) = f.color {
@@ -153,13 +159,14 @@ fn trim_num(v: f32) -> String {
 
 fn para_attrs(p: &Para) -> String {
     let mut css: Vec<&str> = Vec::new();
-    if let Some(a) = align_css(p.align) {
+    if let Some(a) = align_css(p.align, p.rtl) {
         css.push(a);
     }
     if p.page_break {
         css.push("break-before:page;page-break-before:always");
     }
-    if css.is_empty() { String::new() } else { format!(" style=\"{}\"", css.join(";")) }
+    let dir = if p.rtl { " dir=\"rtl\"" } else { "" };
+    if css.is_empty() { dir.to_string() } else { format!("{dir} style=\"{}\"", css.join(";")) }
 }
 
 fn para_html(p: &Para) -> String {
@@ -175,7 +182,7 @@ fn para_html(p: &Para) -> String {
 }
 
 fn table_html(t: &FTable, out: &mut String, depth: usize) {
-    out.push_str("<table style=\"border-collapse:collapse\">\n");
+    out.push_str(if t.rtl { "<table dir=\"rtl\" style=\"border-collapse:collapse\">\n" } else { "<table style=\"border-collapse:collapse\">\n" });
     for row in &t.rows {
         out.push_str("<tr>");
         for c in row {
@@ -206,10 +213,11 @@ fn table_html(t: &FTable, out: &mut String, depth: usize) {
                 [FBlock::Para(p)] if p.kind == Kind::Normal && p.list.is_none() && !p.page_break => Some(p),
                 _ => None,
             };
-            if let Some(a) = single.and_then(|p| align_css(p.align)) {
+            if let Some(a) = single.and_then(|p| align_css(p.align, p.rtl)) {
                 css.push(a.to_string());
             }
-            out.push_str(&format!("<{tag}{attrs} style=\"{}\">", css.join(";")));
+            let dir = if single.is_some_and(|p| p.rtl) { " dir=\"rtl\"" } else { "" };
+            out.push_str(&format!("<{tag}{attrs}{dir} style=\"{}\">", css.join(";")));
             match single {
                 Some(p) => out.push_str(&inlines_html(&p.inlines)),
                 None => {

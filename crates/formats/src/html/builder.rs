@@ -34,9 +34,12 @@ struct El {
     page_break_after: bool,
     /// Li: a paragraph of this item was already emitted.
     used: bool,
+    /// Its direction (`dir`, CSS `direction`): `Some(true)` right to left.
+    dir: Option<bool>,
 }
 
 struct TableB {
+    rtl: bool,
     rows: Vec<Vec<Cell>>,
     row: Option<Vec<Cell>>,
     /// The table or one of its cells asks for borders.
@@ -49,6 +52,23 @@ struct ElementStyle {
     preserve: bool,
     page_break: bool,
     page_break_after: bool,
+    dir: Option<bool>,
+}
+
+/// An element's direction: its `dir` attribute, else a CSS `direction` in its `style`;
+/// `Some(true)` is right to left, `None` inherits.
+fn dir_of(attrs: &[(String, String)]) -> Option<bool> {
+    let word = |v: &str| match v.trim().to_ascii_lowercase().as_str() {
+        "rtl" => Some(true),
+        "ltr" => Some(false),
+        _ => None,
+    };
+    attr(attrs, "dir").and_then(word).or_else(|| {
+        attr(attrs, "style")?.split(';').take(64).find_map(|decl| {
+            let (k, v) = decl.split_once(':')?;
+            k.trim().eq_ignore_ascii_case("direction").then(|| word(super::css::strip_important(v))).flatten()
+        })
+    })
 }
 
 fn apply_font_attributes(attrs: &[(String, String)], fmt: &mut Fmt) {
@@ -231,9 +251,14 @@ impl<'r> Builder<'r> {
     }
 
     /// Paragraph context from the open elements (innermost first, up to the enclosing cell).
+    /// The direction the open block elements give (the innermost that sets one).
+    fn block_dir(&self) -> Option<bool> {
+        self.stack.iter().rev().filter(|e| e.kind != ElKind::Inline).find_map(|e| e.dir)
+    }
+
     pub(super) fn start_para(&mut self) -> &mut Para {
         if self.para.is_none() {
-            let mut p = Para::default();
+            let mut p = Para { rtl: self.block_dir().unwrap_or(false), ..Para::default() };
             let mut list_level: Option<(bool, usize)> = None;
             let mut li_at: Option<usize> = None;
             let mut lists = 0usize;
@@ -270,6 +295,15 @@ impl<'r> Builder<'r> {
                 if p.align.is_none() && e.align.is_some() && e.kind != ElKind::Inline {
                     p.align = e.align;
                 }
+            }
+            // HTML's left and right are sides of the page; a right-to-left paragraph's Left is
+            // its start, the right side.
+            if p.rtl {
+                p.align = p.align.map(|a| match a {
+                    Align::Left => Align::Right,
+                    Align::Right => Align::Left,
+                    a => a,
+                });
             }
             if let (Some((o, _)), Some(li)) = (list_level, li_at) {
                 p.list = Some(ListInfo { ordered: o, level: lists.saturating_sub(1).min(8) as u8, start: 1 });
@@ -478,7 +512,7 @@ impl<'r> Builder<'r> {
                     // Keep at most MAX_ROWS rows (the model drops the rest anyway): bounds the
                     // O(rows × rowspan) work of `insert_covered` on a table of millions of `<tr>`.
                     let rows: Vec<_> = t.rows.into_iter().filter(|r| !r.is_empty()).take(wordcraft_doc::table::MAX_ROWS).collect();
-                    let mut ft = FTable { rows, widths: Vec::new(), borderless };
+                    let mut ft = FTable { rows, widths: Vec::new(), borderless, rtl: t.rtl };
                     if !ft.rows.is_empty() {
                         ft.insert_covered();
                         self.container().push(FBlock::Table(ft));
@@ -667,7 +701,14 @@ impl<'r> Builder<'r> {
         if kind == ElKind::Pre {
             preserve = true;
         }
-        ElementStyle { fmt, align, preserve, page_break, page_break_after }
+        let dir = dir_of(attrs);
+        // A paragraph's direction comes from its block ancestors; an inline one marks its text.
+        if kind == ElKind::Inline
+            && let Some(rtl) = dir
+        {
+            fmt.rtl = rtl;
+        }
+        ElementStyle { fmt, align, preserve, page_break, page_break_after, dir }
     }
 
     pub(super) fn start(&mut self, name: &str, attrs: &[(String, String)], self_close: bool) {
@@ -702,9 +743,12 @@ impl<'r> Builder<'r> {
         if kind != ElKind::Inline {
             self.flush();
         }
-        let ElementStyle { mut fmt, align, preserve, page_break, page_break_after } = self.element_style(name, attrs, kind);
+        let ElementStyle { mut fmt, align, preserve, page_break, page_break_after, dir } = self.element_style(name, attrs, kind);
         match kind {
-            ElKind::Table => self.tables.push(TableB { rows: Vec::new(), row: None, bordered: declares_border(attrs, true) }),
+            ElKind::Table => {
+                let rtl = dir.or_else(|| self.block_dir()).unwrap_or(false);
+                self.tables.push(TableB { rtl, rows: Vec::new(), row: None, bordered: declares_border(attrs, true) });
+            }
             ElKind::Tr => {
                 if let Some(t) = self.tables.last_mut()
                     && let Some(r) = t.row.take()
@@ -763,7 +807,7 @@ impl<'r> Builder<'r> {
             }
             _ => {}
         }
-        self.stack.push(El { name: name.to_string(), kind, fmt, align, preserve, page_break, page_break_after, used: false });
+        self.stack.push(El { name: name.to_string(), kind, fmt, align, preserve, page_break, page_break_after, used: false, dir });
     }
 
     pub(super) fn end(&mut self, name: &str) {

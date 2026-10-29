@@ -61,6 +61,7 @@ fn read_formula(xml: &[u8]) -> Option<(String, bool)> {
 }
 
 struct TableB {
+    rtl: bool,
     rows: Vec<Vec<Cell>>,
     row: Vec<Cell>,
     /// Covered cells still owed to the previous cell's column span.
@@ -73,7 +74,7 @@ impl TableB {
     fn finish(self) -> FTable {
         // A column without a width leaves the whole grid to the equal split.
         let widths = if self.widths.iter().all(|w| *w > 0.0) { self.widths } else { Vec::new() };
-        FTable { rows: self.rows, widths, borderless: false }
+        FTable { rows: self.rows, widths, borderless: false, rtl: self.rtl }
     }
 }
 
@@ -313,7 +314,8 @@ impl Body<'_> {
         if let Some(h) = heading {
             kind = Kind::Heading(h.clamp(1, 6));
         }
-        let mut p = Para { kind, align, page_break: pb, keep_next, ..Default::default() };
+        let rtl = style.is_some_and(|s| self.styles.rtl(s));
+        let mut p = Para { kind, align, page_break: pb, keep_next, rtl, ..Default::default() };
         if rule && kind == Kind::Normal {
             p.kind = Kind::Rule;
         }
@@ -564,7 +566,8 @@ impl Body<'_> {
                     self.skip = 1;
                     return;
                 }
-                self.tables.push(TableB { rows: Vec::new(), row: Vec::new(), hcover: 0, widths: Vec::new() });
+                let rtl = get(a, "table:style-name").is_some_and(|s| self.styles.rtl(s));
+                self.tables.push(TableB { rtl, rows: Vec::new(), row: Vec::new(), hcover: 0, widths: Vec::new() });
             }
             "table-column" => {
                 let w = get(a, "table:style-name").and_then(|n| self.styles.column_width(n)).unwrap_or(0.0);
@@ -758,7 +761,7 @@ impl Body<'_> {
             self.para = Some(cur);
             return;
         }
-        let mut rest = Para { kind: cur.kind, list: cur.list, align: cur.align, ..Default::default() };
+        let mut rest = Para { kind: cur.kind, list: cur.list, align: cur.align, rtl: cur.rtl, ..Default::default() };
         // The host paragraph now ends at the first deleted paragraph's mark.
         cur.mark_del = Some(Box::new(mark.clone()));
         cur.mark_ins = first_mark_ins;

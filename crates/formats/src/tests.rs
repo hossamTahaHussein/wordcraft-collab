@@ -1002,3 +1002,91 @@ fn dropped_names_and_links_are_logged_once_per_document() {
     let (_, warned) = crate::test_log::warnings(|| crate::latex::import(tex.as_bytes()));
     assert_eq!(count(&warned, "links longer"), 1, "{warned:?}");
 }
+
+/// A right-to-left document: an RTL paragraph with an RTL run, an LTR paragraph, an RTL table.
+fn rtl_sample() -> Document {
+    let rtl = CharProps { rtl: Some(true), ..Default::default() };
+    let mut p = Paragraph::with_text("مرحبا بالعالم", rtl.clone());
+    p.props.bidi = Some(true);
+    p.props.align = Some(Align::Left);
+    let ltr = Paragraph::with_text("English stays left to right", CharProps::default());
+    let mut t = Table::new(1, 2, 400.0);
+    t.props.bidi_visual = true;
+    t.rows[0].cells[0].blocks = vec![para_block(Paragraph::with_text("أول", rtl.clone()))];
+    t.rows[0].cells[1].blocks = vec![para_block(Paragraph::with_text("ثاني", rtl))];
+    let mut d = Document::new();
+    d.body = vec![para_block(p), para_block(ltr), Arc::new(Block::Table(t)), para_block(Paragraph::new())];
+    d
+}
+
+fn paras(d: &Document) -> Vec<&Paragraph> {
+    d.body.iter().filter_map(|b| b.as_para()).collect()
+}
+
+fn first_table(d: &Document) -> &Table {
+    d.body.iter().find_map(|b| b.as_table()).expect("a table")
+}
+
+#[test]
+fn right_to_left_survives_html_odt_and_rtf() {
+    let d = rtl_sample();
+    for ext in ["html", "odt", "rtf"] {
+        let bytes = export(ext, &d).unwrap().unwrap();
+        let back = import(ext, &bytes).unwrap().unwrap();
+        let ps = paras(&back);
+        let rtl = ps.iter().find(|p| p.text.contains("مرحبا")).unwrap_or_else(|| panic!("{ext}: Arabic paragraph"));
+        let ltr = ps.iter().find(|p| p.text.contains("English")).unwrap();
+        assert!(back.styles.resolve_para(&rtl.props).bidi, "{ext}: RTL paragraph");
+        assert!(!back.styles.resolve_para(&ltr.props).bidi, "{ext}: LTR paragraph");
+        // In a right-to-left paragraph Word's "left" is its start: it stays as written.
+        assert_eq!(rtl.props.align.unwrap_or(Align::Left), Align::Left, "{ext}: alignment");
+        assert!(first_table(&back).props.bidi_visual, "{ext}: RTL table");
+        if ext != "odt" {
+            // ODT has no run direction (the bidi algorithm decides); HTML and RTF keep it.
+            assert!(rtl.runs.iter().any(|r| r.props.rtl == Some(true)), "{ext}: RTL run {:?}", rtl.runs);
+        }
+    }
+}
+
+#[test]
+fn html_direction_is_read_from_dir_and_css() {
+    let html = r#"<html><body><p dir="rtl">مرحبا</p><div dir="rtl"><p>داخل</p></div><p style="direction: rtl">نمط</p>
+        <p>Left <span dir="rtl">عربي</span></p><table dir="rtl"><tr><td>خلية</td></tr></table></body></html>"#;
+    let d = import("html", html.as_bytes()).unwrap().unwrap();
+    let bidi = |t: &str| {
+        let p = paras(&d).into_iter().find(|p| p.text.contains(t)).unwrap_or_else(|| panic!("{t}"));
+        d.styles.resolve_para(&p.props).bidi
+    };
+    assert!(bidi("مرحبا") && bidi("داخل") && bidi("نمط"));
+    assert!(!bidi("Left"));
+    let mixed = paras(&d).into_iter().find(|p| p.text.contains("Left")).unwrap();
+    let k = mixed.text.find("عربي").unwrap();
+    assert_eq!(mixed.props_at(k + "ع".len()).rtl, Some(true));
+    assert!(first_table(&d).props.bidi_visual);
+    // A whole page set right to left (`<html dir>` or `<body dir>`): its paragraphs and tables,
+    // without marking every run.
+    for page in [r#"<html dir="rtl"><body><p>صفحة</p><table><tr><td>خلية</td></tr></table></body></html>"#, r#"<body dir="rtl"><p>صفحة</p></body>"#]
+    {
+        let d = import("html", page.as_bytes()).unwrap().unwrap();
+        let p = paras(&d).into_iter().find(|p| p.text.contains("صفحة")).unwrap();
+        assert!(d.styles.resolve_para(&p.props).bidi, "{page}");
+        assert_eq!(p.props_at(2).rtl, None, "{page}");
+        if page.contains("table") {
+            assert!(first_table(&d).props.bidi_visual);
+        }
+    }
+}
+
+#[test]
+fn rtf_direction_controls_are_read() {
+    let rtf = "{\\rtf1\\ansi{\\rtlpar\\rtlch \\u1605?\\u1585?\\par}{\\ltrpar Left\\par}\
+        \\trowd\\rtlrow\\cellx2000\\intbl A\\cell\\row}";
+    let d = import("rtf", rtf.as_bytes()).unwrap().unwrap();
+    let ps = paras(&d);
+    let ar = ps.iter().find(|p| p.text.contains('م')).unwrap();
+    assert!(d.styles.resolve_para(&ar.props).bidi);
+    assert_eq!(ar.props_at(0).rtl, Some(true));
+    let left = ps.iter().find(|p| p.text.contains("Left")).unwrap();
+    assert!(!d.styles.resolve_para(&left.props).bidi);
+    assert!(first_table(&d).props.bidi_visual);
+}

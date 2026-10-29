@@ -255,6 +255,7 @@ impl Writer {
             (old.italic, cur.italic, "\\i", "\\i0"),
             (underline(old), underline(cur), "\\ul", "\\ulnone"),
             (old.strike, cur.strike, "\\strike", "\\strike0"),
+            (old.rtl, cur.rtl, "\\rtlch", "\\ltrch"),
         ];
         for (o, c, on, off) in flags {
             if o != c {
@@ -312,6 +313,9 @@ impl Writer {
         }
         if f.strike {
             ctl.push_str("\\strike");
+        }
+        if f.rtl {
+            ctl.push_str("\\rtlch");
         }
         if f.sup {
             ctl.push_str("\\super");
@@ -451,6 +455,9 @@ impl Writer {
             Some(Align::Distribute) => out.push_str("\\qd"),
             _ => out.push_str("\\ql"),
         }
+        if p.rtl {
+            out.push_str("\\rtlpar");
+        }
         if p.page_break {
             out.push_str("\\pagebb");
         }
@@ -562,6 +569,9 @@ impl Writer {
         };
         for row in &t.rows {
             out.push_str("\\trowd\\trgaph108\\trleft0");
+            if t.rtl {
+                out.push_str("\\rtlrow");
+            }
             if !row.is_empty() && row.iter().all(|c| c.header) {
                 out.push_str("\\trhdr");
             }

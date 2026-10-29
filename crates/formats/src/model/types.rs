@@ -109,6 +109,8 @@ pub struct Fmt {
     /// Tracked formatting change of this text: who made it and the formatting before it (only
     /// [`from_doc_tracked`] and formats that keep revisions set it).
     pub fmt_change: Option<Box<FmtChange<Fmt>>>,
+    /// Right-to-left text (`w:rtl`: Arabic, Hebrew… shaped and laid out right to left).
+    pub rtl: bool,
 }
 
 /// A tracked formatting change in a flow: who made it, and the formatting before it.
@@ -244,6 +246,9 @@ pub struct Para {
     /// Tracked formatting change of the paragraph: the paragraph's formatting before it (kind,
     /// list, alignment, page break, spacing and borders of `old`; its inlines are unused).
     pub fmt_change: Option<Box<FmtChange<Para>>>,
+    /// A right-to-left paragraph (`w:bidi`): it starts at the right; its alignment is relative
+    /// to that start, as in Word.
+    pub rtl: bool,
 }
 
 impl Para {
@@ -366,6 +371,8 @@ pub struct FTable {
     pub widths: Vec<f32>,
     /// The source table had no borders (HTML default); the document table gets no grid style.
     pub borderless: bool,
+    /// A right-to-left table: its first column on the right (`w:bidiVisual`).
+    pub rtl: bool,
 }
 
 impl FTable {

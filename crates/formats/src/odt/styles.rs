@@ -66,6 +66,26 @@ struct StyleInfo {
     page_number: Option<Option<u32>>,
     /// `style:columns` of a section style.
     columns: Option<Columns>,
+    /// `style:writing-mode` of a paragraph or table style: `Some(true)` right to left.
+    rtl: Option<bool>,
+}
+
+/// A table style's `style:table-properties`: its page number and direction.
+fn table_properties(a: &Attrs, s: &mut StyleInfo) {
+    if let Some(v) = get(a, "style:page-number") {
+        s.page_number = Some(v.trim().parse::<u32>().ok().map(|n| n.min(32_767)));
+    }
+    s.rtl = writing_mode(a).or(s.rtl);
+}
+
+/// A `style:writing-mode`: `Some(true)` right to left, `Some(false)` left to right, `None` for
+/// `page` (the default) and anything else.
+fn writing_mode(a: &Attrs) -> Option<bool> {
+    match get(a, "style:writing-mode")?.trim() {
+        "rl-tb" | "rl" => Some(true),
+        "lr-tb" | "lr" => Some(false),
+        _ => None,
+    }
 }
 
 /// Columns of a `style:columns` element (ODF 1.3 §17.12): count and gap, clamped as the RTF and
@@ -178,10 +198,8 @@ impl Styles {
                     }
                 }
                 "table-properties" => {
-                    if let Some((_, s)) = &mut cur
-                        && let Some(v) = get(&a, "style:page-number")
-                    {
-                        s.page_number = Some(v.trim().parse::<u32>().ok().map(|n| n.min(32_767)));
+                    if let Some((_, s)) = &mut cur {
+                        table_properties(&a, s);
                     }
                 }
                 "table-column-properties" => {
@@ -215,6 +233,7 @@ impl Styles {
                             Some("start") | Some("left") => Some(Align::Left),
                             _ => s.align,
                         };
+                        s.rtl = writing_mode(&a).or(s.rtl);
                         if get(&a, "fo:break-before").is_some_and(|b| b.trim().eq_ignore_ascii_case("page")) {
                             s.page_break = true;
                         }
@@ -318,6 +337,11 @@ impl Styles {
     /// Columns of a section style (whole chain).
     pub(super) fn columns(&self, name: &str) -> Option<Columns> {
         self.chain(name).iter().find_map(|(_, s)| s.columns.clone())
+    }
+
+    /// Whether a paragraph or table style is right to left (whole chain).
+    pub(super) fn rtl(&self, name: &str) -> bool {
+        self.chain(name).iter().find_map(|(_, s)| s.rtl).unwrap_or(false)
     }
 
     /// Width in points of a table-column style (whole chain).

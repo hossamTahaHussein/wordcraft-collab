@@ -87,6 +87,7 @@ impl Reader {
     pub(super) fn para_props(&self, st: &St) -> Para {
         let mut p = Para::new(self.para_kind(st));
         p.align = st.align;
+        p.rtl = st.rtl_par;
         p.page_break = st.pagebb;
         p.spacing = spacing(st);
         p.borders = st.borders.any_visible().then_some(st.borders);
@@ -195,6 +196,10 @@ pub(super) fn is_format_word(w: &str) -> bool {
             | "cb"
             | "v"
             | "pard"
+            | "rtlpar"
+            | "ltrpar"
+            | "rtlch"
+            | "ltrch"
             | "ql"
             | "qc"
             | "qr"
@@ -242,6 +247,8 @@ pub(super) fn is_char_format_word(w: &str) -> bool {
             | "chcbpat"
             | "cb"
             | "v"
+            | "rtlch"
+            | "ltrch"
     ) || (w.starts_with("ul") && w.len() <= 8)
 }
 

@@ -54,6 +54,8 @@ pub(super) struct Writer {
     tables: Vec<Vec<f32>>,
     /// The master page (and page-number restart) each table in `tables` starts.
     table_starts: Vec<Option<SecStart>>,
+    /// Whether each table is right to left (`style:writing-mode`), as `tables`.
+    table_rtl: Vec<bool>,
     /// Automatic styles of the columned `text:section`s written.
     pub(super) section_styles: Vec<String>,
     /// The page a section starts, for the next top-level block.
@@ -170,6 +172,9 @@ impl Writer {
 
         if p.keep_next {
             props.push_str(" fo:keep-with-next=\"always\"");
+        }
+        if p.rtl {
+            props.push_str(" style:writing-mode=\"rl-tb\"");
         }
         if p.kind == Kind::Rule {
             props.push_str(" fo:border-bottom=\"0.75pt solid #a0a0a0\" fo:padding-bottom=\"1pt\"");
@@ -563,6 +568,7 @@ impl Writer {
             vec![468.0 / cols as f32; cols]
         };
         self.tables.push(widths);
+        self.table_rtl.push(t.rtl);
         self.table_starts.push(self.master.take());
         let tn = self.tables.len();
         out.push_str(&format!("<table:table table:name=\"Table{tn}\" table:style-name=\"Table{tn}\">"));
@@ -656,8 +662,9 @@ impl Writer {
                 }
                 None => (String::new(), String::new()),
             };
+            let mode = if self.table_rtl.get(i).copied().unwrap_or(false) { " style:writing-mode=\"rl-tb\"" } else { "" };
             s.push_str(&format!(
-                "<style:style style:name=\"Table{tn}\" style:family=\"table\"{master}><style:table-properties style:width=\"{}\" table:align=\"margins\"{number}/></style:style>",
+                "<style:style style:name=\"Table{tn}\" style:family=\"table\"{master}><style:table-properties style:width=\"{}\" table:align=\"margins\"{number}{mode}/></style:style>",
                 pt(total)
             ));
             for (c, w) in widths.iter().enumerate() {

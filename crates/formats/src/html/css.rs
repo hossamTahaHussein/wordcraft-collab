@@ -33,7 +33,7 @@ pub fn css_len_pt(v: &str) -> Option<f32> {
     }
 }
 
-fn strip_important(v: &str) -> &str {
+pub(super) fn strip_important(v: &str) -> &str {
     let s = v.trim();
     if let Some(pos) = s.rfind('!') {
         let after = s[pos + 1..].trim();
