@@ -211,3 +211,50 @@ fn a_menu_opens_under_its_buttons_right_edge() {
     let popup = ctx.memory(|m| m.area_rect(egui::Popup::default_response_id(&more))).expect("menu shown");
     assert!((popup.max.x - more.rect.max.x).abs() < 4.0, "right edges level: {popup:?} under {:?}", more.rect);
 }
+
+/// Every point an icon paints, in `r` (paths, segments, circles, rectangle corners).
+fn icon_points(rtl: bool, name: &str) -> Vec<(f32, f32)> {
+    let ctx = egui::Context::default();
+    craft_ui::direction::apply(&ctx, if rtl { craft_ui::direction::Direction::Rtl } else { craft_ui::direction::Direction::Ltr });
+    let r = egui::Rect::from_min_size(egui::pos2(100.0, 100.0), egui::vec2(20.0, 20.0));
+    let out = ctx.run_ui(egui::RawInput::default(), |ui| crate::icons::paint(ui.painter(), r, name, egui::Color32::BLACK, egui::Color32::RED));
+    let mut pts = Vec::new();
+    fn walk(s: &Shape, pts: &mut Vec<(f32, f32)>) {
+        match s {
+            Shape::Vec(v) => v.iter().for_each(|s| walk(s, pts)),
+            Shape::Path(p) => pts.extend(p.points.iter().map(|q| (q.x, q.y))),
+            Shape::LineSegment { points, .. } => pts.extend(points.iter().map(|q| (q.x, q.y))),
+            Shape::Circle(c) => pts.push((c.center.x, c.center.y)),
+            Shape::Rect(r) => pts.extend([(r.rect.min.x, r.rect.min.y), (r.rect.max.x, r.rect.max.y)]),
+            _ => {}
+        }
+    }
+    for c in &out.shapes {
+        walk(&c.shape, &mut pts);
+    }
+    pts
+}
+
+/// The points mirrored about the icon's centre line (x = 110), sorted for comparison.
+fn mirrored(pts: &[(f32, f32)]) -> Vec<(i32, i32)> {
+    let mut v: Vec<(i32, i32)> = pts.iter().map(|(x, y)| (((220.0 - x) * 10.0).round() as i32, (y * 10.0).round() as i32)).collect();
+    v.sort_unstable();
+    v
+}
+
+fn sorted(pts: &[(f32, f32)]) -> Vec<(i32, i32)> {
+    let mut v: Vec<(i32, i32)> = pts.iter().map(|(x, y)| ((x * 10.0).round() as i32, (y * 10.0).round() as i32)).collect();
+    v.sort_unstable();
+    v
+}
+
+#[test]
+fn bullets_and_indent_icons_flip_right_to_left() {
+    for name in ["bullets", "multilevel", "outdent", "indent"] {
+        let ltr = icon_points(false, name);
+        assert!(!ltr.is_empty(), "{name} paints");
+        assert_eq!(sorted(&icon_points(true, name)), mirrored(&ltr), "{name} mirrored");
+    }
+    // Undo keeps its drawing (history runs left to right).
+    assert_eq!(sorted(&icon_points(true, "undo")), sorted(&icon_points(false, "undo")));
+}

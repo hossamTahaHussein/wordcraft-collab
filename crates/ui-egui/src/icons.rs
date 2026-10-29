@@ -10,6 +10,8 @@ struct Pen<'a> {
     c: Color32,
     a: Color32,
     w: f32,
+    /// Drawn mirrored (a right-to-left interface's bullets and indents).
+    flip: bool,
 }
 
 impl Pen<'_> {
@@ -19,6 +21,7 @@ impl Pen<'_> {
     fn pt(&self, x: f32, y: f32) -> Pos2 {
         let s = self.s();
         let o = self.r.center() - vec2(10.0 * s, 10.0 * s);
+        let x = if self.flip { 20.0 - x } else { x };
         pos2(o.x + x * s, o.y + y * s)
     }
     fn stroke(&self, c: Color32) -> Stroke {
@@ -40,10 +43,10 @@ impl Pen<'_> {
         self.p.add(Shape::convex_polygon(v, c, Stroke::NONE));
     }
     fn rect(&self, x0: f32, y0: f32, x1: f32, y1: f32, c: Color32) {
-        self.p.rect_stroke(Rect::from_min_max(self.pt(x0, y0), self.pt(x1, y1)), 1.0, self.stroke(c), egui::StrokeKind::Middle);
+        self.p.rect_stroke(Rect::from_two_pos(self.pt(x0, y0), self.pt(x1, y1)), 1.0, self.stroke(c), egui::StrokeKind::Middle);
     }
     fn frect(&self, x0: f32, y0: f32, x1: f32, y1: f32, c: Color32) {
-        self.p.rect_filled(Rect::from_min_max(self.pt(x0, y0), self.pt(x1, y1)), 0.5, c);
+        self.p.rect_filled(Rect::from_two_pos(self.pt(x0, y0), self.pt(x1, y1)), 0.5, c);
     }
     fn circle(&self, x: f32, y: f32, r: f32, c: Color32) {
         self.p.circle_stroke(self.pt(x, y), r * self.s(), self.stroke(c));
@@ -71,9 +74,15 @@ impl Pen<'_> {
     }
 }
 
+/// Icons drawn mirrored in a right-to-left interface.
+const FLIPPED: &[&str] = &["bullets", "multilevel", "outdent", "indent"];
+
 /// Paint icon `name` into `r`. `c` is the line colour; the accent comes from the theme.
 pub fn paint(p: &Painter, r: Rect, name: &str, c: Color32, accent: Color32) {
-    let pen = Pen { p, r, c, a: accent, w: 1.25 };
+    // What these show starts at the reading start (craft-ui's FLIPPED_ICONS): right to left they
+    // are drawn mirrored. Undo, rotate, alignment and numbered lists keep their drawing.
+    let flip = FLIPPED.contains(&name) && craft_ui::direction::is_rtl(p.ctx());
+    let pen = Pen { p, r, c, a: accent, w: 1.25, flip };
     if let Some(kind) = name.strip_prefix("shape.")
         && shape(&pen, kind)
     {
