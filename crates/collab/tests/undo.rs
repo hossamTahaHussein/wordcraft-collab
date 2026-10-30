@@ -252,3 +252,25 @@ fn api_edits_are_not_the_persons_own() {
     relay.settle(&mut [&mut a]);
     assert!(a.confirmed_text().contains('Z'), "undo never takes back the API's edit: {}", a.confirmed_text());
 }
+
+/// A redo the relay refuses doesn't lose the step: Redo is still there to try again.
+#[test]
+fn a_refused_redo_keeps_its_step() {
+    let mut relay = Relay::new(doc_with("x"));
+    let mut a = Peer::join("a", "Ann", &relay);
+    end(&mut a);
+    a.type_text("y");
+    relay.settle(&mut [&mut a]);
+    a.act("edit.undo", json!({}));
+    relay.settle(&mut [&mut a]);
+    assert_eq!(a.confirmed_text(), "x");
+    assert!(a.replica.can_redo());
+    a.act("edit.redo", json!({}));
+    a.replica.drain_local(&mut a.visible);
+    let redo = a.replica.next_to_send().unwrap();
+    a.replica.refused(redo.seq, &mut a.visible);
+    assert!(a.replica.can_redo(), "the refused redo's step is still there");
+    a.act("edit.redo", json!({}));
+    relay.settle(&mut [&mut a]);
+    assert_eq!(a.confirmed_text(), "xy", "and redoing it again works");
+}

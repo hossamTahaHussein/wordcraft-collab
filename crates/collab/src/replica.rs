@@ -294,11 +294,27 @@ impl Replica {
     pub fn refused(&mut self, seq: u64, visible: &mut Session) {
         self.drain_local(visible);
         let Some(i) = self.pending.iter().position(|p| p.seq == seq) else { return };
-        if self.pending[i].kind == OpKind::Undo
-            && let Some(t) = self.pending[i].params.get("target").and_then(Value::as_u64)
-            && self.undone.last().and_then(|g| g.first()) == Some(&t)
-        {
-            self.undone.pop();
+        let named = |op: &Op| -> Option<Vec<u64>> {
+            let target = op.params.get("target").and_then(Value::as_u64).filter(|t| *t > 0)?;
+            let more = op.params.get("more").and_then(Value::as_array).map(|m| m.iter().filter_map(Value::as_u64).collect::<Vec<_>>());
+            Some(std::iter::once(target).chain(more.unwrap_or_default()).collect())
+        };
+        match self.pending[i].kind {
+            // An undo that didn't happen leaves nothing to redo.
+            OpKind::Undo => {
+                if let Some(t) = named(&self.pending[i]).and_then(|g| g.first().copied())
+                    && self.undone.last().and_then(|g| g.first()) == Some(&t)
+                {
+                    self.undone.pop();
+                }
+            }
+            // A redo that didn't happen can be tried again.
+            OpKind::Redo => {
+                if let Some(group) = named(&self.pending[i]) {
+                    self.undone.push(group);
+                }
+            }
+            _ => {}
         }
         if i == 0 {
             self.in_flight = false;
