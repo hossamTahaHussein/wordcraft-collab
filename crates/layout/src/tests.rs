@@ -2,7 +2,7 @@ use super::*;
 use wordcraft_doc::fill::Fill;
 use wordcraft_doc::para::InlineObject;
 use wordcraft_doc::props::{Align, Border, BorderStyle, Borders, ParaProps, TextDirection};
-use wordcraft_doc::{Pos, Table};
+use wordcraft_doc::{Block, Pos, Table};
 
 mod autospace;
 mod bidi;
@@ -11916,4 +11916,31 @@ fn an_empty_bulleted_mark_after_a_bulleted_section_closer_draws_no_bullet() {
             .any(|it| matches!(it, Placed::Lines { path, para, .. } if *path == Path::top(filler) && para.label.is_some()));
         assert!(text, "{filler} lines above: the text closer keeps its bullet");
     }
+}
+
+/// Print Markup of a right-to-left document puts the markup area on the left of each page, as the
+/// editor does: the comment is there, and the page's own text moves right by the area's width.
+#[test]
+fn comment_balloons_of_a_right_to_left_document_are_on_the_left() {
+    let mut d = Document::from_text("مرحبا بالعالم\nسطر ثان هنا");
+    for b in d.body.iter_mut() {
+        if let Block::Para(p) = std::sync::Arc::make_mut(b) {
+            p.props.bidi = Some(true);
+        }
+    }
+    assert!(d.reads_right_to_left());
+    comment_on(&mut d, 1, 0, 6, "Ada Reviewer", "Check this", None);
+    let plain = lay(&d);
+    let l = balloon_layout(&d);
+    let area = balloons::MARKUP_AREA;
+    let lines = comment_lines(&l, 0);
+    assert!(!lines.is_empty() && lines.iter().all(|(_, x, _)| *x < area), "the comment is in the left area: {lines:?}");
+    let body_x = |l: &DocLayout| {
+        l.pages[0].items.iter().find_map(|it| match it {
+            Placed::Lines { story: StoryRef::Body, x, .. } => Some(*x),
+            _ => None,
+        })
+    };
+    let (moved, own) = (body_x(&l).unwrap(), body_x(&plain).unwrap());
+    assert!((moved - own - area).abs() < 0.01, "the body moved right by the area: {moved} vs {own}");
 }

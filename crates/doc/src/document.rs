@@ -56,6 +56,13 @@ impl Default for Document {
 }
 
 impl Document {
+    /// Whether the document reads right to left: its last section is right to left, or its first
+    /// paragraph with text is (Word puts the markup area on that side, among other things).
+    pub fn reads_right_to_left(&self) -> bool {
+        self.last_section.rtl
+            || self.body.iter().filter_map(|b| b.as_para()).find(|p| !p.is_empty()).is_some_and(|p| self.styles.resolve_para(&p.props).bidi)
+    }
+
     /// A blank document: one empty Normal paragraph, Letter, built-in styles.
     pub fn new() -> Self {
         Document {

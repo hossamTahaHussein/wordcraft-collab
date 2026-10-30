@@ -93,9 +93,7 @@ pub(super) fn shown_comment(app: &WordApp) -> Option<u32> {
 /// Whether the markup area goes on the left of each page: the document reads right to left (its
 /// last section is right to left, or its first paragraph with text is), as Word puts it.
 pub fn markup_on_left(app: &WordApp) -> bool {
-    let doc = &app.session.doc;
-    doc.last_section.rtl
-        || doc.body.iter().filter_map(|b| b.as_para()).find(|p| !p.is_empty()).is_some_and(|p| doc.styles.resolve_para(&p.props).bidi)
+    app.session.doc.reads_right_to_left()
 }
 
 /// Width of the markup area beside each page for comment and revision balloons (points), or 0.

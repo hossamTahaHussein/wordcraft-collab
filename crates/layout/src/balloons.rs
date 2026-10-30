@@ -163,11 +163,22 @@ pub(crate) fn add(ctx: &mut Ctx, lay: &mut DocLayout) {
         }
         cards.push(Card { page: caret.page, ax: caret.x, ay: caret.top + caret.height, items, h: y + PAD, color });
     }
-    // Every page gets the markup area, so the pages keep one size.
+    // Every page gets the markup area, so the pages keep one size. A right-to-left document has
+    // it on the left, as the editor does: the page's own content moves right to make room.
+    let left = doc.reads_right_to_left();
+    let shift = if left { MARKUP_AREA } else { 0.0 };
     let widths: Vec<f32> = lay.pages.iter().map(|p| p.w).collect();
     for p in &mut lay.pages {
         p.w += MARKUP_AREA;
         p.markup = MARKUP_AREA;
+        if left {
+            for it in &mut p.items {
+                it.translate(shift, 0.0);
+            }
+        }
+    }
+    for c in &mut cards {
+        c.ax += shift;
     }
     let mut by_page: BTreeMap<usize, Vec<Card>> = BTreeMap::new();
     for c in cards {
@@ -194,7 +205,8 @@ pub(crate) fn add(ctx: &mut Ctx, lay: &mut DocLayout) {
             limit = *t - GAP;
         }
         let mut next = top_min;
-        let x0 = pw + SIDE;
+        // The card's left edge, and where the leader leaves the page and meets the card.
+        let (x0, page_edge, card_edge) = if left { (SIDE, shift, SIDE + card_w) } else { (pw + SIDE, pw, pw + SIDE) };
         for (c, t) in list.into_iter().zip(tops) {
             let top = t.max(next);
             // No room left beside this page (dozens of comments on it): the rest are left out
@@ -207,8 +219,8 @@ pub(crate) fn add(ctx: &mut Ctx, lay: &mut DocLayout) {
             next = top + h + GAP;
             let line = |style, width: f32| Border { style, width, color: Some(c.color), space: 0.0 };
             // Leader: along the text from the anchor to the page edge, then to the card.
-            page.items.push(Placed::Rule { x0: c.ax, y0: c.ay, x1: pw, y1: c.ay, border: line(BorderStyle::Dashed, 0.5) });
-            page.items.push(Placed::Rule { x0: pw, y0: c.ay, x1: x0, y1: top + 8.0, border: line(BorderStyle::Single, 0.5) });
+            page.items.push(Placed::Rule { x0: c.ax, y0: c.ay, x1: page_edge, y1: c.ay, border: line(BorderStyle::Dashed, 0.5) });
+            page.items.push(Placed::Rule { x0: page_edge, y0: c.ay, x1: card_edge, y1: top + 8.0, border: line(BorderStyle::Single, 0.5) });
             // The card: white, outlined and striped in the author's colour.
             let card = Rect::new(x0, top, card_w, h);
             page.items.push(Placed::Fill { rect: card, color: Rgb(0xFF, 0xFF, 0xFF) });
