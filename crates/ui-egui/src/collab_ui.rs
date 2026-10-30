@@ -191,8 +191,17 @@ fn version_history(app: &mut WordApp, ctx: &Context) {
     let mut open = true;
     let editor = app.session.collab_role() == CollabRole::Edit;
     let mut asked = Vec::new();
+    // It opens at the reading start: the top right in a right-to-left interface.
+    let screen = ctx.content_rect();
+    let (pivot, at) = if craft_ui::direction::is_rtl(ctx) {
+        (egui::Align2::RIGHT_TOP, egui::pos2(screen.right() - 16.0, screen.top() + 16.0))
+    } else {
+        (egui::Align2::LEFT_TOP, egui::pos2(screen.left() + 16.0, screen.top() + 16.0))
+    };
     egui::Window::new(tl!("Version history"))
         .id(egui::Id::unique("collab_versions"))
+        .pivot(pivot)
+        .default_pos(at)
         .open(&mut open)
         .default_width(420.0)
         .default_height(420.0)

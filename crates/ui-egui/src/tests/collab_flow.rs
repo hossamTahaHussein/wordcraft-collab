@@ -77,3 +77,25 @@ fn the_header_says_whether_changes_are_saved() {
         assert!(at.max.y < 40.0, "{label} is in the title row: {at:?}");
     }
 }
+
+/// Version history opens at the reading start: the top right in an Arabic interface.
+#[test]
+fn version_history_opens_at_the_reading_start() {
+    for (lang, title, right) in [("en", "Version history", false), ("ar", "سجل الإصدارات", true)] {
+        let (mut app, ctx) = app_in(lang);
+        app.session.set_collab(true);
+        app.collab.active = true;
+        app.collab.history = Some(VersionHistory { rows: Some(Vec::new()), preview: None });
+        let shapes = frame(&mut app, &ctx, W);
+        // The window's title, not the status bar's label of the same name.
+        let at = shapes
+            .iter()
+            .filter_map(|c| match &c.shape {
+                Shape::Text(t) if t.galley.text() == title => Some(t.visual_bounding_rect()),
+                _ => None,
+            })
+            .find(|r| r.min.y < 700.0)
+            .unwrap_or_else(|| panic!("{lang}: the window's title"));
+        assert_eq!(at.center().x > W / 2.0, right, "{lang}: {at:?}");
+    }
+}
