@@ -54,19 +54,7 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
         list.sort_by(|a, b| a.1.total_cmp(&b.1).then(a.0.total_cmp(&b.0)));
         let page_scale = layout.pages.get(pi).map_or(scale, |page| page_screen_scale(*pr, page, scale));
         // Beside the page in the column; floating, beside it when the view has room, else over its edge.
-        let (x0, w, over_page) = if mw > 0.0 {
-            let w = (mw * page_scale - 20.0).max(60.0);
-            (if left { pr.min.x - 10.0 - w } else { pr.max.x + 10.0 }, w, false)
-        } else {
-            let w = (FLOAT_WIDTH * page_scale - 20.0).max(60.0);
-            if left {
-                let beside = pr.min.x - 10.0 - w;
-                if beside >= view.min.x + 8.0 { (beside, w, false) } else { ((view.min.x + 8.0).min(view.max.x - w - 8.0), w, true) }
-            } else {
-                let beside = pr.max.x + 10.0;
-                if beside + w <= view.max.x - 8.0 { (beside, w, false) } else { ((view.max.x - w - 8.0).max(view.min.x + 8.0), w, true) }
-            }
-        };
+        let (x0, w, over_page) = card_column(*pr, mw, page_scale, left, view);
         // Leaders run along the text to the page's edge on the markup area's side, then to the card's near edge.
         let (page_edge, card_edge) = if left { (pr.min.x, x0 + w) } else { (pr.max.x, x0) };
         let mut next_y = pr.min.y;
@@ -186,6 +174,24 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
     if let Some((id, p)) = clicked {
         select_balloon(app, id);
         app.session.sel = wordcraft_engine::Selection::caret(p);
+    }
+}
+
+/// Where page `pr`'s cards go: their left edge, their width, and whether they lie over the page.
+/// In the markup area (`mw` wide, on the `left` or right); floating, beside the page when the
+/// view has room, else over the page's edge.
+fn card_column(pr: Rect, mw: f32, page_scale: f32, left: bool, view: Rect) -> (f32, f32, bool) {
+    if mw > 0.0 {
+        let w = (mw * page_scale - 20.0).max(60.0);
+        return (if left { pr.min.x - 10.0 - w } else { pr.max.x + 10.0 }, w, false);
+    }
+    let w = (FLOAT_WIDTH * page_scale - 20.0).max(60.0);
+    if left {
+        let beside = pr.min.x - 10.0 - w;
+        if beside >= view.min.x + 8.0 { (beside, w, false) } else { ((view.min.x + 8.0).min(view.max.x - w - 8.0), w, true) }
+    } else {
+        let beside = pr.max.x + 10.0;
+        if beside + w <= view.max.x - 8.0 { (beside, w, false) } else { ((view.max.x - w - 8.0).max(view.min.x + 8.0), w, true) }
     }
 }
 

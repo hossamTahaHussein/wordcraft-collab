@@ -142,6 +142,7 @@ pub(super) fn columns_for(avail_w: f32, slot_px: f32, pages: usize, min_cols: us
 /// Place pages (sizes in points) in rows of `cols`, left to right then top to bottom, each in a slot
 /// as wide as the widest page plus `markup` and centred in `avail_w`. Returns the screen-space rects
 /// (relative to the content's top-left) and the content size.
+#[cfg(test)]
 pub(super) fn place_pages(sizes: &[(f32, f32)], markup: f32, scale: f32, cols: usize, avail: egui::Vec2) -> (Vec<Rect>, egui::Vec2) {
     place_pages_beside(sizes, markup, false, scale, cols, avail)
 }
