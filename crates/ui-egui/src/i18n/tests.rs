@@ -1202,3 +1202,14 @@ fn a_right_to_left_interface_sets_the_right_to_left_editing_language() {
     frame(&mut app);
     assert_eq!(app.session.editing_lang_bidi, None);
 }
+
+/// Every row of every embedded catalog parses: a broken row (a lost placeholder, a stray tab)
+/// would quietly show its text in English.
+#[test]
+fn every_catalog_row_parses() {
+    if CRAFT_I18N.is_empty() {
+        return;
+    }
+    let problems = I18N.check_all();
+    assert!(problems.is_empty(), "{} catalog rows are skipped:\n{problems:#?}", problems.len());
+}

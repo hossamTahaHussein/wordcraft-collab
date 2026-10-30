@@ -2077,3 +2077,103 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	Reči: {words}! Bacio bih konfete, ali onda bih morao da ih počistim.
 	{words} words. That's {words} more than I've written today.	Reči: {words}. To je {words} više nego što sam ja danas napisao.
 	“{text}” ({row}, {series}) isn't a number.	„{text}” ({row}, {series}) nije broj.
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Dokument {name} nije mogao da se sačuva, pa je i dalje otvoren i ništa nije izgubljeno: {error}
+	Wait for the print job to finish submitting before closing.	Pre zatvaranja sačekajte da se slanje zadatka za štampanje završi.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Vraćanje otvara nesačuvanu kopiju. Originalna datoteka ostaje nepromenjena.
+	Recovery is disabled while this document has a password.	Oporavak je onemogućen dok je dokument zaštićen lozinkom.
+	Local recovery is unavailable or still loading.	Lokalni oporavak nije dostupan ili se još učitava.
+	No recovery copies.	Nema kopija za oporavak.
+	Recovery copy	Kopija za oporavak
+	Discard…	Odbaci…
+	Continue without restoring	Nastavi bez vraćanja
+	Advanced Properties…	Napredna svojstva…
+	View and edit the document's custom properties.	Pregledajte i uredite prilagođena svojstva dokumenta.
+	Current Document	Trenutni dokument
+	{n} people editing	Broj osoba koje uređuju: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Pravopisni rečnik za {language} nije mogao da se pročita, pa se tekst ne proverava. Datoteka: {file}. Razlog: {reason}
+	Go to {name}	Idi na: {name}
+	Community	Zajednica
+	Questions, ideas and bug reports on GitHub	Pitanja, ideje i prijave grešaka na GitHub-u
+	Version history	Istorija verzija
+	{language} (dictionary unreadable)	{language} (rečnik ne može da se pročita)
+	Text Size	Veličina teksta
+	Saving…	Čuvanje…
+	All changes saved	Sve izmene su sačuvane
+	Offline — changes will sync	Van mreže — izmene će biti sinhronizovane
+	Commenting	Komentarisanje
+	Suggesting	Predlaganje
+	View only	Samo pregled
+	Syncing…	Sinhronizovanje…
+	Too many changes are waiting to sync. The document is read only until they do.	Previše izmena čeka na sinhronizaciju. Dokument je samo za čitanje dok se ne sinhronizuju.
+	Reconnecting…	Ponovno povezivanje…
+	You're offline. The document is read only until your changes sync.	Van mreže ste. Dokument je samo za čitanje dok se vaše izmene ne sinhronizuju.
+	Save my copy	Sačuvaj moju kopiju
+	Loading…	Učitavanje…
+	No versions yet. A version is kept when the document is saved.	Još nema verzija. Verzija se čuva svaki put kada se dokument sačuva.
+	This version is no longer kept.	Ova verzija se više ne čuva.
+	Restore this version	Vrati ovu verziju
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Isecanje na strani radi samo na nerotiranim slikama: prvo podesite rotaciju na 0° ili koristite polja za isecanje
+	The number must be a divisor of {max}.	Broj mora biti delilac broja {max}.
+	Reference type:	Vrsta reference:
+	Insert reference to:	Umetni referencu na:
+	For which item:	Za koju stavku:
+	Nothing of this type in the document.	U dokumentu nema ničeg ove vrste.
+	*Bold* and _italic_ as real formatting	*Podebljano* i _kurziv_ kao pravo oblikovanje
+	Add a period with double-space	Dodaj tačku pri dvostrukom razmaku
+	Built-in Heading styles	Ugrađeni stilovi naslova
+	Set left- and first-indent with tabs and backspaces	Podesi levu uvlaku i uvlaku prvog reda tasterima Tab i Backspace
+	Automatically add words to list (First Letter)	Automatski dodaj reči na listu (Prvo slovo)
+	Automatically add words to list (INitial CAps)	Automatski dodaj reči na listu (DVa POčetna velika)
+	Select a place in this document:	Izaberite mesto u ovom dokumentu:
+	Top of the Document	Početak dokumenta
+	Bookmarks	Obeleživači
+	Find “{text}” in the document	Pronađi „{text}“ u dokumentu
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Besplatan, otvoreni obrađivač teksta napisan u Rust-u, sa zajedničkim uređivanjem u realnom vremenu.\nZasnovan na programu WordCraft tima ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, autor: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Zasnovan na github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Odbaciti kopiju za oporavak dokumenta {name}?
+	This cannot be undone. Your original file stays unchanged.	Ovo ne može da se poništi. Originalna datoteka ostaje nepromenjena.
+	Discard	Odbaci
+	Enter bookmark name:	Unesite naziv obeleživača:
+	This document has no bookmarks.	Ovaj dokument nema obeleživače.
+	Type a page number, or +2 / -1.	Unesite broj strane ili +2 / -1.
+	Property names are 1–{max} characters.	Naziv svojstva mora imati od 1 do {max} znakova.
+	Property values are at most {max} bytes.	Vrednost svojstva može imati najviše {max} bajtova.
+	Only text properties can be changed.	Mogu da se menjaju samo tekstualna svojstva.
+	Select a property to change.	Izaberite svojstvo koje želite da promenite.
+	This document has no custom properties.	Ovaj dokument nema prilagođena svojstva.
+	Value:	Vrednost:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Samo tekstualna svojstva: Word-ove vrste broj, datum i da/ne nisu ponuđene.
+	{field}, record {n}	{field}, zapis {n}
+	Folder path	Putanja fascikle
+	No items to show.	Nema stavki za prikaz.
+	File type	Vrsta datoteke
+	No new sources in that file	U toj datoteci nema novih izvora
+	Imported 1 source	Uvezen je 1 izvor
+	Imported {n} sources	Broj uvezenih izvora: {n}
+	pi	pi
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ne može da se pročita: {reason})
+	Spanish (Latin America)	Španski (Latinska Amerika)
+	Spanish (Uruguay)	Španski (Urugvaj)
+	Pane Options	Opcije okna
+	Dock Left	Usidri levo
+	Dock Right	Usidri desno
+	Float	Plutajuće
+	Move Pane: {title}	Premesti okno: {title}
+	Resize Pane	Promeni veličinu okna
+	AaBbCcDd	AaBbCcDd
+	Body text in a short paragraph to show spacing.	Osnovni tekst u kratkom pasusu za prikaz razmaka.
+	Pages in the range	Strane u opsegu
+	Scale to paper size	Prilagodi veličini papira
+	Viewing	Prikaz
+	Viewing — read without changing anything	Prikaz — čitajte bez ikakvih izmena
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Boja strane
+	Update check is not supported in the web browser.	Provera ažuriranja nije podržana u veb pregledaču.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} je trenutno najnovija dostupna verzija.
+	Could not check for updates:\n{error}	Provera ažuriranja nije uspela:\n{error}
+	Checking for updates…	Provera ažuriranja…
+	{name} options	Opcije za {name}

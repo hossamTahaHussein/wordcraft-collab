@@ -2705,3 +2705,92 @@ preview	Title	Naslov
 	✓ None	✓ Brez
 	➕ New comment	➕ Nov komentar
 	📂  Browse…	📂  Prebrskaj …
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Dokumenta {name} ni bilo mogoče shraniti, zato ostaja odprt in nič ni izgubljeno: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Obnovitev odpre neshranjeno kopijo. Izvirna datoteka ostane nespremenjena.
+	Recovery is disabled while this document has a password.	Obnovitev je onemogočena, dokler je dokument zaščiten z geslom.
+	Local recovery is unavailable or still loading.	Lokalna obnovitev ni na voljo ali se še nalaga.
+	No recovery copies.	Ni kopij za obnovitev.
+	Recovery copy	Kopija za obnovitev
+	Discard…	Zavrzi …
+	Continue without restoring	Nadaljuj brez obnovitve
+	Advanced Properties…	Napredne lastnosti …
+	View and edit the document's custom properties.	Oglejte si in uredite lastnosti dokumenta po meri.
+	Current Document	Trenutni dokument
+	{n} people editing	Število urejevalcev: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Slovarja za črkovanje za jezik {language} ni bilo mogoče prebrati, zato se ne preverja. Datoteka: {file}. Razlog: {reason}
+	Go to {name}	Pojdi na: {name}
+	Community	Skupnost
+	Questions, ideas and bug reports on GitHub	Vprašanja, zamisli in poročila o napakah na GitHubu
+	Version history	Zgodovina različic
+	{language} (dictionary unreadable)	{language} (slovarja ni mogoče prebrati)
+	Text Size	Velikost besedila
+	Saving…	Shranjevanje …
+	All changes saved	Vse spremembe so shranjene
+	Offline — changes will sync	Brez povezave – spremembe bodo sinhronizirane
+	Commenting	Komentiranje
+	Suggesting	Predlaganje
+	View only	Samo ogled
+	Syncing…	Sinhronizacija …
+	Too many changes are waiting to sync. The document is read only until they do.	Na sinhronizacijo čaka preveč sprememb. Dokument je samo za branje, dokler ne bodo sinhronizirane.
+	Reconnecting…	Vnovično povezovanje …
+	You're offline. The document is read only until your changes sync.	Niste povezani. Dokument je samo za branje, dokler vaše spremembe ne bodo sinhronizirane.
+	Save my copy	Shrani mojo kopijo
+	Loading…	Nalaganje …
+	No versions yet. A version is kept when the document is saved.	Različic še ni. Različica se ohrani ob vsakem shranjevanju dokumenta.
+	This version is no longer kept.	Ta različica ni več ohranjena.
+	Restore this version	Obnovi to različico
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Obrezovanje na strani deluje samo za nezasukane slike: najprej nastavite zasuk na 0° ali uporabite polja za obrezovanje
+	No matching commands	Ni ustreznih ukazov
+	The number must be a divisor of {max}.	Število mora biti delitelj števila {max}.
+	Nothing of this type in the document.	V dokumentu ni ničesar te vrste.
+	*Bold* and _italic_ as real formatting	*Krepko* in _ležeče_ kot pravo oblikovanje
+	Add a period with double-space	Ob dvojnem presledku dodaj piko
+	Built-in Heading styles	Vgrajeni slogi naslovov
+	Set left- and first-indent with tabs and backspaces	Nastavi levi zamik in zamik prve vrstice s tabulatorji in vračalko
+	Automatically add words to list (First Letter)	Samodejno dodaj besede na seznam (Prva črka)
+	Automatically add words to list (INitial CAps)	Samodejno dodaj besede na seznam (DVe ZAčetni VEliki)
+	Select a place in this document:	Izberite mesto v tem dokumentu:
+	Top of the Document	Začetek dokumenta
+	Bookmarks	Zaznamki
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Različica {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Brezplačen odprtokodni urejevalnik besedil, napisan v jeziku Rust, s sočasnim urejanjem v realnem času.\nTemelji na programu WordCraft ekipe ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, avtor: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Temelji na github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Želite zavreči kopijo za obnovitev dokumenta {name}?
+	This cannot be undone. Your original file stays unchanged.	Tega ni mogoče razveljaviti. Izvirna datoteka ostane nespremenjena.
+	Property names are 1–{max} characters.	Ime lastnosti mora imeti od 1 do {max} znakov.
+	Property values are at most {max} bytes.	Vrednost lastnosti ima lahko največ {max} bajtov.
+	Only text properties can be changed.	Spremeniti je mogoče samo besedilne lastnosti.
+	Select a property to change.	Izberite lastnost, ki jo želite spremeniti.
+	This document has no custom properties.	Ta dokument nima lastnosti po meri.
+	Modify	Spremeni
+	Text properties only: Word's number, date and yes-no types aren't offered.	Samo besedilne lastnosti: Wordove vrste število, datum in da/ne niso na voljo.
+	{field}, record {n}	{field}, zapis {n}
+	Folder path	Pot do mape
+	File type	Vrsta datoteke
+	No new sources in that file	V tej datoteki ni novih virov
+	Imported 1 source	Uvožen je 1 vir
+	Imported {n} sources	Uvoženi viri: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ni mogoče prebrati: {reason})
+	Spanish (Latin America)	Španščina (Latinska Amerika)
+	Spanish (Uruguay)	Španščina (Urugvaj)
+	Pane Options	Možnosti podokna
+	Dock Left	Zasidraj levo
+	Dock Right	Zasidraj desno
+	Float	Plavajoče
+	Move Pane: {title}	Premakni podokno: {title}
+	Resize Pane	Spremeni velikost podokna
+	Pages in the range	Strani v obsegu
+	Scale to paper size	Prilagodi velikosti papirja
+	Viewing	Ogled
+	Viewing — read without changing anything	Ogled – branje brez kakršnih koli sprememb
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Barva strani
+	Update check is not supported in the web browser.	Preverjanje posodobitev v spletnem brskalniku ni podprto.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} je trenutno najnovejša razpoložljiva različica.
+	Could not check for updates:\n{error}	Posodobitev ni bilo mogoče preveriti:\n{error}
+	Check for Updates	Preveri posodobitve
+	Checking for updates…	Preverjanje posodobitev …

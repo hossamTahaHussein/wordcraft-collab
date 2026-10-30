@@ -2409,3 +2409,60 @@ preview	Title	عنوان
 	✓ None	✓ هیچ‌کدام
 	➕ New comment	➕ نظر جدید
 	📂  Browse…	📂  مرور…
+	Advanced Properties…	ویژگی‌های پیشرفته…
+	View and edit the document's custom properties.	مشاهده و ویرایش ویژگی‌های سفارشی سند.
+	{n} people editing	در حال ویرایش: {n} نفر
+	Go to {name}	رفتن به {name}
+	Questions, ideas and bug reports on GitHub	پرسش‌ها، ایده‌ها و گزارش اشکال در GitHub
+	Version history	تاریخچهٔ نسخه
+	Text Size	اندازهٔ متن
+	Saving…	در حال ذخیره…
+	All changes saved	همهٔ تغییرات ذخیره شد
+	Offline — changes will sync	آفلاین — تغییرات همگام‌سازی خواهند شد
+	Commenting	نظردهی
+	Suggesting	پیشنهاددهی
+	View only	فقط مشاهده
+	Reconnecting…	در حال اتصال دوباره…
+	You're offline. The document is read only until your changes sync.	شما آفلاین هستید. تا وقتی تغییرات شما همگام‌سازی نشود، سند فقط خواندنی است.
+	Save my copy	ذخیرهٔ نسخهٔ من
+	Loading…	در حال بارگذاری…
+	No versions yet. A version is kept when the document is saved.	هنوز نسخه‌ای نیست. هر بار که سند ذخیره شود، یک نسخه نگه داشته می‌شود.
+	This version is no longer kept.	این نسخه دیگر نگه داشته نمی‌شود.
+	Restore this version	بازیابی این نسخه
+	*Bold* and _italic_ as real formatting	*پررنگ* و _ایتالیک_ به‌صورت قالب‌بندی واقعی
+	Add a period with double-space	افزودن نقطه با دو فاصله
+	Built-in Heading styles	سبک‌های سرتیتر داخلی
+	Set left- and first-indent with tabs and backspaces	تنظیم تورفتگی چپ و تورفتگی سطر اول با Tab و Backspace
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	یک واژه‌پرداز آزاد و متن‌باز که در Rust نوشته شده و ویرایش هم‌زمان گروهی را پشتیبانی می‌کند.\nبر پایهٔ WordCraft از تیم ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab از Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	بر پایهٔ github.com/storytold/wordcraft
+	Property names are 1–{max} characters.	نام ویژگی‌ها ۱ تا {max} کاراکتر است.
+	Property values are at most {max} bytes.	مقدار ویژگی‌ها حداکثر {max} بایت است.
+	Only text properties can be changed.	فقط ویژگی‌های متنی را می‌توان تغییر داد.
+	Select a property to change.	ویژگی‌ای را برای تغییر انتخاب کنید.
+	This document has no custom properties.	این سند ویژگی سفارشی ندارد.
+	Text properties only: Word's number, date and yes-no types aren't offered.	فقط ویژگی‌های متنی: نوع‌های عدد، تاریخ و بله/خیر Word ارائه نمی‌شوند.
+	{field}, record {n}	{field}، رکورد {n}
+	Folder path	مسیر پوشه
+	File type	نوع فایل
+	Spanish (Latin America)	اسپانیایی (آمریکای لاتین)
+	Spanish (Uruguay)	اسپانیایی (اروگوئه)
+	Pane Options	گزینه‌های پنجره
+	Dock Left	داک در چپ
+	Dock Right	داک در راست
+	Float	شناور
+	Move Pane: {title}	جابه‌جایی پنجره: {title}
+	Resize Pane	تغییر اندازهٔ پنجره
+	Pages in the range	صفحه‌های درون محدوده
+	Viewing	مشاهده
+	Viewing — read without changing anything	مشاهده — خواندن بدون تغییر چیزی
+	Page color	رنگ صفحه
+	Update check is not supported in the web browser.	بررسی به‌روزرسانی در مرورگر وب پشتیبانی نمی‌شود.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} در حال حاضر جدیدترین نسخهٔ موجود است.
+	Could not check for updates:\n{error}	بررسی به‌روزرسانی‌ها ممکن نشد:\n{error}
+	Checking for updates…	در حال بررسی به‌روزرسانی‌ها…
+	Syncing…	در حال همگام‌سازی…
+	Too many changes are waiting to sync. The document is read only until they do.	تغییرات زیادی در انتظار همگام‌سازی هستند. تا وقتی همگام‌سازی نشوند، سند فقط خواندنی است.

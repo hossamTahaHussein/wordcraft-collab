@@ -2472,3 +2472,87 @@ preview	Title	Tytuł
 	✓ None	✓ Brak
 	➕ New comment	➕ Nowy komentarz
 	📂  Browse…	📂  Przeglądaj…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Nie udało się zapisać pliku {name}. Dokument jest nadal otwarty i nic nie zostało utracone: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Przywrócenie otwiera niezapisaną kopię. Oryginalny plik pozostaje bez zmian.
+	Recovery is disabled while this document has a password.	Odzyskiwanie jest wyłączone, dopóki ten dokument ma hasło.
+	Local recovery is unavailable or still loading.	Odzyskiwanie lokalne jest niedostępne lub nadal się wczytuje.
+	No recovery copies.	Brak kopii do odzyskania.
+	Recovery copy	Kopia do odzyskania
+	Discard…	Odrzuć…
+	Continue without restoring	Kontynuuj bez przywracania
+	Advanced Properties…	Właściwości zaawansowane…
+	View and edit the document's custom properties.	Wyświetl i edytuj niestandardowe właściwości dokumentu.
+	Current Document	Bieżący dokument
+	{n} people editing	Edytujący: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Nie udało się odczytać słownika pisowni dla języka: {language}, więc tekst nie jest sprawdzany. Plik: {file}. Przyczyna: {reason}
+	Go to {name}	Przejdź do: {name}
+	Questions, ideas and bug reports on GitHub	Pytania, pomysły i zgłoszenia błędów w serwisie GitHub
+	Version history	Historia wersji
+	{language} (dictionary unreadable)	{language} (nie można odczytać słownika)
+	Text Size	Rozmiar tekstu
+	Saving…	Zapisywanie…
+	All changes saved	Wszystkie zmiany zapisane
+	Offline — changes will sync	Offline — zmiany zostaną zsynchronizowane
+	Commenting	Komentowanie
+	Suggesting	Sugerowanie
+	View only	Tylko wyświetlanie
+	Reconnecting…	Ponowne łączenie…
+	You're offline. The document is read only until your changes sync.	Jesteś offline. Dokument jest tylko do odczytu, dopóki Twoje zmiany nie zostaną zsynchronizowane.
+	Save my copy	Zapisz moją kopię
+	Loading…	Wczytywanie…
+	No versions yet. A version is kept when the document is saved.	Nie ma jeszcze wersji. Wersja jest zachowywana przy zapisaniu dokumentu.
+	This version is no longer kept.	Ta wersja nie jest już przechowywana.
+	Restore this version	Przywróć tę wersję
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Przycinanie na stronie działa dla obrazów, które nie są obrócone: najpierw ustaw obrót na 0° albo użyj pól przycinania
+	The number must be a divisor of {max}.	Liczba musi być dzielnikiem liczby {max}.
+	Nothing of this type in the document.	W dokumencie nie ma elementów tego typu.
+	*Bold* and _italic_ as real formatting	*Pogrubienie* i _kursywa_ jako rzeczywiste formatowanie
+	Add a period with double-space	Dodaj kropkę po podwójnej spacji
+	Built-in Heading styles	Wbudowane style nagłówków
+	Set left- and first-indent with tabs and backspaces	Ustawiaj wcięcie lewe i pierwszego wiersza klawiszami Tab i Backspace
+	Automatically add words to list (First Letter)	Automatycznie dodawaj wyrazy do listy (Pierwsza litera)
+	Automatically add words to list (INitial CAps)	Automatycznie dodawaj wyrazy do listy (POczątkowe WIelkie litery)
+	Select a place in this document:	Wybierz miejsce w tym dokumencie:
+	Top of the Document	Początek dokumentu
+	Bookmarks	Zakładki
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Darmowy edytor tekstu o otwartym kodzie, napisany w języku Rust, ze wspólną edycją w czasie rzeczywistym.\nOparty na programie WordCraft zespołu ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, autor: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Oparty na github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Odrzucić kopię do odzyskania pliku {name}?
+	This cannot be undone. Your original file stays unchanged.	Tej operacji nie można cofnąć. Oryginalny plik pozostaje bez zmian.
+	Property names are 1–{max} characters.	Nazwy właściwości mają od 1 do {max} znaków.
+	Property values are at most {max} bytes.	Wartości właściwości mają najwyżej {max} B.
+	Only text properties can be changed.	Można zmieniać tylko właściwości tekstowe.
+	Select a property to change.	Wybierz właściwość do zmiany.
+	This document has no custom properties.	Ten dokument nie ma właściwości niestandardowych.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Tylko właściwości tekstowe: typy liczba, data i tak/nie programu Word nie są dostępne.
+	{field}, record {n}	{field}, rekord {n}
+	Folder path	Ścieżka folderu
+	File type	Typ pliku
+	No new sources in that file	Brak nowych źródeł w tym pliku
+	Imported 1 source	Zaimportowano 1 źródło
+	Imported {n} sources	Zaimportowane źródła: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (nie można odczytać: {reason})
+	Spanish (Latin America)	Hiszpański (Ameryka Łacińska)
+	Spanish (Uruguay)	Hiszpański (Urugwaj)
+	Pane Options	Opcje okienka
+	Dock Left	Zadokuj po lewej
+	Dock Right	Zadokuj po prawej
+	Float	Swobodne
+	Move Pane: {title}	Przesuń okienko: {title}
+	Resize Pane	Zmień rozmiar okienka
+	Pages in the range	Strony w zakresie
+	Scale to paper size	Skaluj do rozmiaru papieru
+	Viewing	Wyświetlanie
+	Viewing — read without changing anything	Wyświetlanie — czytanie bez wprowadzania zmian
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Kolor strony
+	Update check is not supported in the web browser.	Sprawdzanie aktualizacji nie jest obsługiwane w przeglądarce internetowej.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} to obecnie najnowsza dostępna wersja.
+	Could not check for updates:\n{error}	Nie udało się sprawdzić aktualizacji:\n{error}
+	Checking for updates…	Sprawdzanie aktualizacji…
+	Syncing…	Synchronizowanie…
+	Too many changes are waiting to sync. The document is read only until they do.	Zbyt wiele zmian czeka na synchronizację. Dokument jest tylko do odczytu, dopóki nie zostaną zsynchronizowane.

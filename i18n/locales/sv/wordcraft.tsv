@@ -2433,3 +2433,89 @@ preview	Title	Titel
 	✓ None	✓ Ingen
 	➕ New comment	➕ Ny kommentar
 	📂  Browse…	📂  Bläddra…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Det gick inte att spara {name}, så dokumentet är fortfarande öppet och inget har gått förlorat: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Återställ öppnar en osparad kopia. Originalfilen förblir oförändrad.
+	Recovery is disabled while this document has a password.	Återställning är avstängd så länge dokumentet har ett lösenord.
+	Local recovery is unavailable or still loading.	Lokal återställning är inte tillgänglig eller läses fortfarande in.
+	No recovery copies.	Inga återställningskopior.
+	Recovery copy	Återställningskopia
+	Discard…	Släng…
+	Continue without restoring	Fortsätt utan att återställa
+	Advanced Properties…	Avancerade egenskaper…
+	View and edit the document's custom properties.	Visa och redigera dokumentets anpassade egenskaper.
+	Current Document	Aktuellt dokument
+	{n} people editing	{n} personer redigerar
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Stavningsordlistan för {language} kunde inte läsas, så språket kontrolleras inte. Fil: {file}. Orsak: {reason}
+	Go to {name}	Gå till {name}
+	Questions, ideas and bug reports on GitHub	Frågor, idéer och felrapporter på GitHub
+	Version history	Versionshistorik
+	{language} (dictionary unreadable)	{language} (ordlistan kan inte läsas)
+	Text Size	Textstorlek
+	Saving…	Sparar…
+	All changes saved	Alla ändringar har sparats
+	Offline — changes will sync	Offline – ändringarna synkroniseras senare
+	Commenting	Kommenterar
+	Suggesting	Föreslår
+	View only	Endast visning
+	Syncing…	Synkroniserar…
+	Too many changes are waiting to sync. The document is read only until they do.	För många ändringar väntar på att synkroniseras. Dokumentet är skrivskyddat tills de har synkroniserats.
+	Reconnecting…	Återansluter…
+	You're offline. The document is read only until your changes sync.	Du är offline. Dokumentet är skrivskyddat tills dina ändringar har synkroniserats.
+	Save my copy	Spara min kopia
+	Loading…	Läser in…
+	No versions yet. A version is kept when the document is saved.	Inga versioner än. En version sparas varje gång dokumentet sparas.
+	This version is no longer kept.	Den här versionen finns inte längre kvar.
+	Restore this version	Återställ den här versionen
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Beskärning på sidan fungerar bara på bilder som inte är roterade: ställ först in Rotation på 0° eller använd beskärningsfälten
+	No matching commands	Inga matchande kommandon
+	The number must be a divisor of {max}.	Talet måste vara en delare av {max}.
+	Nothing of this type in the document.	Det finns inget av den här typen i dokumentet.
+	*Bold* and _italic_ as real formatting	*Fet* och _kursiv_ som riktig formatering
+	Add a period with double-space	Lägg till punkt vid dubbelt blanksteg
+	Built-in Heading styles	Inbyggda rubrikstilar
+	Set left- and first-indent with tabs and backspaces	Ange vänster- och förstaradsindrag med tabb och backsteg
+	Automatically add words to list (First Letter)	Lägg automatiskt till ord i listan (Första bokstav)
+	Automatically add words to list (INitial CAps)	Lägg automatiskt till ord i listan (TVå INledande VErsaler)
+	Select a place in this document:	Välj en plats i det här dokumentet:
+	Top of the Document	Början av dokumentet
+	Bookmarks	Bokmärken
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	En gratis ordbehandlare med öppen källkod, skriven i Rust, med samredigering i realtid.\nBaserad på WordCraft från ArtCraft-teamet.
+	WordCraft Collab by Hossam Taha	WordCraft Collab av Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Baserad på github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Vill du slänga återställningskopian av {name}?
+	This cannot be undone. Your original file stays unchanged.	Det här kan inte ångras. Originalfilen förblir oförändrad.
+	Property names are 1–{max} characters.	Egenskapsnamn ska vara 1–{max} tecken långa.
+	Property values are at most {max} bytes.	Egenskapsvärden får vara högst {max} byte.
+	Only text properties can be changed.	Bara textegenskaper kan ändras.
+	Select a property to change.	Välj en egenskap att ändra.
+	This document has no custom properties.	Det här dokumentet har inga anpassade egenskaper.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Endast textegenskaper: Words typer för tal, datum och ja/nej erbjuds inte.
+	{field}, record {n}	{field}, post {n}
+	Folder path	Mappsökväg
+	File type	Filtyp
+	No new sources in that file	Inga nya källor i den filen
+	Imported 1 source	1 källa har importerats
+	Imported {n} sources	{n} källor har importerats
+	{language}: {file} (unreadable: {reason})	{language}: {file} (kan inte läsas: {reason})
+	Spanish (Latin America)	Spanska (Latinamerika)
+	Spanish (Uruguay)	Spanska (Uruguay)
+	Pane Options	Panelalternativ
+	Dock Left	Docka till vänster
+	Dock Right	Docka till höger
+	Float	Flytande
+	Move Pane: {title}	Flytta panel: {title}
+	Resize Pane	Ändra panelens storlek
+	Pages in the range	Sidor i intervallet
+	Scale to paper size	Skala till pappersstorlek
+	Viewing	Visning
+	Viewing — read without changing anything	Visning – läs utan att ändra något
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Sidfärg
+	Update check is not supported in the web browser.	Uppdateringskontroll stöds inte i webbläsaren.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} är för närvarande den senaste tillgängliga versionen.
+	Could not check for updates:\n{error}	Det gick inte att söka efter uppdateringar:\n{error}
+	Check for Updates	Sök efter uppdateringar
+	Checking for updates…	Söker efter uppdateringar…

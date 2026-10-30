@@ -2363,3 +2363,139 @@ preview	Title	제목
 	✓ None	✓ 없음
 	➕ New comment	➕ 새 메모
 	📂  Browse…	📂  찾아보기…
+	No document is open. Create a document or open one first.	열린 문서가 없습니다. 먼저 문서를 만들거나 여세요.
+	Waiting for the save to finish…	저장이 끝나기를 기다리는 중…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	{name}을(를) 저장하지 못했습니다. 문서는 열린 상태이며 손실된 내용은 없습니다: {error}
+	Saving {name} was cancelled, so it is still open and nothing was lost.	{name} 저장이 취소되었습니다. 문서는 열린 상태이며 손실된 내용은 없습니다.
+	Wait for the print job to finish submitting before closing.	닫기 전에 인쇄 작업 전송이 끝날 때까지 기다리세요.
+	Restore opens an unsaved copy. Your original file stays unchanged.	복원하면 저장되지 않은 사본이 열립니다. 원본 파일은 변경되지 않습니다.
+	Recovery is disabled while this document has a password.	이 문서에 암호가 설정되어 있는 동안에는 복구를 사용할 수 없습니다.
+	Local recovery is unavailable or still loading.	로컬 복구를 사용할 수 없거나 아직 로드 중입니다.
+	No recovery copies.	복구 사본이 없습니다.
+	Recovery copy	복구 사본
+	Discard…	삭제…
+	Continue without restoring	복원하지 않고 계속
+	Advanced Properties…	고급 속성…
+	View and edit the document's custom properties.	문서의 사용자 지정 속성을 보고 편집합니다.
+	Edit Document	문서 편집
+	Current Document	현재 문서
+	{n} people editing	{n}명이 편집 중
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	{language} 맞춤법 사전을 읽을 수 없어 맞춤법을 검사하지 않습니다. 파일: {file}. 이유: {reason}
+	Account	계정
+	Go to {name}	{name}(으)로 이동
+	Questions, ideas and bug reports on GitHub	GitHub에서 질문, 아이디어, 버그 신고
+	Version history	버전 기록
+	{language} (dictionary unreadable)	{language}(사전을 읽을 수 없음)
+	{language} (no dictionary)	{language}(사전 없음)
+	Text Size	텍스트 크기
+	Saving…	저장 중…
+	All changes saved	모든 변경 내용이 저장됨
+	Offline — changes will sync	오프라인 — 변경 내용은 나중에 동기화됩니다
+	Commenting	댓글 작성
+	Suggesting	제안
+	View only	보기 전용
+	Syncing…	동기화 중…
+	Too many changes are waiting to sync. The document is read only until they do.	동기화를 기다리는 변경 내용이 너무 많습니다. 동기화될 때까지 문서는 읽기 전용입니다.
+	Reconnecting…	다시 연결하는 중…
+	You're offline. The document is read only until your changes sync.	오프라인 상태입니다. 변경 내용이 동기화될 때까지 문서는 읽기 전용입니다.
+	Save my copy	내 사본 저장
+	Loading…	로드 중…
+	No versions yet. A version is kept when the document is saved.	아직 버전이 없습니다. 문서를 저장하면 버전이 보관됩니다.
+	This version is no longer kept.	이 버전은 더 이상 보관되지 않습니다.
+	Restore this version	이 버전 복원
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	페이지에서 자르기는 회전하지 않은 그림에서만 작동합니다. 먼저 회전을 0°로 설정하거나 자르기 상자를 사용하세요
+	Sort by:	정렬 기준:
+	Hidden bookmarks	숨겨진 책갈피
+	Style name:	스타일 이름:
+	{name}   {height} × {width} in	{name}   {height} × {width}인치
+	{name}   {height} × {width} mm	{name}   {height} × {width}mm
+	{width} × {height} mm	{width} × {height}mm
+	{kind}, {columns} × {rows}, {size} ({paper})	{kind}, {columns} × {rows}, {size}({paper})
+	Ascending	오름차순
+	The number must be a divisor of {max}.	숫자는 {max}의 약수여야 합니다.
+	Moved from:	이동한 위치(시작):
+	Moved to:	이동한 위치(끝):
+	Reference type:	참조 유형:
+	Insert reference to:	참조로 삽입할 내용:
+	For which item:	대상 항목:
+	Nothing of this type in the document.	문서에 이 유형의 항목이 없습니다.
+	*Bold* and _italic_ as real formatting	*굵게* 및 _기울임꼴_을 실제 서식으로
+	Add a period with double-space	공백 두 번으로 마침표 추가
+	Built-in Heading styles	기본 제공 제목 스타일
+	Set left- and first-indent with tabs and backspaces	Tab 키와 Backspace 키로 왼쪽 들여쓰기와 첫 줄 들여쓰기 설정
+	Automatically add words to list (First Letter)	목록에 단어 자동 추가(첫 글자)
+	Automatically add words to list (INitial CAps)	목록에 단어 자동 추가(연속된 두 대문자)
+	Document name	문서 이름
+	Mirror margins	좌우 대칭 여백
+	Link to:	연결 대상:
+	Existing File or Web Page	기존 파일 또는 웹 페이지
+	Place in This Document	현재 문서의 위치
+	Select a place in this document:	이 문서에서 위치 선택:
+	Top of the Document	문서의 처음
+	Bookmarks	책갈피
+	Suggested	추천
+	Find “{text}” in the document	문서에서 “{text}” 찾기
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Rust로 만든 무료 오픈 소스 워드 프로세서로, 실시간 공동 편집을 지원합니다.\nArtCraft 팀의 WordCraft를 기반으로 합니다.
+	WordCraft Collab by Hossam Taha	WordCraft Collab - 제작: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	github.com/storytold/wordcraft 기반
+	Discard the recovery copy of {name}?	{name}의 복구 사본을 삭제하시겠습니까?
+	This cannot be undone. Your original file stays unchanged.	이 작업은 취소할 수 없습니다. 원본 파일은 변경되지 않습니다.
+	Go to what:	이동할 대상:
+	Type +2 or -1 to move from the page you are on.	현재 페이지에서 이동하려면 +2 또는 -1을 입력하세요.
+	Enter bookmark name:	책갈피 이름 입력:
+	This document has no bookmarks.	이 문서에는 책갈피가 없습니다.
+	Type a page number, or +2 / -1.	페이지 번호 또는 +2 / -1을 입력하세요.
+	Property names are 1–{max} characters.	속성 이름은 1–{max}자입니다.
+	Property values are at most {max} bytes.	속성 값은 최대 {max}바이트입니다.
+	Only text properties can be changed.	텍스트 속성만 변경할 수 있습니다.
+	Select a property to change.	변경할 속성을 선택하세요.
+	This document has no custom properties.	이 문서에는 사용자 지정 속성이 없습니다.
+	Text properties only: Word's number, date and yes-no types aren't offered.	텍스트 속성만 지원: Word의 숫자, 날짜, 예/아니요 유형은 제공되지 않습니다.
+	{field}, record {n}	{field}, 레코드 {n}
+	Filter and Sort	필터 및 정렬
+	{count} of {total} recipients will be merged.	받는 사람 {total}명 중 {count}명이 병합됩니다.
+	Compare to	비교 대상
+	And	그리고
+	Or	또는
+	Remove condition	조건 제거
+	Add Condition	조건 추가
+	Folder path	폴더 경로
+	No items to show.	표시할 항목이 없습니다.
+	File type	파일 형식
+	No new sources in that file	해당 파일에 새 원본이 없습니다
+	Imported 1 source	원본 1개를 가져왔습니다
+	Imported {n} sources	원본 {n}개를 가져왔습니다
+	Dictionaries folder:	사전 폴더:
+	Not set: the system's usual places	설정 안 됨: 시스템의 일반적인 위치
+	{language}: {file} (unreadable: {reason})	{language}: {file}(읽을 수 없음: {reason})
+	{language}: {file}	{language}: {file}
+	{language}: no dictionary found	{language}: 사전을 찾을 수 없음
+	Croatian	크로아티아어
+	Spanish (Latin America)	스페인어(라틴 아메리카)
+	Spanish (Uruguay)	스페인어(우루과이)
+	Show alignment guides when moving pictures and shapes	그림과 도형을 이동할 때 맞춤 안내선 표시
+	Moved objects snap to the page's edges and centre, the margins and other objects. Hold Alt to move freely.	이동한 개체는 페이지의 가장자리와 가운데, 여백, 다른 개체에 맞춰집니다. 자유롭게 이동하려면 Alt 키를 누른 채로 이동하세요.
+	Auto ({percent}%)	자동({percent}%)
+	Pane Options	창 옵션
+	Dock Left	왼쪽에 도킹
+	Dock Right	오른쪽에 도킹
+	Float	떠 있는 창
+	Move Pane: {title}	창 이동: {title}
+	Resize Pane	창 크기 조절
+	Pages in the range	범위의 페이지
+	Scale to paper size	용지 크기에 맞게 조정
+	Viewing	보기
+	Viewing — read without changing anything	보기 — 아무것도 변경하지 않고 읽습니다
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Reading Mode	읽기 모드
+	Text size	텍스트 크기
+	Page color	페이지 색
+	Update check is not supported in the web browser.	웹 브라우저에서는 업데이트 확인이 지원되지 않습니다.
+	WordCraft {version} is currently the newest version available.	WordCraft {version}이(가) 현재 사용 가능한 최신 버전입니다.
+	Could not check for updates:\n{error}	업데이트를 확인할 수 없습니다:\n{error}
+	Check for Updates	업데이트 확인
+	Checking for updates…	업데이트 확인 중…
+	{name} options	{name} 옵션

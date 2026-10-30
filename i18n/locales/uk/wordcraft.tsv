@@ -2142,3 +2142,99 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	Слів: {words}! Я б кинув конфеті, але ж потім самому прибирати.
 	{words} words. That's {words} more than I've written today.	Слів: {words}. Це на {words} більше, ніж я написав сьогодні.
 	“{text}” ({row}, {series}) isn't a number.	«{text}» ({row}, {series}) — не число.
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Не вдалося зберегти «{name}», тому документ залишається відкритим і нічого не втрачено: {error}
+	Wait for the print job to finish submitting before closing.	Перш ніж закрити, дочекайтеся завершення надсилання завдання на друк.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Відновлення відкриває незбережену копію. Вихідний файл залишається без змін.
+	Recovery is disabled while this document has a password.	Відновлення вимкнено, поки документ захищено паролем.
+	Local recovery is unavailable or still loading.	Локальне відновлення недоступне або ще завантажується.
+	No recovery copies.	Немає копій для відновлення.
+	Recovery copy	Копія для відновлення
+	Discard…	Видалити…
+	Continue without restoring	Продовжити без відновлення
+	Advanced Properties…	Додаткові властивості…
+	View and edit the document's custom properties.	Перегляд і зміна власних властивостей документа.
+	Current Document	Поточний документ
+	{n} people editing	Редагують: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Не вдалося прочитати орфографічний словник для мови «{language}», тому текст не перевіряється. Файл: {file}. Причина: {reason}
+	Go to {name}	Перейти до: {name}
+	Questions, ideas and bug reports on GitHub	Запитання, ідеї та повідомлення про помилки на GitHub
+	Version history	Історія версій
+	{language} (dictionary unreadable)	{language} (словник не читається)
+	Text Size	Розмір тексту
+	Saving…	Збереження…
+	All changes saved	Усі зміни збережено
+	Offline — changes will sync	Офлайн — зміни буде синхронізовано
+	Commenting	Коментування
+	Suggesting	Пропонування змін
+	View only	Лише перегляд
+	Reconnecting…	Повторне підключення…
+	You're offline. The document is read only until your changes sync.	Немає підключення до мережі. Документ доступний лише для читання, доки ваші зміни не синхронізуються.
+	Save my copy	Зберегти мою копію
+	Loading…	Завантаження…
+	No versions yet. A version is kept when the document is saved.	Версій ще немає. Версія зберігається щоразу, коли документ зберігають.
+	This version is no longer kept.	Ця версія більше не зберігається.
+	Restore this version	Відновити цю версію
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Обрізання на сторінці працює лише для неповернутих зображень: спершу встановіть поворот 0° або скористайтеся полями обрізання
+	The number must be a divisor of {max}.	Число має бути дільником {max}.
+	Reference type:	Тип посилання:
+	Insert reference to:	Вставити посилання на:
+	For which item:	Для якого елемента:
+	Nothing of this type in the document.	У документі немає елементів цього типу.
+	*Bold* and _italic_ as real formatting	*Напівжирний* і _курсив_ як справжнє форматування
+	Add a period with double-space	Ставити крапку після подвійного пробілу
+	Built-in Heading styles	Вбудовані стилі заголовків
+	Set left- and first-indent with tabs and backspaces	Задавати відступ ліворуч і відступ першого рядка клавішами Tab і Backspace
+	Automatically add words to list (First Letter)	Автоматично додавати слова до списку (Перша літера)
+	Automatically add words to list (INitial CAps)	Автоматично додавати слова до списку (ДВі ВЕликі)
+	Select a place in this document:	Виберіть місце в документі:
+	Top of the Document	Початок документа
+	Bookmarks	Закладки
+	Find “{text}” in the document	Знайти «{text}» у документі
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Безкоштовний текстовий процесор із відкритим кодом, написаний мовою Rust, зі спільним редагуванням у реальному часі.\nСтворено на основі WordCraft від команди ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, автор — Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	На основі github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Видалити копію для відновлення «{name}»?
+	This cannot be undone. Your original file stays unchanged.	Цю дію не можна скасувати. Вихідний файл залишається без змін.
+	Enter bookmark name:	Введіть назву закладки:
+	Type a page number, or +2 / -1.	Введіть номер сторінки або +2 / -1.
+	Property names are 1–{max} characters.	Назва властивості має містити від 1 до {max} символів.
+	Property values are at most {max} bytes.	Значення властивості не може перевищувати {max} байтів.
+	Only text properties can be changed.	Змінювати можна лише текстові властивості.
+	Select a property to change.	Виберіть властивість, яку потрібно змінити.
+	This document has no custom properties.	У цьому документі немає власних властивостей.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Лише текстові властивості: типи Word «число», «дата» і «так/ні» не пропонуються.
+	{field}, record {n}	{field}, запис {n}
+	Folder path	Шлях до папки
+	No items to show.	Немає елементів для показу.
+	File type	Тип файлу
+	No new sources in that file	У цьому файлі немає нових джерел
+	Imported 1 source	Імпортовано 1 джерело
+	Imported {n} sources	Імпортовано джерел: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (не читається: {reason})
+	Spanish (Latin America)	Іспанська (Латинська Америка)
+	Spanish (Uruguay)	Іспанська (Уругвай)
+	Pane Options	Параметри панелі
+	Dock Left	Прикріпити ліворуч
+	Dock Right	Прикріпити праворуч
+	Float	Відкріпити
+	Move Pane: {title}	Перемістити панель: {title}
+	Resize Pane	Змінити розмір панелі
+	AaBbCcDd	AaBbCcDd
+	Body text in a short paragraph to show spacing.	Основний текст у короткому абзаці, щоб показати інтервали.
+	Pages in the range	Сторінки в діапазоні
+	Scale to paper size	Масштабувати за розміром паперу
+	Viewing	Перегляд
+	Viewing — read without changing anything	Перегляд — читання без внесення змін
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Колір сторінки
+	Update check is not supported in the web browser.	Перевірка оновлень не підтримується у веббраузері.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} — наразі найновіша доступна версія.
+	Could not check for updates:\n{error}	Не вдалося перевірити оновлення:\n{error}
+	Check for Updates	Перевірити оновлення
+	Checking for updates…	Перевірка оновлень…
+	{name} options	{name}: параметри
+	Syncing…	Синхронізація…
+	Too many changes are waiting to sync. The document is read only until they do.	Забагато змін очікує на синхронізацію. Документ доступний лише для читання, доки їх не буде синхронізовано.

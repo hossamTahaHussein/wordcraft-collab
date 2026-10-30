@@ -2434,3 +2434,91 @@ preview	Title	Ukázka
 	✓ None	✓ Žádné
 	➕ New comment	➕ Nový komentář
 	📂  Browse…	📂  Procházet…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Dokument {name} se nepodařilo uložit, takže zůstává otevřený a nic se neztratilo: {error}
+	Wait for the print job to finish submitting before closing.	Před zavřením počkejte, až se tisková úloha dokončí odesílat.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Obnovení otevře neuloženou kopii. Váš původní soubor zůstane beze změny.
+	Recovery is disabled while this document has a password.	Obnovení je vypnuté, dokud má tento dokument heslo.
+	Local recovery is unavailable or still loading.	Místní obnovení není k dispozici nebo se ještě načítá.
+	No recovery copies.	Žádné kopie pro obnovení.
+	Recovery copy	Kopie pro obnovení
+	Discard…	Zahodit…
+	Continue without restoring	Pokračovat bez obnovení
+	Advanced Properties…	Upřesnit vlastnosti…
+	View and edit the document's custom properties.	Zobrazit a upravit vlastní vlastnosti dokumentu.
+	Current Document	Aktuální dokument
+	{n} people editing	Upravuje: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Slovník pravopisu pro jazyk {language} se nepodařilo přečíst, proto se pravopis nekontroluje. Soubor: {file}. Důvod: {reason}
+	Go to {name}	Přejít na {name}
+	Questions, ideas and bug reports on GitHub	Otázky, nápady a hlášení chyb na GitHubu
+	Version history	Historie verzí
+	{language} (dictionary unreadable)	{language} (slovník nelze přečíst)
+	Text Size	Velikost textu
+	Saving…	Ukládání…
+	All changes saved	Všechny změny jsou uložené
+	Offline — changes will sync	Bez připojení — změny se synchronizují
+	Commenting	Komentování
+	Suggesting	Navrhování
+	View only	Jen prohlížení
+	Reconnecting…	Opětovné připojování…
+	You're offline. The document is read only until your changes sync.	Jste offline. Dokument je jen pro čtení, dokud se vaše změny nesynchronizují.
+	Save my copy	Uložit moji kopii
+	Loading…	Načítání…
+	No versions yet. A version is kept when the document is saved.	Zatím žádné verze. Verze se uchová při uložení dokumentu.
+	This version is no longer kept.	Tato verze se již neuchovává.
+	Restore this version	Obnovit tuto verzi
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Oříznutí přímo na stránce funguje u neotočených obrázků: nejprve nastavte Otočení na 0°, nebo použijte pole pro oříznutí
+	The number must be a divisor of {max}.	Číslo musí být dělitelem čísla {max}.
+	Nothing of this type in the document.	V dokumentu není nic tohoto typu.
+	*Bold* and _italic_ as real formatting	*Tučné* a _kurzíva_ jako skutečné formátování
+	Add a period with double-space	Přidat tečku při dvojité mezeře
+	Built-in Heading styles	Předdefinované styly nadpisů
+	Set left- and first-indent with tabs and backspaces	Nastavit levé odsazení a odsazení prvního řádku tabulátory a klávesou Backspace
+	Automatically add words to list (First Letter)	Automaticky přidávat slova do seznamu (první písmeno)
+	Automatically add words to list (INitial CAps)	Automaticky přidávat slova do seznamu (DVě POčáteční velká)
+	Select a place in this document:	Vyberte místo v tomto dokumentu:
+	Top of the Document	Začátek dokumentu
+	Bookmarks	Záložky
+	Find “{text}” in the document	Najít „{text}“ v dokumentu
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Bezplatný textový procesor s otevřeným zdrojovým kódem napsaný v jazyce Rust, se společnými úpravami v reálném čase.\nZaložený na WordCraftu od týmu ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab od Hossama Tahy
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Založeno na github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Zahodit kopii pro obnovení dokumentu {name}?
+	This cannot be undone. Your original file stays unchanged.	Tuto akci nelze vrátit zpět. Váš původní soubor zůstane beze změny.
+	Enter bookmark name:	Zadejte název záložky:
+	Type a page number, or +2 / -1.	Zadejte číslo stránky, nebo +2 / -1.
+	Property names are 1–{max} characters.	Názvy vlastností mají 1–{max} znaků.
+	Property values are at most {max} bytes.	Hodnoty vlastností mají nejvýše {max} bajtů.
+	Only text properties can be changed.	Měnit lze pouze textové vlastnosti.
+	Select a property to change.	Vyberte vlastnost, kterou chcete změnit.
+	This document has no custom properties.	Tento dokument nemá žádné vlastní vlastnosti.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Pouze textové vlastnosti: typy Wordu číslo, datum a ano/ne nejsou k dispozici.
+	{field}, record {n}	{field}, záznam {n}
+	Folder path	Cesta ke složce
+	File type	Typ souboru
+	No new sources in that file	V tomto souboru nejsou žádné nové prameny
+	Imported 1 source	Importován 1 pramen
+	Imported {n} sources	Importované prameny: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (nelze přečíst: {reason})
+	Spanish (Latin America)	Španělština (Latinská Amerika)
+	Spanish (Uruguay)	Španělština (Uruguay)
+	Pane Options	Možnosti podokna
+	Dock Left	Ukotvit vlevo
+	Dock Right	Ukotvit vpravo
+	Float	Plovoucí
+	Move Pane: {title}	Přesunout podokno: {title}
+	Resize Pane	Změnit velikost podokna
+	Pages in the range	Stránky v rozsahu
+	Scale to paper size	Přizpůsobit velikosti papíru
+	Viewing	Prohlížení
+	Viewing — read without changing anything	Prohlížení — čtení bez jakýchkoli změn
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Barva stránky
+	Update check is not supported in the web browser.	Kontrola aktualizací není ve webovém prohlížeči podporována.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} je aktuálně nejnovější dostupná verze.
+	Could not check for updates:\n{error}	Aktualizace se nepodařilo zkontrolovat:\n{error}
+	Checking for updates…	Kontrola aktualizací…
+	Syncing…	Synchronizace…
+	Too many changes are waiting to sync. The document is read only until they do.	Na synchronizaci čeká příliš mnoho změn. Dokument je jen pro čtení, dokud se nesynchronizují.

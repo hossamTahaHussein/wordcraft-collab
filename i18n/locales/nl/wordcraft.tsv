@@ -2509,3 +2509,120 @@ preview	Title	Titel
 	✓ None	✓ Geen
 	➕ New comment	➕ Nieuwe opmerking
 	📂  Browse…	📂  Bladeren…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	{name} kon niet worden opgeslagen, dus het document is nog geopend en er is niets verloren: {error}
+	Wait for the print job to finish submitting before closing.	Wacht tot de afdruktaak volledig is verzonden voordat je sluit.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Herstellen opent een niet-opgeslagen kopie. Je oorspronkelijke bestand blijft ongewijzigd.
+	Recovery is disabled while this document has a password.	Herstel is uitgeschakeld zolang dit document een wachtwoord heeft.
+	Local recovery is unavailable or still loading.	Lokaal herstel is niet beschikbaar of wordt nog geladen.
+	No recovery copies.	Geen herstelkopieën.
+	Recovery copy	Herstelkopie
+	Discard…	Negeren…
+	Continue without restoring	Doorgaan zonder herstellen
+	Personal	Persoonlijk
+	Templates you save in your templates folder show up here.	Sjablonen die je in je sjablonenmap opslaat, verschijnen hier.
+	Save as Word Template…	Opslaan als Word-sjabloon…
+	Saves a .dotx template in your templates folder. It shows up in File › New under Personal.	Slaat een .dotx-sjabloon op in je sjablonenmap. Het verschijnt in Bestand › Nieuw onder Persoonlijk.
+	Advanced Properties…	Geavanceerde eigenschappen…
+	View and edit the document's custom properties.	De aangepaste eigenschappen van het document bekijken en bewerken.
+	Current Document	Huidig document
+	{n} people editing	{n} personen bewerken
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Het spellingwoordenboek voor {language} kon niet worden gelezen, dus de spelling wordt niet gecontroleerd. Bestand: {file}. Reden: {reason}
+	Go to {name}	Ga naar {name}
+	Questions, ideas and bug reports on GitHub	Vragen, ideeën en bugmeldingen op GitHub
+	Show the ribbon	Het lint weergeven
+	Version history	Versiegeschiedenis
+	Editing footnote	Voetnoot bewerken
+	Editing endnote	Eindnoot bewerken
+	{language} (dictionary unreadable)	{language} (woordenboek onleesbaar)
+	Text Size	Tekstgrootte
+	Saving…	Opslaan…
+	All changes saved	Alle wijzigingen opgeslagen
+	Offline — changes will sync	Offline — wijzigingen worden later gesynchroniseerd
+	Commenting	Opmerkingen maken
+	Suggesting	Voorstellen doen
+	View only	Alleen bekijken
+	Syncing…	Synchroniseren…
+	Too many changes are waiting to sync. The document is read only until they do.	Er wachten te veel wijzigingen op synchronisatie. Het document is alleen-lezen totdat ze zijn gesynchroniseerd.
+	Reconnecting…	Opnieuw verbinden…
+	You're offline. The document is read only until your changes sync.	Je bent offline. Het document is alleen-lezen totdat je wijzigingen zijn gesynchroniseerd.
+	Save my copy	Mijn kopie opslaan
+	Loading…	Laden…
+	No versions yet. A version is kept when the document is saved.	Nog geen versies. Er wordt een versie bewaard wanneer het document wordt opgeslagen.
+	This version is no longer kept.	Deze versie wordt niet meer bewaard.
+	Restore this version	Deze versie herstellen
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Bijsnijden op de pagina werkt bij afbeeldingen die niet gedraaid zijn: zet de rotatie eerst op 0° of gebruik de bijsnijvakken
+	Continue from previous section	Doorgaan vanaf vorige sectie
+	The number must be a divisor of {max}.	Het getal moet een deler van {max} zijn.
+	Nothing of this type in the document.	Niets van dit type in het document.
+	Include label and number	Label en nummer opnemen
+	*Bold* and _italic_ as real formatting	*Vet* en _cursief_ als echte opmaak
+	Add a period with double-space	Punt toevoegen bij dubbele spatie
+	Built-in Heading styles	Ingebouwde kopstijlen
+	Set left- and first-indent with tabs and backspaces	Linker- en eerste-regelinspringing instellen met Tab en Backspace
+	Automatically add words to list (First Letter)	Woorden automatisch aan de lijst toevoegen (Eerste letter)
+	Automatically add words to list (INitial CAps)	Woorden automatisch aan de lijst toevoegen (TWee HOofdletters aan het begin)
+	Select a place in this document:	Selecteer een plaats in dit document:
+	Top of the Document	Begin van het document
+	Bookmarks	Bladwijzers
+	Find “{text}” in the document	“{text}” zoeken in het document
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Een gratis, open source-tekstverwerker geschreven in Rust, met gelijktijdig bewerken in realtime.\nGebaseerd op WordCraft van het team van ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab door Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Gebaseerd op github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	De herstelkopie van {name} negeren?
+	This cannot be undone. Your original file stays unchanged.	Dit kan niet ongedaan worden gemaakt. Je oorspronkelijke bestand blijft ongewijzigd.
+	Enter bookmark name:	Voer de naam van de bladwijzer in:
+	This document has no bookmarks.	Dit document heeft geen bladwijzers.
+	Type a page number, or +2 / -1.	Typ een paginanummer, of +2 / -1.
+	Property names are 1–{max} characters.	Eigenschapsnamen zijn 1–{max} tekens lang.
+	Property values are at most {max} bytes.	Eigenschapswaarden zijn maximaal {max} bytes.
+	Only text properties can be changed.	Alleen teksteigenschappen kunnen worden gewijzigd.
+	Select a property to change.	Selecteer een eigenschap om te wijzigen.
+	This document has no custom properties.	Dit document heeft geen aangepaste eigenschappen.
+	Value:	Waarde:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Alleen teksteigenschappen: de typen getal, datum en ja/nee van Word worden niet aangeboden.
+	{field}, record {n}	{field}, record {n}
+	Folder path	Mappad
+	File type	Bestandstype
+	No new sources in that file	Geen nieuwe bronnen in dat bestand
+	Imported 1 source	1 bron geïmporteerd
+	Imported {n} sources	{n} bronnen geïmporteerd
+	Select a shape, text box or drawing canvas to format its fill.	Selecteer een vorm, tekstvak of tekencanvas om de vulling op te maken.
+	No fill	Geen vulling
+	Solid fill	Effen vulling
+	Gradient fill	Verloopvulling
+	Preset gradients	Vooraf ingestelde verlopen
+	Gradient stops	Verloopstops
+	Add gradient stop	Verloopstop toevoegen
+	Remove gradient stop	Verloopstop verwijderen
+	Rotate with shape	Met vorm meedraaien
+	Old menu keys: Alt, {keys}. Keep typing, or press Esc to cancel.	Oude menutoetsen: Alt, {keys}. Typ verder of druk op Esc om te annuleren.
+	cm	cm
+	mm	mm
+	pi	pi
+	{language}: {file} (unreadable: {reason})	{language}: {file} (onleesbaar: {reason})
+	Spanish (Latin America)	Spaans (Latijns-Amerika)
+	Spanish (Uruguay)	Spaans (Uruguay)
+	User templates:	Gebruikerssjablonen:
+	Not set	Niet ingesteld
+	Pane Options	Opties voor deelvenster
+	Dock Left	Links dokken
+	Dock Right	Rechts dokken
+	Float	Zwevend
+	Move Pane: {title}	Deelvenster verplaatsen: {title}
+	Resize Pane	Formaat van deelvenster wijzigen
+	Pages in the range	Pagina's in het bereik
+	Scale to paper size	Schalen naar papierformaat
+	Viewing	Bekijken
+	Viewing — read without changing anything	Bekijken — lees zonder iets te wijzigen
+	More tabs	Meer tabbladen
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	No Gradient	Geen verloop
+	More Gradients…	Meer verlopen…
+	Page color	Paginakleur
+	Update check is not supported in the web browser.	Controleren op updates wordt niet ondersteund in de webbrowser.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} is momenteel de nieuwste beschikbare versie.
+	Could not check for updates:\n{error}	Kan niet controleren op updates:\n{error}
+	Checking for updates…	Controleren op updates…

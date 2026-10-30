@@ -2063,3 +2063,107 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	Sõnu: {words}! Viskaksin konfetit, aga siis peaksin selle ise ära koristama.
 	{words} words. That's {words} more than I've written today.	Sõnu: {words}. See on {words} rohkem, kui mina täna kirjutanud olen.
 	“{text}” ({row}, {series}) isn't a number.	„{text}” ({row}, {series}) ei ole arv.
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Faili {name} ei saanud salvestada, seega on see endiselt avatud ja midagi ei läinud kaotsi: {error}
+	Wait for the print job to finish submitting before closing.	Enne sulgemist oodake, kuni prinditöö on täielikult edastatud.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Taastamine avab salvestamata koopia. Teie algne fail jääb muutmata.
+	Recovery is disabled while this document has a password.	Taastamine on keelatud, kuni sellel dokumendil on parool.
+	Local recovery is unavailable or still loading.	Kohalik taastamine pole saadaval või alles laaditakse.
+	No recovery copies.	Taastekoopiaid pole.
+	Recovery copy	Taastekoopia
+	Discard…	Hülga…
+	Continue without restoring	Jätka taastamata
+	Advanced Properties…	Täpsemad atribuudid…
+	View and edit the document's custom properties.	Vaadake ja muutke dokumendi kohandatud atribuute.
+	Current Document	Praegune dokument
+	{n} people editing	Redigeerijaid: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Keele {language} õigekirjasõnastikku ei saanud lugeda, seega seda ei kontrollita. Fail: {file}. Põhjus: {reason}
+	Go to {name}	Mine: {name}
+	Questions, ideas and bug reports on GitHub	Küsimused, ideed ja veateated GitHubis
+	Version history	Versiooniajalugu
+	{language} (dictionary unreadable)	{language} (sõnastik pole loetav)
+	Text Size	Teksti suurus
+	Saving…	Salvestamine…
+	All changes saved	Kõik muudatused on salvestatud
+	Offline — changes will sync	Võrguühenduseta — muudatused sünkroonitakse
+	Commenting	Kommenteerimine
+	Suggesting	Soovitamine
+	View only	Ainult vaatamine
+	Reconnecting…	Ühenduse taastamine…
+	You're offline. The document is read only until your changes sync.	Teil pole võrguühendust. Dokument on kirjutuskaitstud, kuni teie muudatused on sünkroonitud.
+	Save my copy	Salvesta minu koopia
+	Loading…	Laadimine…
+	No versions yet. A version is kept when the document is saved.	Versioone veel pole. Versioon säilitatakse dokumendi salvestamisel.
+	This version is no longer kept.	Seda versiooni enam ei säilitata.
+	Restore this version	Taasta see versioon
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Lehel kärpimine toimib pööramata piltide puhul: seadke esmalt pööramine väärtusele 0° või kasutage kärpimisvälju
+	No matching commands	Sobivaid käske pole
+	The number must be a divisor of {max}.	Arv peab olema arvu {max} jagaja.
+	Nothing of this type in the document.	Dokumendis pole midagi seda tüüpi.
+	*Bold* and _italic_ as real formatting	*Paks* ja _kaldkiri_ päris vorminguna
+	Add a period with double-space	Lisa topelttühiku korral punkt
+	Built-in Heading styles	Sisseehitatud pealkirjastiilid
+	Set left- and first-indent with tabs and backspaces	Määra vasak taane ja esirea taane tabeldusklahvi ja tagasilükkeklahviga
+	Automatically add words to list (First Letter)	Lisa sõnad loendisse automaatselt (esitäht)
+	Automatically add words to list (INitial CAps)	Lisa sõnad loendisse automaatselt (KAks SUurt algustähte)
+	Select a place in this document:	Valige koht selles dokumendis:
+	Top of the Document	Dokumendi algus
+	Bookmarks	Järjehoidjad
+	Find “{text}” in the document	Otsi dokumendist „{text}“
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Versioon {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Tasuta avatud lähtekoodiga tekstitöötlusprogramm, mis on kirjutatud Rustis ja toetab reaalajas ühist redigeerimist.\nPõhineb ArtCrafti meeskonna WordCraftil.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, autor Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Põhineb projektil github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Kas hüljata faili {name} taastekoopia?
+	This cannot be undone. Your original file stays unchanged.	Seda ei saa tagasi võtta. Teie algne fail jääb muutmata.
+	Enter bookmark name:	Sisestage järjehoidja nimi:
+	This document has no bookmarks.	Selles dokumendis pole järjehoidjaid.
+	Type a page number, or +2 / -1.	Sisestage lehekülje number või +2 / -1.
+	Property names are 1–{max} characters.	Atribuutide nimed on 1–{max} märki pikad.
+	Property values are at most {max} bytes.	Atribuutide väärtused on kuni {max} baiti.
+	Only text properties can be changed.	Muuta saab ainult tekstiatribuute.
+	Select a property to change.	Valige muudetav atribuut.
+	This document has no custom properties.	Sellel dokumendil pole kohandatud atribuute.
+	Value:	Väärtus:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Ainult tekstiatribuudid: Wordi arvu-, kuupäeva- ja jah/ei-tüüpe ei pakuta.
+	{field}, record {n}	{field}, kirje {n}
+	Folder path	Kausta tee
+	No items to show.	Kuvatavaid üksusi pole.
+	File type	Failitüüp
+	No new sources in that file	Selles failis pole uusi allikaid
+	Imported 1 source	Imporditi 1 allikas
+	Imported {n} sources	Imporditud allikaid: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (pole loetav: {reason})
+	Spanish (Latin America)	Hispaania (Ladina-Ameerika)
+	Spanish (Uruguay)	Hispaania (Uruguay)
+	Pane Options	Paani valikud
+	Dock Left	Dokki vasakule
+	Dock Right	Dokki paremale
+	Float	Hõljuv
+	Move Pane: {title}	Teisalda paan: {title}
+	Resize Pane	Muuda paani suurust
+	Pages in the range	Vahemiku leheküljed
+	Scale to paper size	Sobita paberi suurusega
+	Viewing	Vaatamine
+	Viewing — read without changing anything	Vaatamine — loe ilma midagi muutmata
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Lehe värv
+	Update check is not supported in the web browser.	Värskenduste otsimist veebibrauseris ei toetata.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} on praegu uusim saadaolev versioon.
+	Could not check for updates:\n{error}	Värskendusi ei saanud kontrollida:\n{error}
+	Check for Updates	Otsi värskendusi
+	Checking for updates…	Värskenduste otsimine…
+	{name} options	{name} – valikud
+	Reference type:	Viite tüüp:
+	Insert reference to:	Lisa viide kohale:
+	For which item:	Millisele üksusele:
+	AaBbCcDd	AaBbCcDd
+	Body text in a short paragraph to show spacing.	Põhitekst lühikeses lõigus, et näidata vahesid.
+	Restore	Taasta
+	Community	Kogukond
+	Discard	Hülga
+	Modify	Muuda
+	Syncing…	Sünkroonimine…
+	Too many changes are waiting to sync. The document is read only until they do.	Sünkroonimist ootab liiga palju muudatusi. Dokument on kirjutuskaitstud, kuni need on sünkroonitud.

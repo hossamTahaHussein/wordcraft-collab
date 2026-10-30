@@ -2447,3 +2447,94 @@
 	{words} words. That's {words} more than I've written today.	Думи: {words}. Това са с {words} повече, отколкото съм написал аз днес.
 	“{text}” ({row}, {series}) isn't a number.	„{text}“ ({row}, {series}) не е число.
 	✓ None	✓ Няма
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Документът {name} не можа да бъде запазен, затова остава отворен и нищо не е загубено: {error}
+	Wait for the print job to finish submitting before closing.	Изчакайте заданието за печат да бъде изпратено докрай, преди да затворите.
+	Restore opens an unsaved copy. Your original file stays unchanged.	„Възстановяване“ отваря незапазено копие. Оригиналният Ви файл остава непроменен.
+	Recovery is disabled while this document has a password.	Възстановяването е изключено, докато този документ има парола.
+	Local recovery is unavailable or still loading.	Локалното възстановяване не е налично или все още се зарежда.
+	No recovery copies.	Няма копия за възстановяване.
+	Recovery copy	Копие за възстановяване
+	Discard…	Отхвърляне…
+	Continue without restoring	Продължаване без възстановяване
+	Advanced Properties…	Разширени свойства…
+	View and edit the document's custom properties.	Преглед и редактиране на потребителските свойства на документа.
+	Current Document	Текущ документ
+	{n} people editing	Редактиращи: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Правописният речник за {language} не можа да бъде прочетен, затова правописът не се проверява. Файл: {file}. Причина: {reason}
+	Go to {name}	Отиване до {name}
+	Questions, ideas and bug reports on GitHub	Въпроси, идеи и съобщения за грешки в GitHub
+	Version history	История на версиите
+	{language} (dictionary unreadable)	{language} (речникът не може да се прочете)
+	Text Size	Размер на текста
+	Saving…	Запазване…
+	All changes saved	Всички промени са запазени
+	Offline — changes will sync	Офлайн – промените ще се синхронизират
+	Commenting	Коментиране
+	Suggesting	Предлагане
+	View only	Само четене
+	Reconnecting…	Повторно свързване…
+	You're offline. The document is read only until your changes sync.	Вие сте офлайн. Документът е само за четене, докато промените Ви се синхронизират.
+	Save my copy	Запазване на моето копие
+	Loading…	Зареждане…
+	No versions yet. A version is kept when the document is saved.	Все още няма версии. Версия се съхранява при всяко запазване на документа.
+	This version is no longer kept.	Тази версия вече не се съхранява.
+	Restore this version	Възстановяване на тази версия
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Изрязването върху страницата работи при незавъртени картини: първо задайте „Завъртане“ на 0° или използвайте полетата за изрязване
+	No matching commands	Няма съвпадащи команди
+	The number must be a divisor of {max}.	Числото трябва да е делител на {max}.
+	Nothing of this type in the document.	В документа няма нищо от този тип.
+	*Bold* and _italic_ as real formatting	*Получер* и _курсив_ като истинско форматиране
+	Add a period with double-space	Добавяне на точка при двоен интервал
+	Built-in Heading styles	Вградени стилове за заглавия
+	Set left- and first-indent with tabs and backspaces	Задаване на ляв отстъп и отстъп на първия ред с табулации и Backspace
+	Automatically add words to list (First Letter)	Автоматично добавяне на думи в списъка (първа буква)
+	Automatically add words to list (INitial CAps)	Автоматично добавяне на думи в списъка (ДВе НАчални главни)
+	Select a place in this document:	Изберете място в този документ:
+	Top of the Document	Начало на документа
+	Bookmarks	Отметки
+	Find “{text}” in the document	Търсене на „{text}“ в документа
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Версия {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Безплатен текстообработващ редактор с отворен код, написан на Rust, със съвместно редактиране в реално време.\nБазиран на WordCraft на екипа на ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab от Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Базиран на github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Да се отхвърли ли копието за възстановяване на {name}?
+	This cannot be undone. Your original file stays unchanged.	Това действие не може да бъде отменено. Оригиналният Ви файл остава непроменен.
+	Enter bookmark name:	Въведете име на отметката:
+	Type a page number, or +2 / -1.	Въведете номер на страница или +2 / -1.
+	Property names are 1–{max} characters.	Имената на свойствата трябва да са от 1 до {max} знака.
+	Property values are at most {max} bytes.	Стойностите на свойствата са най-много {max} байта.
+	Only text properties can be changed.	Могат да се променят само текстови свойства.
+	Select a property to change.	Изберете свойство за промяна.
+	This document has no custom properties.	Този документ няма потребителски свойства.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Само текстови свойства: типовете на Word за число, дата и да/не не се предлагат.
+	{field}, record {n}	{field}, запис {n}
+	Folder path	Път до папката
+	File type	Тип на файла
+	No new sources in that file	В този файл няма нови източници
+	Imported 1 source	Импортиран е 1 източник
+	Imported {n} sources	Импортирани източници: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (не може да се прочете: {reason})
+	Spanish (Latin America)	Испански (Латинска Америка)
+	Spanish (Uruguay)	Испански (Уругвай)
+	Pane Options	Опции на панела
+	Dock Left	Закотвяне вляво
+	Dock Right	Закотвяне вдясно
+	Float	Плаващ
+	Move Pane: {title}	Преместване на панела: {title}
+	Resize Pane	Преоразмеряване на панела
+	Pages in the range	Страници в диапазона
+	Scale to paper size	Мащабиране до размера на хартията
+	Viewing	Разглеждане
+	Viewing — read without changing anything	Разглеждане – четене, без да се променя нищо
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Цвят на страницата
+	Update check is not supported in the web browser.	Проверката за актуализации не се поддържа в уеб браузъра.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} е най-новата налична версия в момента.
+	Could not check for updates:\n{error}	Неуспешна проверка за актуализации:\n{error}
+	Check for Updates	Проверка за актуализации
+	Checking for updates…	Проверка за актуализации…
+	Syncing…	Синхронизиране…
+	Too many changes are waiting to sync. The document is read only until they do.	Твърде много промени чакат синхронизиране. Документът е само за четене, докато не бъдат синхронизирани.

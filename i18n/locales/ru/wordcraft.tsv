@@ -2464,3 +2464,85 @@ preview	Title	Пример
 	✓ None	✓ Нет
 	➕ New comment	➕ Новое примечание
 	📂  Browse…	📂  Обзор…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Не удалось сохранить «{name}», поэтому документ остаётся открытым и ничего не потеряно: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	При восстановлении открывается несохранённая копия. Исходный файл не изменяется.
+	Recovery is disabled while this document has a password.	Восстановление отключено, пока документ защищён паролем.
+	Local recovery is unavailable or still loading.	Локальное восстановление недоступно или ещё загружается.
+	No recovery copies.	Нет копий для восстановления.
+	Recovery copy	Копия для восстановления
+	Discard…	Удалить…
+	Continue without restoring	Продолжить без восстановления
+	Advanced Properties…	Дополнительные свойства…
+	View and edit the document's custom properties.	Просмотр и изменение настраиваемых свойств документа.
+	Current Document	Текущий документ
+	{n} people editing	Редактируют: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Не удалось прочитать орфографический словарь для языка «{language}», поэтому текст не проверяется. Файл: {file}. Причина: {reason}
+	Go to {name}	Перейти к: {name}
+	Questions, ideas and bug reports on GitHub	Вопросы, идеи и сообщения об ошибках на GitHub
+	Version history	Журнал версий
+	{language} (dictionary unreadable)	{language} (словарь не читается)
+	Text Size	Размер текста
+	Saving…	Сохранение…
+	All changes saved	Все изменения сохранены
+	Offline — changes will sync	Офлайн — изменения будут синхронизированы
+	Commenting	Комментирование
+	Suggesting	Предложение правок
+	View only	Только просмотр
+	Reconnecting…	Повторное подключение…
+	You're offline. The document is read only until your changes sync.	Нет подключения к сети. Документ доступен только для чтения, пока ваши изменения не синхронизируются.
+	Save my copy	Сохранить мою копию
+	Loading…	Загрузка…
+	No versions yet. A version is kept when the document is saved.	Версий пока нет. Версия сохраняется при каждом сохранении документа.
+	This version is no longer kept.	Эта версия больше не хранится.
+	Restore this version	Восстановить эту версию
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Обрезка на странице работает только для неповёрнутых рисунков: сначала задайте поворот 0° или используйте поля обрезки
+	The number must be a divisor of {max}.	Число должно быть делителем {max}.
+	Nothing of this type in the document.	В документе нет элементов этого типа.
+	*Bold* and _italic_ as real formatting	*Полужирный* и _курсив_ как настоящее форматирование
+	Add a period with double-space	Ставить точку при двойном пробеле
+	Built-in Heading styles	Встроенные стили заголовков
+	Set left- and first-indent with tabs and backspaces	Задавать отступ слева и отступ первой строки клавишами Tab и Backspace
+	Automatically add words to list (First Letter)	Автоматически добавлять слова в список (Первая буква)
+	Automatically add words to list (INitial CAps)	Автоматически добавлять слова в список (ДВе ПРописные)
+	Bookmarks	Закладки
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Бесплатный текстовый процессор с открытым исходным кодом, написанный на Rust, с совместным редактированием в реальном времени.\nОснован на WordCraft от команды ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, автор — Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Основано на github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Удалить копию для восстановления «{name}»?
+	This cannot be undone. Your original file stays unchanged.	Это действие нельзя отменить. Исходный файл не изменяется.
+	Property names are 1–{max} characters.	Имя свойства должно содержать от 1 до {max} знаков.
+	Property values are at most {max} bytes.	Значение свойства не может превышать {max} байт.
+	Only text properties can be changed.	Изменять можно только текстовые свойства.
+	Select a property to change.	Выберите свойство для изменения.
+	This document has no custom properties.	В этом документе нет настраиваемых свойств.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Только текстовые свойства: типы Word «число», «дата» и «да/нет» не предлагаются.
+	{field}, record {n}	{field}, запись {n}
+	Folder path	Путь к папке
+	File type	Тип файла
+	No new sources in that file	В этом файле нет новых источников
+	Imported 1 source	Импортирован 1 источник
+	Imported {n} sources	Импортировано источников: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (не читается: {reason})
+	Spanish (Latin America)	Испанский (Латинская Америка)
+	Spanish (Uruguay)	Испанский (Уругвай)
+	Pane Options	Параметры панели
+	Dock Left	Прикрепить слева
+	Dock Right	Прикрепить справа
+	Float	Открепить
+	Move Pane: {title}	Переместить панель: {title}
+	Resize Pane	Изменить размер панели
+	Pages in the range	Страницы в диапазоне
+	Scale to paper size	Масштабировать по размеру бумаги
+	Viewing	Просмотр
+	Viewing — read without changing anything	Просмотр — чтение без внесения изменений
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Цвет страницы
+	Update check is not supported in the web browser.	Проверка обновлений не поддерживается в веб-браузере.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} — самая новая из доступных версий.
+	Could not check for updates:\n{error}	Не удалось проверить наличие обновлений:\n{error}
+	Checking for updates…	Проверка обновлений…
+	Syncing…	Синхронизация…
+	Too many changes are waiting to sync. The document is read only until they do.	Слишком много изменений ожидает синхронизации. Документ доступен только для чтения, пока они не будут синхронизированы.

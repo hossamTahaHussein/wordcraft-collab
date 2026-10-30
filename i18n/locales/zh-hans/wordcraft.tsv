@@ -2134,3 +2134,98 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	{words} 个字！我想放彩带，但之后还得自己清理。
 	{words} words. That's {words} more than I've written today.	{words} 个字。比我今天写的多了 {words} 个。
 	“{text}” ({row}, {series}) isn't a number.	“{text}”（{row}，{series}）不是数字。
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	无法保存“{name}”，因此它仍保持打开，没有丢失任何内容：{error}
+	Wait for the print job to finish submitting before closing.	请等待打印作业提交完成后再关闭。
+	Restore opens an unsaved copy. Your original file stays unchanged.	“恢复”会打开一个未保存的副本。原始文件保持不变。
+	Recovery is disabled while this document has a password.	此文档设有密码，因此恢复功能已禁用。
+	Local recovery is unavailable or still loading.	本地恢复不可用或仍在加载。
+	No recovery copies.	没有恢复副本。
+	Recovery copy	恢复副本
+	Discard…	放弃…
+	Continue without restoring	继续而不恢复
+	Advanced Properties…	高级属性…
+	View and edit the document's custom properties.	查看和编辑文档的自定义属性。
+	Current Document	当前文档
+	{n} people editing	{n} 人正在编辑
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	无法读取{language}的拼写词典，因此不会检查该语言。文件：{file}。原因：{reason}
+	Go to {name}	转到 {name}
+	Questions, ideas and bug reports on GitHub	在 GitHub 上提问、提出想法和报告错误
+	Version history	版本历史记录
+	{language} (dictionary unreadable)	{language}（词典无法读取）
+	Text Size	文字大小
+	Saving…	正在保存…
+	All changes saved	所有更改均已保存
+	Offline — changes will sync	脱机 — 更改将在稍后同步
+	Commenting	可批注
+	Suggesting	可提建议
+	View only	仅查看
+	Syncing…	正在同步…
+	Too many changes are waiting to sync. The document is read only until they do.	等待同步的更改过多。同步完成之前，文档为只读。
+	Reconnecting…	正在重新连接…
+	You're offline. The document is read only until your changes sync.	你已脱机。在你的更改同步之前，文档为只读。
+	Save my copy	保存我的副本
+	Loading…	正在加载…
+	No versions yet. A version is kept when the document is saved.	还没有版本。每次保存文档时都会保留一个版本。
+	This version is no longer kept.	此版本已不再保留。
+	Restore this version	恢复此版本
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	页面上的裁剪仅适用于未旋转的图片：请先将旋转设为 0°，或使用裁剪框
+	The number must be a divisor of {max}.	该数字必须是 {max} 的约数。
+	Reference type:	引用类型：
+	Insert reference to:	引用内容：
+	For which item:	引用哪一项：
+	Nothing of this type in the document.	文档中没有此类型的项目。
+	*Bold* and _italic_ as real formatting	将 *粗体* 和 _斜体_ 设为真实格式
+	Add a period with double-space	连按两次空格时添加句号
+	Built-in Heading styles	内置标题样式
+	Set left- and first-indent with tabs and backspaces	用 Tab 键和退格键设置左缩进和首行缩进
+	Automatically add words to list (First Letter)	自动将单词添加到列表（首字母）
+	Automatically add words to list (INitial CAps)	自动将单词添加到列表（前两个字母大写）
+	Select a place in this document:	请选择文档中的位置：
+	Top of the Document	文档顶端
+	Bookmarks	书签
+	Find “{text}” in the document	在文档中查找“{text}”
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	一款用 Rust 编写的免费开源文字处理软件，支持实时协同编辑。\n基于 ArtCraft 团队的 WordCraft。
+	WordCraft Collab by Hossam Taha	WordCraft Collab，作者 Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	基于 github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	要放弃“{name}”的恢复副本吗？
+	This cannot be undone. Your original file stays unchanged.	此操作无法撤消。原始文件保持不变。
+	Enter bookmark name:	输入书签名：
+	Type a page number, or +2 / -1.	请键入页码，或 +2 / -1。
+	Property names are 1–{max} characters.	属性名称须为 1–{max} 个字符。
+	Property values are at most {max} bytes.	属性值最多 {max} 个字节。
+	Only text properties can be changed.	只能更改文本属性。
+	Select a property to change.	请选择要更改的属性。
+	This document has no custom properties.	此文档没有自定义属性。
+	Text properties only: Word's number, date and yes-no types aren't offered.	仅支持文本属性：不提供 Word 的数字、日期和是/否类型。
+	{field}, record {n}	{field}，记录 {n}
+	Folder path	文件夹路径
+	No items to show.	没有可显示的项目。
+	File type	文件类型
+	No new sources in that file	该文件中没有新的源
+	Imported 1 source	已导入 1 个源
+	Imported {n} sources	已导入 {n} 个源
+	{language}: {file} (unreadable: {reason})	{language}：{file}（无法读取：{reason}）
+	Spanish (Latin America)	西班牙语（拉丁美洲）
+	Spanish (Uruguay)	西班牙语（乌拉圭）
+	Pane Options	窗格选项
+	Dock Left	停放在左侧
+	Dock Right	停放在右侧
+	Float	浮动
+	Move Pane: {title}	移动窗格：{title}
+	Resize Pane	调整窗格大小
+	AaBbCcDd	AaBbCcDd
+	Body text in a short paragraph to show spacing.	用一小段正文文本来展示间距。
+	Pages in the range	范围内的页面
+	Scale to paper size	按纸张大小缩放
+	Viewing	查看
+	Viewing — read without changing anything	查看 — 只阅读，不做任何更改
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	页面颜色
+	Update check is not supported in the web browser.	网页浏览器中不支持检查更新。
+	WordCraft {version} is currently the newest version available.	WordCraft {version} 是目前可用的最新版本。
+	Could not check for updates:\n{error}	无法检查更新：\n{error}
+	Checking for updates…	正在检查更新…
+	{name} options	{name} 选项

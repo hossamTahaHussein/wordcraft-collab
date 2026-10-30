@@ -2826,3 +2826,90 @@ preview	Title	სათაური
 	✓ None	✓ არცერთი
 	➕ New comment	➕ ახალი კომენტარი
 	📂  Browse…	📂  არჩევა…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	შენახვა ვერ მოხერხდა ({name}): დოკუმენტი ისევ ღიაა და არაფერი დაკარგულა: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	აღდგენა ხსნის შეუნახავ ასლს. თქვენი ორიგინალი ფაილი უცვლელი რჩება.
+	Recovery is disabled while this document has a password.	აღდგენა გამორთულია, სანამ ამ დოკუმენტს პაროლი აქვს.
+	Local recovery is unavailable or still loading.	ლოკალური აღდგენა მიუწვდომელია ან ჯერ კიდევ იტვირთება.
+	No recovery copies.	აღდგენის ასლები არ არის.
+	Recovery copy	აღდგენის ასლი
+	Restore	აღდგენა
+	Discard…	გადაგდება…
+	Continue without restoring	გაგრძელება აღდგენის გარეშე
+	Advanced Properties…	დამატებითი თვისებები…
+	View and edit the document's custom properties.	დოკუმენტის მორგებული თვისებების ნახვა და რედაქტირება.
+	Current Document	მიმდინარე დოკუმენტი
+	{n} people editing	რედაქტირებს {n} ადამიანი
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	მართლწერის ლექსიკონის ({language}) წაკითხვა ვერ მოხერხდა, ამიტომ ტექსტი არ მოწმდება. ფაილი: {file}. მიზეზი: {reason}
+	Go to {name}	გადასვლა: {name}
+	Community	საზოგადოება
+	Questions, ideas and bug reports on GitHub	კითხვები, იდეები და შეცდომების შეტყობინებები GitHub-ზე
+	Version history	ვერსიების ისტორია
+	{language} (dictionary unreadable)	{language} (ლექსიკონი ვერ იკითხება)
+	Text Size	ტექსტის ზომა
+	Saving…	ინახება…
+	All changes saved	ყველა ცვლილება შენახულია
+	Offline — changes will sync	ოფლაინ — ცვლილებები მოგვიანებით სინქრონიზდება
+	Commenting	კომენტირება
+	Suggesting	შეთავაზება
+	View only	მხოლოდ ნახვა
+	Syncing…	სინქრონიზაცია…
+	Too many changes are waiting to sync. The document is read only until they do.	სინქრონიზაციას ძალიან ბევრი ცვლილება ელოდება. მანამდე დოკუმენტი მხოლოდ წასაკითხია.
+	Reconnecting…	ხელახლა დაკავშირება…
+	You're offline. The document is read only until your changes sync.	თქვენ ოფლაინ ხართ. დოკუმენტი მხოლოდ წასაკითხია, სანამ თქვენი ცვლილებები არ სინქრონიზდება.
+	Save my copy	ჩემი ასლის შენახვა
+	Loading…	იტვირთება…
+	No versions yet. A version is kept when the document is saved.	ვერსიები ჯერ არ არის. ვერსია ინახება დოკუმენტის შენახვისას.
+	This version is no longer kept.	ეს ვერსია აღარ ინახება.
+	Restore this version	ამ ვერსიის აღდგენა
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	გვერდზე ჩამოჭრა მუშაობს მოუბრუნებელ სურათებზე: ჯერ მობრუნება დააყენეთ 0°-ზე, ან გამოიყენეთ ჩამოჭრის ველები
+	No matching commands	შესაბამისი ბრძანებები არ მოიძებნა
+	The number must be a divisor of {max}.	რიცხვი უნდა იყოს {max}-ის გამყოფი.
+	Nothing of this type in the document.	დოკუმენტში ამ ტიპის არაფერია.
+	*Bold* and _italic_ as real formatting	*მუქი* და _დახრილი_ ნამდვილ ფორმატირებად
+	Add a period with double-space	წერტილის დამატება ორმაგი ჰარით
+	Built-in Heading styles	ჩაშენებული სათაურის სტილები
+	Set left- and first-indent with tabs and backspaces	მარცხენა და პირველი სტრიქონის შეწევის დაყენება Tab-ით და Backspace-ით
+	Automatically add words to list (First Letter)	სიტყვების ავტომატურად დამატება სიაში (პირველი ასო)
+	Automatically add words to list (INitial CAps)	სიტყვების ავტომატურად დამატება სიაში (ორი დიდი ასო დასაწყისში)
+	Bookmarks	სანიშნეები
+	WordCraft Collab	WordCraft Collab
+	Version {version}	ვერსია {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	უფასო, ღია კოდის ტექსტური რედაქტორი, დაწერილი Rust-ზე, რეალურ დროში ერთობლივი რედაქტირებით.\nდაფუძნებულია ArtCraft-ის გუნდის WordCraft-ზე.
+	WordCraft Collab by Hossam Taha	WordCraft Collab — ავტორი: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	დაფუძნებულია: github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	გადაიგდოს აღდგენის ასლი ({name})?
+	This cannot be undone. Your original file stays unchanged.	ამის დაბრუნება შეუძლებელია. თქვენი ორიგინალი ფაილი უცვლელი რჩება.
+	Discard	გადაგდება
+	Property names are 1–{max} characters.	თვისების სახელი 1–{max} სიმბოლოსგან შედგება.
+	Property values are at most {max} bytes.	თვისების მნიშვნელობა მაქსიმუმ {max} ბაიტია.
+	Only text properties can be changed.	მხოლოდ ტექსტური თვისებების შეცვლაა შესაძლებელი.
+	Select a property to change.	აირჩიეთ შესაცვლელი თვისება.
+	This document has no custom properties.	ამ დოკუმენტს მორგებული თვისებები არ აქვს.
+	Modify	შეცვლა
+	Value:	მნიშვნელობა:
+	Text properties only: Word's number, date and yes-no types aren't offered.	მხოლოდ ტექსტური თვისებები: Word-ის რიცხვის, თარიღისა და დიახ/არა ტიპები ხელმისაწვდომი არ არის.
+	{field}, record {n}	{field}, ჩანაწერი {n}
+	Folder path	საქაღალდის მისამართი
+	File type	ფაილის ტიპი
+	No new sources in that file	ამ ფაილში ახალი წყაროები არ არის
+	Imported 1 source	იმპორტირებულია 1 წყარო
+	Imported {n} sources	იმპორტირებულია {n} წყარო
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ვერ იკითხება: {reason})
+	Pane Options	პანელის პარამეტრები
+	Dock Left	მიმაგრება მარცხნივ
+	Dock Right	მიმაგრება მარჯვნივ
+	Float	მცურავი
+	Move Pane: {title}	პანელის გადაადგილება: {title}
+	Resize Pane	პანელის ზომის შეცვლა
+	Pages in the range	დიაპაზონის გვერდები
+	Scale to paper size	ქაღალდის ზომაზე მორგება
+	Viewing	ნახვა
+	Viewing — read without changing anything	ნახვა — კითხვა არაფრის შეცვლის გარეშე
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Update check is not supported in the web browser.	განახლებების შემოწმება ვებბრაუზერში მხარდაჭერილი არ არის.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} ამჟამად უახლესი ხელმისაწვდომი ვერსიაა.
+	Could not check for updates:\n{error}	განახლებების შემოწმება ვერ მოხერხდა:\n{error}
+	Check for Updates	განახლებების შემოწმება
+	Checking for updates…	განახლებების შემოწმება…

@@ -2883,3 +2883,69 @@ preview	Title	Názov
 	✓ None	✓ Žiadne
 	➕ New comment	➕ Nový komentár
 	📂  Browse…	📂  Prehľadávať…
+	Advanced Properties…	Rozšírené vlastnosti…
+	View and edit the document's custom properties.	Zobraziť a upraviť vlastné vlastnosti dokumentu.
+	{n} people editing	Upravujúci používatelia: {n}
+	Go to {name}	Prejsť na: {name}
+	Community	Komunita
+	Questions, ideas and bug reports on GitHub	Otázky, nápady a hlásenia chýb na GitHube
+	Version history	História verzií
+	Text Size	Veľkosť textu
+	Saving…	Ukladá sa…
+	All changes saved	Všetky zmeny sú uložené
+	Offline — changes will sync	Offline — zmeny sa zosynchronizujú
+	Commenting	Komentovanie
+	Suggesting	Navrhovanie
+	View only	Iba zobrazenie
+	Syncing…	Synchronizuje sa…
+	Too many changes are waiting to sync. The document is read only until they do.	Na synchronizáciu čaká príliš veľa zmien. Dokument je iba na čítanie, kým sa nezosynchronizujú.
+	Reconnecting…	Opätovné pripájanie…
+	You're offline. The document is read only until your changes sync.	Ste offline. Dokument je iba na čítanie, kým sa vaše zmeny nezosynchronizujú.
+	Save my copy	Uložiť moju kópiu
+	Loading…	Načítava sa…
+	No versions yet. A version is kept when the document is saved.	Zatiaľ žiadne verzie. Verzia sa uchová pri každom uložení dokumentu.
+	This version is no longer kept.	Táto verzia sa už neuchováva.
+	Restore this version	Obnoviť túto verziu
+	No matching commands	Žiadne zodpovedajúce príkazy
+	*Bold* and _italic_ as real formatting	*Tučné* a _kurzíva_ ako skutočné formátovanie
+	Add a period with double-space	Pridať bodku po dvojitej medzere
+	Built-in Heading styles	Vstavané štýly nadpisov
+	Set left- and first-indent with tabs and backspaces	Nastaviť ľavú zarážku a zarážku prvého riadka klávesmi Tab a Backspace
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Verzia {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Bezplatný textový procesor s otvoreným zdrojovým kódom napísaný v jazyku Rust, so spoločnými úpravami v reálnom čase.\nZaložený na WordCrafte od tímu ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, autor: Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Založené na github.com/storytold/wordcraft
+	Property names are 1–{max} characters.	Názov vlastnosti musí mať 1 až {max} znakov.
+	Property values are at most {max} bytes.	Hodnota vlastnosti môže mať najviac {max} bajtov.
+	Only text properties can be changed.	Meniť možno iba textové vlastnosti.
+	Select a property to change.	Vyberte vlastnosť, ktorú chcete zmeniť.
+	This document has no custom properties.	Tento dokument nemá žiadne vlastné vlastnosti.
+	Modify	Zmeniť
+	Value:	Hodnota:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Iba textové vlastnosti: typy Wordu číslo, dátum a áno/nie nie sú k dispozícii.
+	{field}, record {n}	{field}, záznam {n}
+	Folder path	Cesta k priečinku
+	File type	Typ súboru
+	Spanish (Latin America)	Španielčina (Latinská Amerika)
+	Spanish (Uruguay)	Španielčina (Uruguaj)
+	The text at the insertion point is marked Do not check spelling or grammar.	Text v mieste kurzora je označený ako Nekontrolovať pravopis ani gramatiku.
+	{language}: WordCraft doesn't check spelling or grammar in this language yet.	{language}: WordCraft v tomto jazyku zatiaľ nekontroluje pravopis ani gramatiku.
+	Spelling and grammar are checked in {language}.	Pravopis a gramatika sa kontrolujú v jazyku {language}.
+	Pane Options	Možnosti tably
+	Dock Left	Ukotviť vľavo
+	Dock Right	Ukotviť vpravo
+	Float	Uvoľniť
+	Move Pane: {title}	Presunúť tablu: {title}
+	Resize Pane	Zmeniť veľkosť tably
+	Pages in the range	Strany v rozsahu
+	Viewing	Zobrazenie
+	Viewing — read without changing anything	Zobrazenie – čítať bez akýchkoľvek zmien
+	Page color	Farba strany
+	Update check is not supported in the web browser.	Kontrola aktualizácií nie je vo webovom prehliadači podporovaná.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} je momentálne najnovšia dostupná verzia.
+	Could not check for updates:\n{error}	Aktualizácie sa nepodarilo skontrolovať:\n{error}
+	Check for Updates	Skontrolovať aktualizácie
+	Checking for updates…	Kontrolujú sa aktualizácie…

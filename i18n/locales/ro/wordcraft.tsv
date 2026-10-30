@@ -2875,3 +2875,95 @@ preview	Title	Titlu
 	✓ None	✓ Niciunul
 	➕ New comment	➕ Comentariu nou
 	📂  Browse…	📂  Răsfoire…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Fișierul {name} nu a putut fi salvat, deci rămâne deschis și nu s-a pierdut nimic: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Restaurarea deschide o copie nesalvată. Fișierul original rămâne neschimbat.
+	Recovery is disabled while this document has a password.	Recuperarea este dezactivată cât timp acest document are parolă.
+	Local recovery is unavailable or still loading.	Recuperarea locală nu este disponibilă sau încă se încarcă.
+	No recovery copies.	Nicio copie de recuperare.
+	Recovery copy	Copie de recuperare
+	Restore	Restaurare
+	Discard…	Renunțare…
+	Continue without restoring	Continuare fără restaurare
+	Advanced Properties…	Proprietăți avansate…
+	View and edit the document's custom properties.	Vizualizați și editați proprietățile personalizate ale documentului.
+	Current Document	Documentul curent
+	{n} people editing	{n} persoane editează
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Dicționarul ortografic pentru {language} nu a putut fi citit, așa că nu se verifică. Fișier: {file}. Motiv: {reason}
+	Go to {name}	Salt la {name}
+	Community	Comunitate
+	Questions, ideas and bug reports on GitHub	Întrebări, idei și raportări de erori pe GitHub
+	Version history	Istoric versiuni
+	{language} (dictionary unreadable)	{language} (dicționar ilizibil)
+	Text Size	Dimensiune text
+	Saving…	Se salvează…
+	All changes saved	Toate modificările au fost salvate
+	Offline — changes will sync	Offline — modificările se vor sincroniza
+	Commenting	Comentare
+	Suggesting	Sugerare
+	View only	Doar vizualizare
+	Reconnecting…	Se reconectează…
+	You're offline. The document is read only until your changes sync.	Sunteți offline. Documentul este doar pentru citire până când modificările se sincronizează.
+	Save my copy	Salvare copie proprie
+	Loading…	Se încarcă…
+	No versions yet. A version is kept when the document is saved.	Nicio versiune încă. O versiune se păstrează când documentul este salvat.
+	This version is no longer kept.	Această versiune nu mai este păstrată.
+	Restore this version	Restaurare această versiune
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Decuparea pe pagină funcționează la imaginile nerotite: setați mai întâi rotația la 0° sau folosiți casetele de decupare
+	No matching commands	Nicio comandă potrivită
+	The number must be a divisor of {max}.	Numărul trebuie să fie un divizor al lui {max}.
+	Nothing of this type in the document.	Nimic de acest tip în document.
+	*Bold* and _italic_ as real formatting	*Aldin* și _cursiv_ ca formatare reală
+	Add a period with double-space	Adăugare punct la spațiu dublu
+	Built-in Heading styles	Stiluri de titlu predefinite
+	Set left- and first-indent with tabs and backspaces	Setare indent stânga și de primul rând cu Tab și Backspace
+	Automatically add words to list (First Letter)	Adăugare automată a cuvintelor în listă (Prima literă)
+	Automatically add words to list (INitial CAps)	Adăugare automată a cuvintelor în listă (MAjuscule INițiale)
+	Select a place in this document:	Selectați un loc din acest document:
+	Top of the Document	Începutul documentului
+	Bookmarks	Marcaje
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Versiunea {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Un procesor de text gratuit și open-source, scris în Rust, cu editare în comun în timp real.\nBazat pe WordCraft al echipei ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab de Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Bazat pe github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Renunțați la copia de recuperare a fișierului {name}?
+	This cannot be undone. Your original file stays unchanged.	Acțiunea nu poate fi anulată. Fișierul original rămâne neschimbat.
+	Discard	Renunțare
+	Property names are 1–{max} characters.	Numele proprietăților au 1–{max} caractere.
+	Property values are at most {max} bytes.	Valorile proprietăților au cel mult {max} octeți.
+	Only text properties can be changed.	Se pot modifica doar proprietățile de tip text.
+	Select a property to change.	Selectați o proprietate de modificat.
+	This document has no custom properties.	Acest document nu are proprietăți personalizate.
+	Modify	Modificare
+	Value:	Valoare:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Doar proprietăți de tip text: tipurile număr, dată și da/nu din Word nu sunt disponibile.
+	{field}, record {n}	{field}, înregistrarea {n}
+	Folder path	Cale folder
+	File type	Tip fișier
+	No new sources in that file	Nicio sursă nouă în acel fișier
+	Imported 1 source	S-a importat 1 sursă
+	Imported {n} sources	Surse importate: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ilizibil: {reason})
+	Spanish (Latin America)	Spaniolă (America Latină)
+	Spanish (Uruguay)	Spaniolă (Uruguay)
+	Pane Options	Opțiuni panou
+	Dock Left	Andocare la stânga
+	Dock Right	Andocare la dreapta
+	Float	Flotant
+	Move Pane: {title}	Mutare panou: {title}
+	Resize Pane	Redimensionare panou
+	Pages in the range	Paginile din interval
+	Scale to paper size	Scalare la dimensiunea hârtiei
+	Viewing	Vizualizare
+	Viewing — read without changing anything	Vizualizare - citiți fără a modifica nimic
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Culoare pagină
+	Update check is not supported in the web browser.	Căutarea actualizărilor nu este acceptată în browserul web.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} este în prezent cea mai nouă versiune disponibilă.
+	Could not check for updates:\n{error}	Nu s-au putut căuta actualizări:\n{error}
+	Check for Updates	Căutare actualizări
+	Checking for updates…	Se caută actualizări…
+	Syncing…	Se sincronizează…
+	Too many changes are waiting to sync. The document is read only until they do.	Prea multe modificări așteaptă sincronizarea. Documentul este doar pentru citire până când se sincronizează.

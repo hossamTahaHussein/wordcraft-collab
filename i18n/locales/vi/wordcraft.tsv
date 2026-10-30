@@ -2527,3 +2527,88 @@ template	Letter	Thư
 	✓ None	✓ Không có
 	➕ New comment	➕ Nhận xét mới
 	📂  Browse…	📂  Duyệt…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Không thể lưu {name}, nên tài liệu vẫn đang mở và không mất gì: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Khôi phục sẽ mở một bản sao chưa lưu. Tệp gốc của bạn vẫn giữ nguyên.
+	Recovery is disabled while this document has a password.	Tính năng khôi phục bị tắt khi tài liệu này có mật khẩu.
+	Local recovery is unavailable or still loading.	Khôi phục cục bộ không khả dụng hoặc vẫn đang tải.
+	No recovery copies.	Không có bản khôi phục nào.
+	Recovery copy	Bản khôi phục
+	Discard…	Loại bỏ…
+	Continue without restoring	Tiếp tục mà không khôi phục
+	Advanced Properties…	Thuộc tính nâng cao…
+	View and edit the document's custom properties.	Xem và chỉnh sửa các thuộc tính tùy chỉnh của tài liệu.
+	Current Document	Tài liệu hiện tại
+	{n} people editing	{n} người đang chỉnh sửa
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Không đọc được từ điển chính tả cho {language}, nên ngôn ngữ này không được kiểm tra. Tệp: {file}. Lý do: {reason}
+	Go to {name}	Đi tới {name}
+	Questions, ideas and bug reports on GitHub	Câu hỏi, ý tưởng và báo lỗi trên GitHub
+	Version history	Lịch sử phiên bản
+	{language} (dictionary unreadable)	{language} (không đọc được từ điển)
+	Text Size	Cỡ chữ
+	Saving…	Đang lưu…
+	All changes saved	Đã lưu mọi thay đổi
+	Offline — changes will sync	Ngoại tuyến — các thay đổi sẽ được đồng bộ
+	Commenting	Nhận xét
+	Suggesting	Đề xuất
+	View only	Chỉ xem
+	Syncing…	Đang đồng bộ…
+	Too many changes are waiting to sync. The document is read only until they do.	Có quá nhiều thay đổi đang chờ đồng bộ. Tài liệu ở chế độ chỉ đọc cho đến khi đồng bộ xong.
+	Reconnecting…	Đang kết nối lại…
+	You're offline. The document is read only until your changes sync.	Bạn đang ngoại tuyến. Tài liệu ở chế độ chỉ đọc cho đến khi các thay đổi của bạn được đồng bộ.
+	Save my copy	Lưu bản sao của tôi
+	Loading…	Đang tải…
+	No versions yet. A version is kept when the document is saved.	Chưa có phiên bản nào. Mỗi lần lưu tài liệu sẽ giữ lại một phiên bản.
+	This version is no longer kept.	Phiên bản này không còn được lưu giữ.
+	Restore this version	Khôi phục phiên bản này
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Cắt xén trên trang chỉ áp dụng cho ảnh chưa xoay: hãy đặt Xoay về 0° trước, hoặc dùng các ô cắt xén
+	The number must be a divisor of {max}.	Số phải là ước số của {max}.
+	Nothing of this type in the document.	Tài liệu không có mục nào thuộc loại này.
+	*Bold* and _italic_ as real formatting	*Đậm* và _nghiêng_ thành định dạng thật
+	Add a period with double-space	Thêm dấu chấm khi gõ hai dấu cách
+	Built-in Heading styles	Kiểu đề mục có sẵn
+	Set left- and first-indent with tabs and backspaces	Đặt thụt lề trái và thụt dòng đầu bằng phím Tab và Backspace
+	Automatically add words to list (First Letter)	Tự động thêm từ vào danh sách (Chữ cái đầu)
+	Automatically add words to list (INitial CAps)	Tự động thêm từ vào danh sách (HAi CHữ hoa đầu)
+	Select a place in this document:	Chọn một vị trí trong tài liệu này:
+	Top of the Document	Đầu tài liệu
+	Bookmarks	Dấu trang
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Trình xử lý văn bản miễn phí, mã nguồn mở được viết bằng Rust, hỗ trợ cùng chỉnh sửa theo thời gian thực.\nDựa trên WordCraft của đội ngũ ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab của Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Dựa trên github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Loại bỏ bản khôi phục của {name}?
+	This cannot be undone. Your original file stays unchanged.	Không thể hoàn tác thao tác này. Tệp gốc của bạn vẫn giữ nguyên.
+	Property names are 1–{max} characters.	Tên thuộc tính phải dài từ 1 đến {max} ký tự.
+	Property values are at most {max} bytes.	Giá trị thuộc tính tối đa {max} byte.
+	Only text properties can be changed.	Chỉ có thể thay đổi thuộc tính văn bản.
+	Select a property to change.	Chọn một thuộc tính để thay đổi.
+	This document has no custom properties.	Tài liệu này không có thuộc tính tùy chỉnh.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Chỉ hỗ trợ thuộc tính văn bản: không có các kiểu số, ngày và có/không của Word.
+	{field}, record {n}	{field}, bản ghi {n}
+	Folder path	Đường dẫn thư mục
+	File type	Loại tệp
+	No new sources in that file	Tệp đó không có nguồn mới
+	Imported 1 source	Đã nhập 1 nguồn
+	Imported {n} sources	Đã nhập {n} nguồn
+	{language}: {file} (unreadable: {reason})	{language}: {file} (không đọc được: {reason})
+	Spanish (Latin America)	Tiếng Tây Ban Nha (Mỹ Latinh)
+	Spanish (Uruguay)	Tiếng Tây Ban Nha (Uruguay)
+	Pane Options	Tùy chọn ngăn
+	Dock Left	Neo bên trái
+	Dock Right	Neo bên phải
+	Float	Thả nổi
+	Move Pane: {title}	Di chuyển ngăn: {title}
+	Resize Pane	Đổi kích thước ngăn
+	Pages in the range	Các trang trong phạm vi
+	Scale to paper size	Co giãn theo khổ giấy
+	Viewing	Xem
+	Viewing — read without changing anything	Xem — đọc mà không thay đổi gì
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Màu nền trang
+	Update check is not supported in the web browser.	Trình duyệt web không hỗ trợ kiểm tra bản cập nhật.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} hiện là phiên bản mới nhất.
+	Could not check for updates:\n{error}	Không thể kiểm tra bản cập nhật:\n{error}
+	Check for Updates	Kiểm tra bản cập nhật
+	Checking for updates…	Đang kiểm tra bản cập nhật…

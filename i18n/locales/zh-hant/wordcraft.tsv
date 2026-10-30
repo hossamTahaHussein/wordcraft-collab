@@ -2127,3 +2127,99 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	{words} 個字！我想放彩帶，但之後還得自己清理。
 	{words} words. That's {words} more than I've written today.	{words} 個字。比我今天寫的多了 {words} 個。
 	“{text}” ({row}, {series}) isn't a number.	「{text}」（{row}，{series}）不是數字。
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	無法儲存「{name}」，因此它仍保持開啟，沒有遺失任何內容：{error}
+	Wait for the print job to finish submitting before closing.	請等候列印工作提交完成後再關閉。
+	Restore opens an unsaved copy. Your original file stays unchanged.	「還原」會開啟一份未儲存的副本。原始檔案保持不變。
+	Recovery is disabled while this document has a password.	此文件設有密碼，因此復原功能已停用。
+	Local recovery is unavailable or still loading.	本機復原無法使用或仍在載入中。
+	No recovery copies.	沒有復原副本。
+	Recovery copy	復原副本
+	Discard…	捨棄…
+	Continue without restoring	繼續但不還原
+	Advanced Properties…	進階內容…
+	View and edit the document's custom properties.	檢視及編輯文件的自訂內容。
+	Current Document	目前文件
+	{n} people editing	{n} 人正在編輯
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	無法讀取{language}的拼字字典，因此不會檢查該語言。檔案：{file}。原因：{reason}
+	Go to {name}	移至 {name}
+	Questions, ideas and bug reports on GitHub	在 GitHub 上提問、分享想法及回報錯誤
+	Version history	版本歷程記錄
+	{language} (dictionary unreadable)	{language}（無法讀取字典）
+	Text Size	文字大小
+	Saving…	正在儲存…
+	All changes saved	所有變更皆已儲存
+	Offline — changes will sync	離線 — 變更將於稍後同步
+	Commenting	可註解
+	Suggesting	可提建議
+	View only	僅檢視
+	Syncing…	正在同步…
+	Too many changes are waiting to sync. The document is read only until they do.	等候同步的變更過多。同步完成之前，文件為唯讀。
+	Reconnecting…	正在重新連線…
+	You're offline. The document is read only until your changes sync.	您目前離線。在您的變更同步之前，文件為唯讀。
+	Save my copy	儲存我的副本
+	Loading…	正在載入…
+	No versions yet. A version is kept when the document is saved.	還沒有任何版本。每次儲存文件時都會保留一個版本。
+	This version is no longer kept.	此版本已不再保留。
+	Restore this version	還原此版本
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	頁面上的裁切僅適用於未旋轉的圖片：請先將旋轉設為 0°，或使用裁切方塊
+	The number must be a divisor of {max}.	數字必須是 {max} 的因數。
+	Reference type:	參照類型：
+	Insert reference to:	插入參照至：
+	For which item:	參照哪一個項目：
+	Nothing of this type in the document.	文件中沒有此類型的項目。
+	*Bold* and _italic_ as real formatting	將 *粗體* 和 _斜體_ 設為實際格式
+	Add a period with double-space	連按兩次空白鍵時加上句點
+	Built-in Heading styles	內建標題樣式
+	Set left- and first-indent with tabs and backspaces	以 Tab 鍵和退格鍵設定左邊縮排及首行縮排
+	Automatically add words to list (First Letter)	自動將單字加入清單（首字母）
+	Automatically add words to list (INitial CAps)	自動將單字加入清單（前兩個字母大寫）
+	Select a place in this document:	請選取這份文件中的位置：
+	Top of the Document	文件頂端
+	Bookmarks	書籤
+	Find “{text}” in the document	在文件中尋找「{text}」
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	一款以 Rust 撰寫的免費開源文書處理軟體，支援即時共同編輯。\n以 ArtCraft 團隊的 WordCraft 為基礎。
+	WordCraft Collab by Hossam Taha	WordCraft Collab，作者 Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	以 github.com/storytold/wordcraft 為基礎
+	Discard the recovery copy of {name}?	要捨棄「{name}」的復原副本嗎？
+	This cannot be undone. Your original file stays unchanged.	此動作無法復原。原始檔案保持不變。
+	Enter bookmark name:	輸入書籤名稱：
+	Type a page number, or +2 / -1.	請輸入頁碼，或 +2 / -1。
+	Property names are 1–{max} characters.	內容名稱須為 1–{max} 個字元。
+	Property values are at most {max} bytes.	內容值最多 {max} 個位元組。
+	Only text properties can be changed.	只能變更文字內容。
+	Select a property to change.	請選取要變更的內容。
+	This document has no custom properties.	此文件沒有自訂內容。
+	Text properties only: Word's number, date and yes-no types aren't offered.	僅支援文字內容：不提供 Word 的數字、日期和是/否類型。
+	{field}, record {n}	{field}，第 {n} 筆記錄
+	Folder path	資料夾路徑
+	No items to show.	沒有可顯示的項目。
+	File type	檔案類型
+	No new sources in that file	該檔案中沒有新的來源
+	Imported 1 source	已匯入 1 個來源
+	Imported {n} sources	已匯入 {n} 個來源
+	{language}: {file} (unreadable: {reason})	{language}：{file}（無法讀取：{reason}）
+	Spanish (Latin America)	西班牙文（拉丁美洲）
+	Spanish (Uruguay)	西班牙文（烏拉圭）
+	Pane Options	窗格選項
+	Dock Left	停駐在左側
+	Dock Right	停駐在右側
+	Float	浮動
+	Move Pane: {title}	移動窗格：{title}
+	Resize Pane	調整窗格大小
+	AaBbCcDd	AaBbCcDd
+	Body text in a short paragraph to show spacing.	以一小段本文來顯示間距。
+	Pages in the range	範圍內的頁面
+	Scale to paper size	依紙張大小縮放
+	Viewing	檢視
+	Viewing — read without changing anything	檢視 — 僅閱讀，不做任何變更
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	頁面色彩
+	Update check is not supported in the web browser.	網頁瀏覽器不支援檢查更新。
+	WordCraft {version} is currently the newest version available.	WordCraft {version} 是目前可用的最新版本。
+	Could not check for updates:\n{error}	無法檢查更新：\n{error}
+	Check for Updates	檢驗更新
+	Checking for updates…	正在檢查更新…
+	{name} options	{name} 選項

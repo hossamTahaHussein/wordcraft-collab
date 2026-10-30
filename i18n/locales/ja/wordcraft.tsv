@@ -2168,3 +2168,98 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	{words} 語! パーティーを開きたいけど、片付けるのはわたしなので。
 	{words} words. That's {words} more than I've written today.	{words} 語。わたしが今日書いた分より {words} 語も上回っています。
 	“{text}” ({row}, {series}) isn't a number.	「{text}」（{row}、{series}）は数値ではありません。
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	{name} を保存できませんでした。文書は開いたままで、何も失われていません: {error}
+	Wait for the print job to finish submitting before closing.	閉じる前に、印刷ジョブの送信が終わるまでお待ちください。
+	Restore opens an unsaved copy. Your original file stays unchanged.	復元すると、保存されていないコピーが開きます。元のファイルは変更されません。
+	Recovery is disabled while this document has a password.	この文書にパスワードが設定されている間は、回復は無効です。
+	Local recovery is unavailable or still loading.	ローカルの回復は利用できないか、まだ読み込み中です。
+	No recovery copies.	回復用のコピーはありません。
+	Recovery copy	回復用のコピー
+	Discard…	破棄…
+	Continue without restoring	復元せずに続行
+	Advanced Properties…	詳細プロパティ…
+	View and edit the document's custom properties.	文書のユーザー設定プロパティを表示、編集します。
+	Current Document	現在の文書
+	{n} people editing	{n} 人が編集中
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	{language}のスペルチェック辞書を読み込めなかったため、チェックされません。ファイル: {file}。理由: {reason}
+	Go to {name}	{name} に移動
+	Questions, ideas and bug reports on GitHub	GitHub で質問、アイデア、バグ報告
+	Version history	バージョン履歴
+	{language} (dictionary unreadable)	{language}（辞書を読み込めません）
+	Text Size	文字サイズ
+	Saving…	保存しています…
+	All changes saved	すべての変更を保存しました
+	Offline — changes will sync	オフライン — 変更は後で同期されます
+	Commenting	コメント
+	Suggesting	提案
+	View only	表示のみ
+	Syncing…	同期しています…
+	Too many changes are waiting to sync. The document is read only until they do.	同期を待っている変更が多すぎます。同期が終わるまで、文書は読み取り専用です。
+	Reconnecting…	再接続しています…
+	You're offline. The document is read only until your changes sync.	オフラインです。変更が同期されるまで、文書は読み取り専用です。
+	Save my copy	自分のコピーを保存
+	Loading…	読み込んでいます…
+	No versions yet. A version is kept when the document is saved.	まだバージョンはありません。文書を保存するとバージョンが保持されます。
+	This version is no longer kept.	このバージョンは保持されなくなりました。
+	Restore this version	このバージョンを復元
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	ページ上でのトリミングは回転していない画像でのみ使えます。先に回転を 0° にするか、トリミングのボックスを使ってください
+	The number must be a divisor of {max}.	{max} の約数を指定してください。
+	Reference type:	参照の種類:
+	Insert reference to:	挿入する参照:
+	For which item:	対象の項目:
+	Nothing of this type in the document.	文書内にこの種類の項目はありません。
+	*Bold* and _italic_ as real formatting	*太字* と _斜体_ を書式に変更する
+	Add a period with double-space	スペース 2 つでピリオドを入力する
+	Built-in Heading styles	組み込みの見出しスタイル
+	Set left- and first-indent with tabs and backspaces	Tab キーと BackSpace キーで左インデントと 1 行目のインデントを設定する
+	Automatically add words to list (First Letter)	単語を自動的にリストに追加する (先頭文字)
+	Automatically add words to list (INitial CAps)	単語を自動的にリストに追加する (先頭 2 文字の大文字)
+	Select a place in this document:	この文書内の場所を選択:
+	Top of the Document	文書の先頭
+	Bookmarks	ブックマーク
+	Find “{text}” in the document	文書内で「{text}」を検索
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Rust で書かれた、リアルタイム共同編集に対応した無料のオープンソース ワープロです。\nArtCraft チームの WordCraft をもとにしています。
+	WordCraft Collab by Hossam Taha	WordCraft Collab（作者: Hossam Taha）
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	github.com/storytold/wordcraft をもとにしています
+	Discard the recovery copy of {name}?	{name} の回復用のコピーを破棄しますか?
+	This cannot be undone. Your original file stays unchanged.	この操作は元に戻せません。元のファイルは変更されません。
+	Enter bookmark name:	ブックマーク名を入力:
+	Type a page number, or +2 / -1.	ページ番号、または +2 / -1 を入力してください。
+	Property names are 1–{max} characters.	プロパティ名は 1–{max} 文字です。
+	Property values are at most {max} bytes.	プロパティの値は {max} バイト以内です。
+	Only text properties can be changed.	変更できるのはテキストのプロパティだけです。
+	Select a property to change.	変更するプロパティを選択してください。
+	This document has no custom properties.	この文書にはユーザー設定プロパティがありません。
+	Text properties only: Word's number, date and yes-no types aren't offered.	テキストのプロパティのみ: Word の数値、日付、はい/いいえの種類は使用できません。
+	{field}, record {n}	{field}、レコード {n}
+	Folder path	フォルダーのパス
+	No items to show.	表示する項目はありません。
+	File type	ファイルの種類
+	No new sources in that file	そのファイルに新しい資料文献はありません
+	Imported 1 source	1 件の資料文献をインポートしました
+	Imported {n} sources	{n} 件の資料文献をインポートしました
+	{language}: {file} (unreadable: {reason})	{language}: {file}（読み込めません: {reason}）
+	Spanish (Latin America)	スペイン語 (ラテンアメリカ)
+	Spanish (Uruguay)	スペイン語 (ウルグアイ)
+	Pane Options	ウィンドウのオプション
+	Dock Left	左にドッキング
+	Dock Right	右にドッキング
+	Float	フローティング
+	Move Pane: {title}	ウィンドウを移動: {title}
+	Resize Pane	ウィンドウのサイズを変更
+	AaBbCcDd	Aaあア亜
+	Body text in a short paragraph to show spacing.	間隔を示すための短い段落の本文です。
+	Pages in the range	範囲内のページ
+	Scale to paper size	用紙サイズに合わせる
+	Viewing	表示
+	Viewing — read without changing anything	表示 — 何も変更せずに読みます
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	ページの色
+	Update check is not supported in the web browser.	Web ブラウザーでは更新の確認はサポートされていません。
+	WordCraft {version} is currently the newest version available.	WordCraft {version} が現在利用できる最新バージョンです。
+	Could not check for updates:\n{error}	更新を確認できませんでした:\n{error}
+	Checking for updates…	更新を確認しています…
+	{name} options	{name} のオプション

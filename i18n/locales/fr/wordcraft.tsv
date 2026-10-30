@@ -2488,3 +2488,89 @@ preview	Title	Titre
 	✓ None	✓ Aucun
 	➕ New comment	➕ Nouveau commentaire
 	📂  Browse…	📂  Parcourir…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Impossible d’enregistrer {name}. Le document reste ouvert et rien n’a été perdu : {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Restaurer ouvre une copie non enregistrée. Votre fichier d’origine reste inchangé.
+	Recovery is disabled while this document has a password.	La récupération est désactivée tant que ce document est protégé par un mot de passe.
+	Local recovery is unavailable or still loading.	La récupération locale n’est pas disponible ou est encore en cours de chargement.
+	No recovery copies.	Aucune copie de récupération.
+	Recovery copy	Copie de récupération
+	Discard…	Supprimer…
+	Continue without restoring	Continuer sans restaurer
+	Advanced Properties…	Propriétés avancées…
+	View and edit the document's custom properties.	Afficher et modifier les propriétés personnalisées du document.
+	Current Document	Document actif
+	{n} people editing	Personnes en train de modifier : {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Le dictionnaire orthographique pour {language} n’a pas pu être lu, cette langue n’est donc pas vérifiée. Fichier : {file}. Raison : {reason}
+	Go to {name}	Atteindre {name}
+	Questions, ideas and bug reports on GitHub	Questions, idées et rapports de bogues sur GitHub
+	Version history	Historique des versions
+	{language} (dictionary unreadable)	{language} (dictionnaire illisible)
+	Text Size	Taille du texte
+	Saving…	Enregistrement…
+	All changes saved	Toutes les modifications sont enregistrées
+	Offline — changes will sync	Hors ligne — les modifications seront synchronisées
+	Commenting	Commentaires uniquement
+	Suggesting	Suggestions uniquement
+	View only	Lecture seule
+	Reconnecting…	Reconnexion…
+	You're offline. The document is read only until your changes sync.	Vous êtes hors ligne. Le document est en lecture seule jusqu’à la synchronisation de vos modifications.
+	Save my copy	Enregistrer ma copie
+	Loading…	Chargement…
+	No versions yet. A version is kept when the document is saved.	Aucune version pour l’instant. Une version est conservée à chaque enregistrement du document.
+	This version is no longer kept.	Cette version n’est plus conservée.
+	Restore this version	Restaurer cette version
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Le rognage sur la page fonctionne avec les images non pivotées : réglez d’abord la rotation sur 0°, ou utilisez les champs de rognage
+	The number must be a divisor of {max}.	Le nombre doit être un diviseur de {max}.
+	Nothing of this type in the document.	Rien de ce type dans le document.
+	*Bold* and _italic_ as real formatting	*Gras* et _italique_ en véritable mise en forme
+	Add a period with double-space	Ajouter un point avec un double espace
+	Built-in Heading styles	Styles de titre prédéfinis
+	Set left- and first-indent with tabs and backspaces	Définir le retrait gauche et de première ligne avec les tabulations et la touche Retour arrière
+	Automatically add words to list (First Letter)	Ajouter automatiquement des mots à la liste (première lettre)
+	Automatically add words to list (INitial CAps)	Ajouter automatiquement des mots à la liste (DEux MAjuscules)
+	Select a place in this document:	Sélectionnez un emplacement dans ce document :
+	Top of the Document	Haut du document
+	Bookmarks	Signets
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Un traitement de texte gratuit et open source, écrit en Rust, avec coédition en temps réel.\nBasé sur WordCraft de l’équipe ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab par Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Basé sur github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Supprimer la copie de récupération de {name} ?
+	This cannot be undone. Your original file stays unchanged.	Cette action est irréversible. Votre fichier d’origine reste inchangé.
+	Property names are 1–{max} characters.	Les noms de propriété comportent de 1 à {max} caractères.
+	Property values are at most {max} bytes.	Les valeurs de propriété font au plus {max} octets.
+	Only text properties can be changed.	Seules les propriétés de type texte peuvent être modifiées.
+	Select a property to change.	Sélectionnez une propriété à modifier.
+	This document has no custom properties.	Ce document n’a aucune propriété personnalisée.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Propriétés de type texte uniquement : les types nombre, date et oui/non de Word ne sont pas proposés.
+	{field}, record {n}	{field}, enregistrement {n}
+	Folder path	Chemin du dossier
+	No items to show.	Aucun élément à afficher.
+	File type	Type de fichier
+	No new sources in that file	Aucune nouvelle source dans ce fichier
+	Imported 1 source	1 source importée
+	Imported {n} sources	{n} sources importées
+	{language}: {file} (unreadable: {reason})	{language} : {file} (illisible : {reason})
+	Spanish (Latin America)	Espagnol (Amérique latine)
+	Spanish (Uruguay)	Espagnol (Uruguay)
+	Pane Options	Options du volet
+	Dock Left	Ancrer à gauche
+	Dock Right	Ancrer à droite
+	Float	Flottant
+	Move Pane: {title}	Déplacer le volet : {title}
+	Resize Pane	Redimensionner le volet
+	Pages in the range	Pages de la plage
+	Scale to paper size	Ajuster au format du papier
+	Viewing	Consultation
+	Viewing — read without changing anything	Consultation — lire sans rien modifier
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Couleur de page
+	Update check is not supported in the web browser.	La recherche de mises à jour n’est pas prise en charge dans le navigateur web.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} est actuellement la version la plus récente disponible.
+	Could not check for updates:\n{error}	Impossible de rechercher des mises à jour :\n{error}
+	Checking for updates…	Recherche de mises à jour…
+	{name} options	Options de {name}
+	Syncing…	Synchronisation…
+	Too many changes are waiting to sync. The document is read only until they do.	Trop de modifications sont en attente de synchronisation. Le document est en lecture seule jusqu’à ce qu’elles soient synchronisées.

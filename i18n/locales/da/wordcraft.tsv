@@ -2520,3 +2520,157 @@ preview	Title	Titel
 	✓ None	✓ Ingen
 	➕ New comment	➕ Ny kommentar
 	📂  Browse…	📂  Gennemse…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	{name} kunne ikke gemmes, så dokumentet er stadig åbent, og intet er gået tabt: {error}
+	Wait for the print job to finish submitting before closing.	Vent, til udskriftsjobbet er sendt helt af sted, før du lukker.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Gendan åbner en ikke-gemt kopi. Din oprindelige fil forbliver uændret.
+	Recovery is disabled while this document has a password.	Gendannelse er slået fra, så længe dokumentet har en adgangskode.
+	Local recovery is unavailable or still loading.	Lokal gendannelse er ikke tilgængelig eller indlæses stadig.
+	No recovery copies.	Ingen gendannelseskopier.
+	Recovery copy	Gendannelseskopi
+	Discard…	Kassér…
+	Continue without restoring	Fortsæt uden at gendanne
+	Personal	Personlige
+	Templates you save in your templates folder show up here.	Skabeloner, du gemmer i din skabelonmappe, vises her.
+	Save as Word Template…	Gem som Word-skabelon…
+	Saves a .dotx template in your templates folder. It shows up in File › New under Personal.	Gemmer en .dotx-skabelon i din skabelonmappe. Den vises i Filer › Ny under Personlige.
+	Advanced Properties…	Avancerede egenskaber…
+	View and edit the document's custom properties.	Vis og redigér dokumentets brugerdefinerede egenskaber.
+	Current Document	Aktuelt dokument
+	{n} people editing	Redigerer nu: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Stavekontrolordbogen til {language} kunne ikke læses, så sproget kontrolleres ikke. Fil: {file}. Årsag: {reason}
+	Hide Quick Access Toolbar	Skjul værktøjslinjen Hurtig adgang
+	Go to {name}	Gå til {name}
+	Questions, ideas and bug reports on GitHub	Spørgsmål, idéer og fejlrapporter på GitHub
+	Show the ribbon	Vis båndet
+	Version history	Versionshistorik
+	Editing footnote	Redigerer fodnote
+	Editing endnote	Redigerer slutnote
+	{language} (dictionary unreadable)	{language} (ordbogen kan ikke læses)
+	Text Size	Tekststørrelse
+	Saving…	Gemmer…
+	All changes saved	Alle ændringer er gemt
+	Offline — changes will sync	Offline — ændringer synkroniseres
+	Commenting	Kommentering
+	Suggesting	Forslag
+	View only	Kun visning
+	Reconnecting…	Genopretter forbindelse…
+	You're offline. The document is read only until your changes sync.	Du er offline. Dokumentet er skrivebeskyttet, indtil dine ændringer er synkroniseret.
+	Save my copy	Gem min kopi
+	Loading…	Indlæser…
+	No versions yet. A version is kept when the document is saved.	Ingen versioner endnu. Der gemmes en version, hver gang dokumentet gemmes.
+	This version is no longer kept.	Denne version gemmes ikke længere.
+	Restore this version	Gendan denne version
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Beskæring på siden virker på billeder, der ikke er drejet: sæt først Rotation til 0°, eller brug beskæringsfelterne
+	Lines to drop:	Antal linjer:
+	Distance from text:	Afstand fra tekst:
+	No matching commands	Ingen matchende kommandoer
+	Lock aspect ratio	Lås højde-bredde-forhold
+	Relative to original picture size	I forhold til billedets oprindelige størrelse
+	{width} × {height} pixels	{width} × {height} pixels
+	Continue from previous section	Fortsæt fra forrige sektion
+	The number must be between 1 and {max}.	Tallet skal være mellem 1 og {max}.
+	The number must be a divisor of {max}.	Tallet skal gå op i {max}.
+	Merge cells before split	Flet celler før opdeling
+	The measurement must be between {min} and {max}.	Målet skal være mellem {min} og {max}.
+	Initial column width:	Startkolonnebredde:
+	AutoFit to contents	Tilpas automatisk til indhold
+	AutoFit to window	Tilpas automatisk til vindue
+	Commas	Kommaer
+	Other:	Andet:
+	Moved from:	Flyttet fra:
+	Moved to:	Flyttet til:
+	Nothing of this type in the document.	Der er intet af denne type i dokumentet.
+	Include label and number	Medtag etiket og nummer
+	*Bold* and _italic_ as real formatting	*Fed* og _kursiv_ som rigtig formatering
+	Add a period with double-space	Tilføj punktum ved dobbelt mellemrum
+	Built-in Heading styles	Indbyggede overskriftsstile
+	Set left- and first-indent with tabs and backspaces	Angiv venstre indrykning og indrykning af første linje med tabulator og tilbagetast
+	Automatically add words to list (First Letter)	Føj automatisk ord til listen (første bogstav)
+	Automatically add words to list (INitial CAps)	Føj automatisk ord til listen (TO STore begyndelsesbogstaver)
+	Show Quick Access Toolbar	Vis værktøjslinjen Hurtig adgang
+	Kerning for fonts:	Knibning for skrifttyper:
+	Points and above	punkt og derover
+	Select a place in this document:	Vælg et sted i dette dokument:
+	Top of the Document	Dokumentets start
+	Bookmarks	Bogmærker
+	Find “{text}” in the document	Find »{text}« i dokumentet
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Version {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	En gratis open source-tekstbehandler skrevet i Rust, med samtidig redigering i realtid.\nBaseret på WordCraft fra ArtCraft-teamet.
+	WordCraft Collab by Hossam Taha	WordCraft Collab af Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Baseret på github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Vil du kassere gendannelseskopien af {name}?
+	This cannot be undone. Your original file stays unchanged.	Dette kan ikke fortrydes. Din oprindelige fil forbliver uændret.
+	Enter bookmark name:	Angiv navn på bogmærke:
+	This document has no bookmarks.	Dette dokument har ingen bogmærker.
+	Type a page number, or +2 / -1.	Skriv et sidetal, eller +2 / -1.
+	Property names are 1–{max} characters.	Egenskabsnavne er på 1–{max} tegn.
+	Property values are at most {max} bytes.	Egenskabsværdier er på højst {max} byte.
+	Only text properties can be changed.	Kun tekstegenskaber kan ændres.
+	Select a property to change.	Vælg en egenskab, der skal ændres.
+	This document has no custom properties.	Dette dokument har ingen brugerdefinerede egenskaber.
+	Value:	Værdi:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Kun tekstegenskaber: Words typer for tal, dato og ja/nej tilbydes ikke.
+	Show only records that will be merged	Vis kun poster, der flettes
+	Find in list:	Find på listen:
+	Any field	Alle felter
+	Matches: {count}	Resultater: {count}
+	{field}, record {n}	{field}, post {n}
+	Folder path	Mappesti
+	No items to show.	Ingen elementer at vise.
+	File type	Filtype
+	Added 1 font	Tilføjede 1 skrifttype
+	Added {n} fonts	Tilføjede {n} skrifttyper
+	{names} and {n} more	{names} og {n} mere
+	{added}; {count} couldn't be read: {names}	{added}; {count} kunne ikke læses: {names}
+	{added}; {n} skipped (limit {max})	{added}; {n} sprunget over (grænse {max})
+	No new sources in that file	Ingen nye kilder i den fil
+	Imported 1 source	Importerede 1 kilde
+	Imported {n} sources	Importerede {n} kilder
+	Select a shape, text box or drawing canvas to format its fill.	Markér en form, en tekstboks eller et lærred for at formatere udfyldningen.
+	No fill	Ingen udfyldning
+	Solid fill	Ensfarvet udfyldning
+	Gradient fill	Gradientudfyldning
+	Preset gradients	Forudindstillede gradienter
+	Direction	Retning
+	Gradient stops	Gradientstop
+	Add gradient stop	Tilføj gradientstop
+	Remove gradient stop	Fjern gradientstop
+	Rotate with shape	Rotér med form
+	Old menu keys: Alt, {keys}. Keep typing, or press Esc to cancel.	Gamle menutaster: Alt, {keys}. Skriv videre, eller tryk på Esc for at annullere.
+	cm	cm
+	mm	mm
+	pi	pi
+	{language}: {file} (unreadable: {reason})	{language}: {file} (kan ikke læses: {reason})
+	Indonesian	Indonesisk
+	Spanish (Latin America)	Spansk (Latinamerika)
+	Spanish (Uruguay)	Spansk (Uruguay)
+	User templates:	Brugerskabeloner:
+	Not set	Ikke angivet
+	Pane Options	Ruderindstillinger
+	Dock Left	Dok til venstre
+	Dock Right	Dok til højre
+	Float	Flydende
+	Move Pane: {title}	Flyt rude: {title}
+	Resize Pane	Tilpas rudens størrelse
+	Pages in the range	Sider i området
+	Scale to paper size	Skalér til papirstørrelse
+	Viewing	Læsning
+	Viewing — read without changing anything	Læsning — læs uden at ændre noget
+	More tabs	Flere faner
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	No Gradient	Ingen gradient
+	More Gradients…	Flere gradienter…
+	Page color	Sidefarve
+	Update check is not supported in the web browser.	Søgning efter opdateringer understøttes ikke i webbrowseren.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} er i øjeblikket den nyeste tilgængelige version.
+	Could not check for updates:\n{error}	Der kunne ikke søges efter opdateringer:\n{error}
+	Check for Updates	Søg efter opdateringer
+	Checking for updates…	Søger efter opdateringer…
+	{name} options	Indstillinger for {name}
+	Recently Used Fonts	Senest anvendte skrifttyper
+	All Fonts	Alle skrifttyper
+	Syncing…	Synkroniserer…
+	Too many changes are waiting to sync. The document is read only until they do.	For mange ændringer venter på at blive synkroniseret. Dokumentet er skrivebeskyttet, indtil de er.

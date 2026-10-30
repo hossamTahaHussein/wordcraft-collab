@@ -2091,3 +2091,98 @@
 	{words} words! I'd throw confetti but I'd have to clean it up.	{words} palavras! Eu jogaria confete, mas depois teria que limpar.
 	{words} words. That's {words} more than I've written today.	{words} palavras. São {words} a mais do que eu escrevi hoje.
 	“{text}” ({row}, {series}) isn't a number.	“{text}” ({row}, {series}) não é um número.
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Não foi possível salvar {name}; ele continua aberto e nada foi perdido: {error}
+	Wait for the print job to finish submitting before closing.	Aguarde o envio do trabalho de impressão terminar antes de fechar.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Restaurar abre uma cópia não salva. Seu arquivo original não é alterado.
+	Recovery is disabled while this document has a password.	A recuperação fica desativada enquanto este documento tiver senha.
+	Local recovery is unavailable or still loading.	A recuperação local não está disponível ou ainda está carregando.
+	No recovery copies.	Nenhuma cópia de recuperação.
+	Recovery copy	Cópia de recuperação
+	Discard…	Descartar…
+	Continue without restoring	Continuar sem restaurar
+	Advanced Properties…	Propriedades avançadas…
+	View and edit the document's custom properties.	Exibir e editar as propriedades personalizadas do documento.
+	Current Document	Documento atual
+	{n} people editing	{n} pessoas editando
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Não foi possível ler o dicionário ortográfico de {language}, então o texto não é verificado. Arquivo: {file}. Motivo: {reason}
+	Go to {name}	Ir para {name}
+	Questions, ideas and bug reports on GitHub	Perguntas, ideias e relatórios de bugs no GitHub
+	Version history	Histórico de versões
+	{language} (dictionary unreadable)	{language} (dicionário ilegível)
+	Text Size	Tamanho do texto
+	Saving…	Salvando…
+	All changes saved	Todas as alterações foram salvas
+	Offline — changes will sync	Offline — as alterações serão sincronizadas
+	Commenting	Comentando
+	Suggesting	Sugerindo
+	View only	Somente visualização
+	Syncing…	Sincronizando…
+	Too many changes are waiting to sync. The document is read only until they do.	Há alterações demais aguardando sincronização. O documento fica somente leitura até que sejam sincronizadas.
+	Reconnecting…	Reconectando…
+	You're offline. The document is read only until your changes sync.	Você está offline. O documento fica somente leitura até que suas alterações sejam sincronizadas.
+	Save my copy	Salvar minha cópia
+	Loading…	Carregando…
+	No versions yet. A version is kept when the document is saved.	Ainda não há versões. Uma versão é guardada quando o documento é salvo.
+	This version is no longer kept.	Esta versão não é mais guardada.
+	Restore this version	Restaurar esta versão
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Cortar na página funciona com imagens não giradas: defina a rotação como 0° primeiro ou use as caixas de corte
+	The number must be a divisor of {max}.	O número deve ser um divisor de {max}.
+	Reference type:	Tipo de referência:
+	Insert reference to:	Inserir referência para:
+	For which item:	Para qual item:
+	Nothing of this type in the document.	Nada deste tipo no documento.
+	*Bold* and _italic_ as real formatting	*Negrito* e _itálico_ como formatação real
+	Add a period with double-space	Adicionar ponto com espaço duplo
+	Built-in Heading styles	Estilos de título internos
+	Set left- and first-indent with tabs and backspaces	Definir recuo esquerdo e da primeira linha com Tab e Backspace
+	Automatically add words to list (First Letter)	Adicionar palavras automaticamente à lista (Primeira letra)
+	Automatically add words to list (INitial CAps)	Adicionar palavras automaticamente à lista (INiciais MAiúsculas)
+	Select a place in this document:	Selecione um local neste documento:
+	Top of the Document	Início do documento
+	Bookmarks	Indicadores
+	Find “{text}” in the document	Localizar “{text}” no documento
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Um processador de texto gratuito e de código aberto, escrito em Rust, com edição conjunta em tempo real.\nBaseado no WordCraft da equipe ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, por Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Baseado em github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Descartar a cópia de recuperação de {name}?
+	This cannot be undone. Your original file stays unchanged.	Isso não pode ser desfeito. Seu arquivo original não é alterado.
+	Enter bookmark name:	Digite o nome do indicador:
+	Type a page number, or +2 / -1.	Digite um número de página, ou +2 / -1.
+	Property names are 1–{max} characters.	Os nomes de propriedades têm de 1 a {max} caracteres.
+	Property values are at most {max} bytes.	Os valores de propriedades têm no máximo {max} bytes.
+	Only text properties can be changed.	Somente propriedades de texto podem ser alteradas.
+	Select a property to change.	Selecione uma propriedade para alterar.
+	This document has no custom properties.	Este documento não tem propriedades personalizadas.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Somente propriedades de texto: os tipos número, data e sim/não do Word não são oferecidos.
+	{field}, record {n}	{field}, registro {n}
+	Folder path	Caminho da pasta
+	No items to show.	Nenhum item para mostrar.
+	File type	Tipo de arquivo
+	No new sources in that file	Nenhuma fonte nova nesse arquivo
+	Imported 1 source	1 fonte importada
+	Imported {n} sources	{n} fontes importadas
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ilegível: {reason})
+	Spanish (Latin America)	Espanhol (América Latina)
+	Spanish (Uruguay)	Espanhol (Uruguai)
+	Pane Options	Opções do painel
+	Dock Left	Encaixar à esquerda
+	Dock Right	Encaixar à direita
+	Float	Flutuante
+	Move Pane: {title}	Mover painel: {title}
+	Resize Pane	Redimensionar painel
+	AaBbCcDd	AaBbCcÇç
+	Body text in a short paragraph to show spacing.	Texto do corpo em um parágrafo curto para mostrar o espaçamento.
+	Pages in the range	Páginas do intervalo
+	Scale to paper size	Ajustar ao tamanho do papel
+	Viewing	Visualização
+	Viewing — read without changing anything	Visualização — leia sem alterar nada
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Cor da página
+	Update check is not supported in the web browser.	A verificação de atualizações não é compatível com o navegador.
+	WordCraft {version} is currently the newest version available.	O WordCraft {version} é a versão mais recente disponível no momento.
+	Could not check for updates:\n{error}	Não foi possível verificar atualizações:\n{error}
+	Checking for updates…	Verificando atualizações…
+	{name} options	Opções de {name}

@@ -2476,3 +2476,48 @@ preview	Title	Tittel
 	✓ None	✓ Ingen
 	➕ New comment	➕ Ny kommentar
 	📂  Browse…	📂  Bla gjennom…
+	{n} people editing	{n} personer redigerer
+	Go to {name}	Gå til {name}
+	Questions, ideas and bug reports on GitHub	Spørsmål, ideer og feilrapporter på GitHub
+	Version history	Versjonslogg
+	Text Size	Tekststørrelse
+	Saving…	Lagrer…
+	All changes saved	Alle endringer er lagret
+	Offline — changes will sync	Frakoblet – endringene synkroniseres senere
+	Commenting	Kommenterer
+	Suggesting	Foreslår
+	View only	Bare visning
+	Reconnecting…	Kobler til på nytt…
+	You're offline. The document is read only until your changes sync.	Du er frakoblet. Dokumentet er skrivebeskyttet til endringene dine er synkronisert.
+	Save my copy	Lagre min kopi
+	Loading…	Laster inn…
+	No versions yet. A version is kept when the document is saved.	Ingen versjoner ennå. En versjon tas vare på når dokumentet lagres.
+	This version is no longer kept.	Denne versjonen er ikke lenger tatt vare på.
+	Restore this version	Gjenopprett denne versjonen
+	*Bold* and _italic_ as real formatting	*Fet* og _kursiv_ som ekte formatering
+	Add a period with double-space	Legg til punktum ved dobbelt mellomrom
+	Built-in Heading styles	Innebygde overskriftsstiler
+	Set left- and first-indent with tabs and backspaces	Angi venstre innrykk og første linjes innrykk med tabulator og tilbaketast
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Et gratis tekstbehandlingsprogram med åpen kildekode, skrevet i Rust, med samtidig redigering i sanntid.\nBasert på WordCraft fra ArtCraft-teamet.
+	WordCraft Collab by Hossam Taha	WordCraft Collab av Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Basert på github.com/storytold/wordcraft
+	Property names are 1–{max} characters.	Egenskapsnavn har 1–{max} tegn.
+	Property values are at most {max} bytes.	Egenskapsverdier er på høyst {max} byte.
+	Only text properties can be changed.	Bare tekstegenskaper kan endres.
+	Select a property to change.	Velg en egenskap som skal endres.
+	This document has no custom properties.	Dette dokumentet har ingen egendefinerte egenskaper.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Bare tekstegenskaper: Words typer for tall, dato og ja/nei tilbys ikke.
+	{field}, record {n}	{field}, post {n}
+	Folder path	Mappebane
+	File type	Filtype
+	Pages in the range	Sider i området
+	Viewing	Visning
+	Viewing — read without changing anything	Visning – les uten å endre noe
+	Update check is not supported in the web browser.	Oppdateringssjekk støttes ikke i nettleseren.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} er for øyeblikket den nyeste tilgjengelige versjonen.
+	Could not check for updates:\n{error}	Kunne ikke se etter oppdateringer:\n{error}
+	Syncing…	Synkroniserer…
+	Too many changes are waiting to sync. The document is read only until they do.	For mange endringer venter på synkronisering. Dokumentet er skrivebeskyttet til de er synkronisert.

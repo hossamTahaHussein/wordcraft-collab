@@ -2432,3 +2432,95 @@ preview	Title	Naslov
 	✓ None	✓ Nema
 	➕ New comment	➕ Novi komentar
 	📂  Browse…	📂  Pregledaj…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	Dokument {name} nije moguće spremiti pa je i dalje otvoren i ništa nije izgubljeno: {error}
+	Restore opens an unsaved copy. Your original file stays unchanged.	Vraćanje otvara nespremljenu kopiju. Vaša izvorna datoteka ostaje nepromijenjena.
+	Recovery is disabled while this document has a password.	Oporavak je onemogućen dok je ovaj dokument zaštićen lozinkom.
+	Local recovery is unavailable or still loading.	Lokalni oporavak nije dostupan ili se još učitava.
+	No recovery copies.	Nema kopija za oporavak.
+	Recovery copy	Kopija za oporavak
+	Discard…	Odbaci…
+	Continue without restoring	Nastavi bez vraćanja
+	Advanced Properties…	Napredna svojstva…
+	View and edit the document's custom properties.	Pregledajte i uredite prilagođena svojstva dokumenta.
+	Current Document	Trenutačni dokument
+	{n} people editing	Uređuju: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	Pravopisni rječnik za {language} nije moguće pročitati pa se pravopis ne provjerava. Datoteka: {file}. Razlog: {reason}
+	Go to {name}	Idi na {name}
+	Questions, ideas and bug reports on GitHub	Pitanja, ideje i prijave pogrešaka na GitHubu
+	Version history	Povijest verzija
+	{language} (dictionary unreadable)	{language} (rječnik nije čitljiv)
+	Text Size	Veličina teksta
+	Saving…	Spremanje…
+	All changes saved	Sve promjene su spremljene
+	Offline — changes will sync	Izvan mreže – promjene će se sinkronizirati
+	Commenting	Komentiranje
+	Suggesting	Predlaganje
+	View only	Samo čitanje
+	Reconnecting…	Ponovno povezivanje…
+	You're offline. The document is read only until your changes sync.	Niste povezani. Dokument je samo za čitanje dok se vaše promjene ne sinkroniziraju.
+	Save my copy	Spremi moju kopiju
+	Loading…	Učitavanje…
+	No versions yet. A version is kept when the document is saved.	Još nema verzija. Verzija se čuva kad se dokument spremi.
+	This version is no longer kept.	Ova se verzija više ne čuva.
+	Restore this version	Vrati ovu verziju
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Obrezivanje na stranici radi na nezakrenutim slikama: najprije postavite Rotaciju na 0° ili upotrijebite polja za obrezivanje
+	No matching commands	Nema odgovarajućih naredbi
+	The number must be a divisor of {max}.	Broj mora biti djelitelj broja {max}.
+	Nothing of this type in the document.	U dokumentu nema ničega ove vrste.
+	*Bold* and _italic_ as real formatting	*Podebljano* i _kurziv_ kao stvarno oblikovanje
+	Add a period with double-space	Dodaj točku dvostrukim razmakom
+	Built-in Heading styles	Ugrađeni stilovi naslova
+	Set left- and first-indent with tabs and backspaces	Postavi lijevu uvlaku i uvlaku prvog retka tabulatorima i tipkom Backspace
+	Automatically add words to list (First Letter)	Automatski dodaj riječi na popis (prvo slovo)
+	Automatically add words to list (INitial CAps)	Automatski dodaj riječi na popis (DVa POčetna velika)
+	Select a place in this document:	Odaberite mjesto u ovom dokumentu:
+	Top of the Document	Vrh dokumenta
+	Bookmarks	Knjižne oznake
+	WordCraft Collab	WordCraft Collab
+	Version {version}	Verzija {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Besplatan program za obradu teksta otvorenog koda, napisan u Rustu, sa zajedničkim uređivanjem u stvarnom vremenu.\nTemelji se na WordCraftu tima ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, autor Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Temelji se na github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Odbaciti kopiju za oporavak dokumenta {name}?
+	This cannot be undone. Your original file stays unchanged.	Ovo se ne može poništiti. Vaša izvorna datoteka ostaje nepromijenjena.
+	Property names are 1–{max} characters.	Nazivi svojstava imaju od 1 do {max} znakova.
+	Property values are at most {max} bytes.	Vrijednosti svojstava imaju najviše {max} bajtova.
+	Only text properties can be changed.	Mogu se mijenjati samo tekstna svojstva.
+	Select a property to change.	Odaberite svojstvo koje želite promijeniti.
+	This document has no custom properties.	Ovaj dokument nema prilagođenih svojstava.
+	Value:	Vrijednost:
+	Text properties only: Word's number, date and yes-no types aren't offered.	Samo tekstna svojstva: Wordove vrste broj, datum i da/ne nisu ponuđene.
+	{field}, record {n}	{field}, zapis {n}
+	Folder path	Put do mape
+	File type	Vrsta datoteke
+	No new sources in that file	U toj datoteci nema novih izvora
+	Imported 1 source	Uvezen je 1 izvor
+	Imported {n} sources	Uvezeni izvori: {n}
+	{language}: {file} (unreadable: {reason})	{language}: {file} (nije čitljivo: {reason})
+	Spanish (Latin America)	Španjolski (Latinska Amerika)
+	Spanish (Uruguay)	Španjolski (Urugvaj)
+	Pane Options	Mogućnosti okna
+	Dock Left	Usidri lijevo
+	Dock Right	Usidri desno
+	Float	Plutajuće
+	Move Pane: {title}	Premjesti okno: {title}
+	Resize Pane	Promijeni veličinu okna
+	Pages in the range	Stranice u rasponu
+	Scale to paper size	Prilagodi veličini papira
+	Viewing	Gledanje
+	Viewing — read without changing anything	Gledanje – čitajte bez ikakvih izmjena
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Boja stranice
+	Update check is not supported in the web browser.	Provjera ažuriranja nije podržana u web-pregledniku.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} trenutačno je najnovija dostupna verzija.
+	Could not check for updates:\n{error}	Nije moguće provjeriti ažuriranja:\n{error}
+	Check for Updates	Provjeri ažuriranja
+	Checking for updates…	Provjera ažuriranja…
+	Restore	Vrati
+	Community	Zajednica
+	Discard	Odbaci
+	Modify	Izmijeni
+	Syncing…	Sinkronizacija…
+	Too many changes are waiting to sync. The document is read only until they do.	Previše promjena čeka sinkronizaciju. Dokument je samo za čitanje dok se ne sinkroniziraju.

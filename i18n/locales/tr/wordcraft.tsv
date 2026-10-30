@@ -2419,3 +2419,92 @@ preview	Title	Örnek
 	{words} words. That's {words} more than I've written today.	{words} sözcük. Bugün benim yazdığımdan {words} fazla.
 	“{text}” ({row}, {series}) isn't a number.	“{text}” ({row}, {series}) bir sayı değil.
 	✓ None	✓ Yok
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	{name} kaydedilemedi; bu yüzden hâlâ açık ve hiçbir şey kaybolmadı: {error}
+	Wait for the print job to finish submitting before closing.	Kapatmadan önce yazdırma işinin gönderilmesinin bitmesini bekleyin.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Geri yükle, kaydedilmemiş bir kopya açar. Özgün dosyanız değişmeden kalır.
+	Recovery is disabled while this document has a password.	Bu belgenin parolası olduğu sürece kurtarma devre dışıdır.
+	Local recovery is unavailable or still loading.	Yerel kurtarma kullanılamıyor veya hâlâ yükleniyor.
+	No recovery copies.	Kurtarma kopyası yok.
+	Recovery copy	Kurtarma kopyası
+	Discard…	At…
+	Continue without restoring	Geri yüklemeden devam et
+	Advanced Properties…	Gelişmiş Özellikler…
+	View and edit the document's custom properties.	Belgenin özel özelliklerini görüntüleyin ve düzenleyin.
+	Current Document	Geçerli Belge
+	{n} people editing	{n} kişi düzenliyor
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	{language} için yazım sözlüğü okunamadı, bu yüzden denetlenmiyor. Dosya: {file}. Neden: {reason}
+	Go to {name}	{name} konumuna git
+	Community	Topluluk
+	Questions, ideas and bug reports on GitHub	GitHub'da sorular, fikirler ve hata bildirimleri
+	Version history	Sürüm geçmişi
+	{language} (dictionary unreadable)	{language} (sözlük okunamıyor)
+	Text Size	Metin Boyutu
+	Saving…	Kaydediliyor…
+	All changes saved	Tüm değişiklikler kaydedildi
+	Offline — changes will sync	Çevrimdışı — değişiklikler eşitlenecek
+	Commenting	Yorum yapma
+	Suggesting	Öneride bulunma
+	View only	Yalnızca görüntüleme
+	Syncing…	Eşitleniyor…
+	Too many changes are waiting to sync. The document is read only until they do.	Eşitlenmeyi bekleyen çok fazla değişiklik var. Bunlar eşitlenene kadar belge salt okunurdur.
+	Reconnecting…	Yeniden bağlanılıyor…
+	You're offline. The document is read only until your changes sync.	Çevrimdışısınız. Değişiklikleriniz eşitlenene kadar belge salt okunurdur.
+	Save my copy	Kopyamı kaydet
+	Loading…	Yükleniyor…
+	No versions yet. A version is kept when the document is saved.	Henüz sürüm yok. Belge her kaydedildiğinde bir sürüm saklanır.
+	This version is no longer kept.	Bu sürüm artık saklanmıyor.
+	Restore this version	Bu sürümü geri yükle
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Sayfada kırpma yalnızca döndürülmemiş resimlerde çalışır: önce Döndürme'yi 0° yapın veya kırpma kutularını kullanın
+	The number must be a divisor of {max}.	Sayı, {max} sayısının bir böleni olmalıdır.
+	Nothing of this type in the document.	Belgede bu türde bir öğe yok.
+	*Bold* and _italic_ as real formatting	*Kalın* ve _italik_ gerçek biçimlendirme olarak
+	Add a period with double-space	Çift boşlukla nokta ekle
+	Built-in Heading styles	Yerleşik Başlık stilleri
+	Set left- and first-indent with tabs and backspaces	Sol ve ilk satır girintisini Sekme ve Geri tuşlarıyla ayarla
+	Automatically add words to list (First Letter)	Sözcükleri listeye otomatik ekle (İlk Harf)
+	Automatically add words to list (INitial CAps)	Sözcükleri listeye otomatik ekle (İKi BAşharf)
+	Select a place in this document:	Bu belgede bir yer seçin:
+	Top of the Document	Belgenin Başı
+	Bookmarks	Yer İşaretleri
+	Find “{text}” in the document	Belgede “{text}” ifadesini bul
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Rust ile yazılmış, gerçek zamanlı ortak düzenleme sunan ücretsiz, açık kaynak bir kelime işlemci.\nArtCraft ekibinin WordCraft'ı temel alınmıştır.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, Hossam Taha tarafından
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	github.com/storytold/wordcraft temel alınmıştır
+	Discard the recovery copy of {name}?	{name} için kurtarma kopyası atılsın mı?
+	This cannot be undone. Your original file stays unchanged.	Bu işlem geri alınamaz. Özgün dosyanız değişmeden kalır.
+	Enter bookmark name:	Yer işareti adını girin:
+	Type a page number, or +2 / -1.	Bir sayfa numarası veya +2 / -1 yazın.
+	Property names are 1–{max} characters.	Özellik adları 1–{max} karakter olmalıdır.
+	Property values are at most {max} bytes.	Özellik değerleri en fazla {max} bayt olabilir.
+	Only text properties can be changed.	Yalnızca metin özellikleri değiştirilebilir.
+	Select a property to change.	Değiştirilecek bir özellik seçin.
+	This document has no custom properties.	Bu belgede özel özellik yok.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Yalnızca metin özellikleri: Word'ün sayı, tarih ve evet-hayır türleri sunulmaz.
+	{field}, record {n}	{field}, kayıt {n}
+	Folder path	Klasör yolu
+	File type	Dosya türü
+	No new sources in that file	Bu dosyada yeni kaynak yok
+	Imported 1 source	1 kaynak içe aktarıldı
+	Imported {n} sources	{n} kaynak içe aktarıldı
+	{language}: {file} (unreadable: {reason})	{language}: {file} (okunamıyor: {reason})
+	Spanish (Latin America)	İspanyolca (Latin Amerika)
+	Spanish (Uruguay)	İspanyolca (Uruguay)
+	Pane Options	Bölme Seçenekleri
+	Dock Left	Sola Yerleştir
+	Dock Right	Sağa Yerleştir
+	Float	Serbest Bırak
+	Move Pane: {title}	Bölmeyi Taşı: {title}
+	Resize Pane	Bölmeyi Yeniden Boyutlandır
+	Pages in the range	Aralıktaki sayfalar
+	Scale to paper size	Kağıt boyutuna ölçekle
+	Viewing	Görüntüleme
+	Viewing — read without changing anything	Görüntüleme — hiçbir şeyi değiştirmeden okuyun
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Sayfa rengi
+	Update check is not supported in the web browser.	Güncelleme denetimi web tarayıcısında desteklenmiyor.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} şu anda mevcut en yeni sürümdür.
+	Could not check for updates:\n{error}	Güncellemeler denetlenemedi:\n{error}
+	Checking for updates…	Güncellemeler denetleniyor…

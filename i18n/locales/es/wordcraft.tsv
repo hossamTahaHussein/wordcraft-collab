@@ -2388,3 +2388,96 @@ preview	Title	Título
 	{words} words. That's {words} more than I've written today.	{words} palabras. Son {words} más de las que he escrito yo hoy.
 	“{text}” ({row}, {series}) isn't a number.	«{text}» ({row}, {series}) no es un número.
 	✓ None	✓ Ninguno
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	No se pudo guardar {name}; sigue abierto y no se perdió nada: {error}
+	Wait for the print job to finish submitting before closing.	Espera a que el trabajo de impresión termine de enviarse antes de cerrar.
+	Restore opens an unsaved copy. Your original file stays unchanged.	Restaurar abre una copia sin guardar. Tu archivo original no cambia.
+	Recovery is disabled while this document has a password.	La recuperación está desactivada mientras este documento tenga contraseña.
+	Local recovery is unavailable or still loading.	La recuperación local no está disponible o todavía se está cargando.
+	No recovery copies.	No hay copias de recuperación.
+	Recovery copy	Copia de recuperación
+	Discard…	Descartar…
+	Continue without restoring	Continuar sin restaurar
+	Advanced Properties…	Propiedades avanzadas…
+	View and edit the document's custom properties.	Ver y editar las propiedades personalizadas del documento.
+	Current Document	Documento actual
+	{n} people editing	Personas editando: {n}
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	No se pudo leer el diccionario ortográfico de {language}, así que no se revisa. Archivo: {file}. Motivo: {reason}
+	Go to {name}	Ir a {name}
+	Questions, ideas and bug reports on GitHub	Preguntas, ideas e informes de errores en GitHub
+	Version history	Historial de versiones
+	{language} (dictionary unreadable)	{language} (diccionario ilegible)
+	Text Size	Tamaño del texto
+	Saving…	Guardando…
+	All changes saved	Todos los cambios guardados
+	Offline — changes will sync	Sin conexión — los cambios se sincronizarán
+	Commenting	Solo comentarios
+	Suggesting	Solo sugerencias
+	View only	Solo lectura
+	Reconnecting…	Reconectando…
+	You're offline. The document is read only until your changes sync.	Estás sin conexión. El documento es de solo lectura hasta que se sincronicen tus cambios.
+	Save my copy	Guardar mi copia
+	Loading…	Cargando…
+	No versions yet. A version is kept when the document is saved.	Todavía no hay versiones. Se guarda una versión cada vez que se guarda el documento.
+	This version is no longer kept.	Esta versión ya no se conserva.
+	Restore this version	Restaurar esta versión
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Recortar en la página funciona con imágenes sin girar: primero pon el Giro en 0° o usa los cuadros de recorte
+	The number must be a divisor of {max}.	El número debe ser un divisor de {max}.
+	Nothing of this type in the document.	No hay nada de este tipo en el documento.
+	*Bold* and _italic_ as real formatting	*Negrita* y _cursiva_ como formato real
+	Add a period with double-space	Añadir un punto con doble espacio
+	Built-in Heading styles	Estilos de título integrados
+	Set left- and first-indent with tabs and backspaces	Establecer sangría izquierda y de primera línea con tabulaciones y retroceso
+	Automatically add words to list (First Letter)	Añadir palabras a la lista automáticamente (primera letra)
+	Automatically add words to list (INitial CAps)	Añadir palabras a la lista automáticamente (DOs MAyúsculas)
+	Select a place in this document:	Selecciona un lugar de este documento:
+	Top of the Document	Principio del documento
+	Bookmarks	Marcadores
+	Find “{text}” in the document	Buscar «{text}» en el documento
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Un procesador de textos gratuito y de código abierto, escrito en Rust, con coedición en tiempo real.\nBasado en WordCraft del equipo de ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab, de Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Basado en github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	¿Descartar la copia de recuperación de {name}?
+	This cannot be undone. Your original file stays unchanged.	Esto no se puede deshacer. Tu archivo original no cambia.
+	Enter bookmark name:	Escribe el nombre del marcador:
+	Type a page number, or +2 / -1.	Escribe un número de página, o +2 / -1.
+	Property names are 1–{max} characters.	Los nombres de propiedad tienen de 1 a {max} caracteres.
+	Property values are at most {max} bytes.	Los valores de propiedad tienen como máximo {max} bytes.
+	Only text properties can be changed.	Solo se pueden cambiar las propiedades de texto.
+	Select a property to change.	Selecciona una propiedad para cambiarla.
+	This document has no custom properties.	Este documento no tiene propiedades personalizadas.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Solo propiedades de texto: no se ofrecen los tipos de número, fecha y sí/no de Word.
+	{field}, record {n}	{field}, registro {n}
+	Folder path	Ruta de la carpeta
+	No items to show.	No hay elementos para mostrar.
+	File type	Tipo de archivo
+	No new sources in that file	No hay fuentes nuevas en ese archivo
+	Imported 1 source	Se importó 1 fuente
+	Imported {n} sources	Se importaron {n} fuentes
+	{language}: {file} (unreadable: {reason})	{language}: {file} (ilegible: {reason})
+	Spanish (Latin America)	Español (Latinoamérica)
+	Spanish (Uruguay)	Español (Uruguay)
+	Pane Options	Opciones del panel
+	Dock Left	Acoplar a la izquierda
+	Dock Right	Acoplar a la derecha
+	Float	Flotante
+	Move Pane: {title}	Mover panel: {title}
+	Resize Pane	Cambiar tamaño del panel
+	Pages in the range	Páginas del intervalo
+	Scale to paper size	Ajustar al tamaño del papel
+	Viewing	Visualización
+	Viewing — read without changing anything	Visualización — leer sin cambiar nada
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Color de página
+	Update check is not supported in the web browser.	La búsqueda de actualizaciones no está disponible en el navegador web.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} es actualmente la versión más reciente disponible.
+	Could not check for updates:\n{error}	No se pudieron buscar actualizaciones:\n{error}
+	Checking for updates…	Buscando actualizaciones…
+	{name} options	Opciones de {name}
+	Reference type:	Tipo de referencia:
+	Insert reference to:	Insertar referencia a:
+	For which item:	Para qué elemento:
+	Syncing…	Sincronizando…
+	Too many changes are waiting to sync. The document is read only until they do.	Hay demasiados cambios esperando a sincronizarse. El documento es de solo lectura hasta que se sincronicen.

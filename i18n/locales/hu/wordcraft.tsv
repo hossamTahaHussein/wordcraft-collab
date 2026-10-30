@@ -2451,3 +2451,91 @@
 	✓ None	✓ Nincs
 	➕ New comment	➕ Új megjegyzés
 	📂  Browse…	📂  Tallózás…
+	Couldn't save {name}, so it is still open and nothing was lost: {error}	A(z) {name} mentése nem sikerült, ezért továbbra is nyitva van, és semmi sem veszett el: {error}
+	Wait for the print job to finish submitting before closing.	Bezárás előtt várd meg, amíg a nyomtatási feladat elküldése befejeződik.
+	Restore opens an unsaved copy. Your original file stays unchanged.	A visszaállítás egy nem mentett másolatot nyit meg. Az eredeti fájl változatlan marad.
+	Recovery is disabled while this document has a password.	A helyreállítás ki van kapcsolva, amíg a dokumentumnak jelszava van.
+	Local recovery is unavailable or still loading.	A helyi helyreállítás nem érhető el, vagy még töltődik.
+	No recovery copies.	Nincsenek helyreállítási másolatok.
+	Recovery copy	Helyreállítási másolat
+	Discard…	Elvetés…
+	Continue without restoring	Folytatás visszaállítás nélkül
+	Advanced Properties…	Speciális tulajdonságok…
+	View and edit the document's custom properties.	A dokumentum egyéni tulajdonságainak megtekintése és szerkesztése.
+	Current Document	Aktuális dokumentum
+	{n} people editing	{n} személy szerkeszt
+	The spelling dictionary for {language} couldn't be read, so it isn't checked. File: {file}. Reason: {reason}	A(z) {language} helyesírási szótára nem olvasható, ezért nincs ellenőrzés. Fájl: {file}. Ok: {reason}
+	Go to {name}	Ugrás ide: {name}
+	Questions, ideas and bug reports on GitHub	Kérdések, ötletek és hibajelentések a GitHubon
+	Version history	Verzióelőzmények
+	{language} (dictionary unreadable)	{language} (a szótár nem olvasható)
+	Text Size	Szövegméret
+	Saving…	Mentés…
+	All changes saved	Minden módosítás mentve
+	Offline — changes will sync	Nincs kapcsolat – a módosítások később szinkronizálódnak
+	Commenting	Megjegyzésírás
+	Suggesting	Javaslattétel
+	View only	Csak megtekintés
+	Reconnecting…	Újracsatlakozás…
+	You're offline. The document is read only until your changes sync.	Nincs kapcsolat. A dokumentum csak olvasható, amíg a módosításaid nem szinkronizálódnak.
+	Save my copy	Saját másolat mentése
+	Loading…	Betöltés…
+	No versions yet. A version is kept when the document is saved.	Még nincsenek verziók. A dokumentum mentésekor megmarad egy verzió.
+	This version is no longer kept.	Ez a verzió már nincs megőrizve.
+	Restore this version	Ennek a verziónak a visszaállítása
+	Crop on the page works on unturned pictures: set Rotation to 0° first, or use the crop boxes	Az oldalon történő körülvágás csak el nem forgatott képeken működik: előbb állítsd az elforgatást 0°-ra, vagy használd a körülvágási mezőket
+	The number must be a divisor of {max}.	A számnak a(z) {max} osztójának kell lennie.
+	Nothing of this type in the document.	A dokumentumban nincs ilyen típusú elem.
+	*Bold* and _italic_ as real formatting	*Félkövér* és _dőlt_ valódi formázásként
+	Add a period with double-space	Pont beszúrása dupla szóközzel
+	Built-in Heading styles	Beépített címsorstílusok
+	Set left- and first-indent with tabs and backspaces	Bal és első sori behúzás beállítása tabulátorral és Backspace billentyűvel
+	Automatically add words to list (First Letter)	Szavak automatikus felvétele a listába (Első betű)
+	Automatically add words to list (INitial CAps)	Szavak automatikus felvétele a listába (KEzdő NAgybetűk)
+	Select a place in this document:	Válassz egy helyet a dokumentumban:
+	Top of the Document	A dokumentum eleje
+	Bookmarks	Könyvjelzők
+	Find “{text}” in the document	„{text}” keresése a dokumentumban
+	WordCraft Collab	WordCraft Collab
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	Ingyenes, nyílt forráskódú szövegszerkesztő Rustban írva, valós idejű közös szerkesztéssel.\nAz ArtCraft csapat WordCraft programján alapul.
+	WordCraft Collab by Hossam Taha	WordCraft Collab – Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	Alapja: github.com/storytold/wordcraft
+	Discard the recovery copy of {name}?	Elveted a(z) {name} helyreállítási másolatát?
+	This cannot be undone. Your original file stays unchanged.	Ez nem vonható vissza. Az eredeti fájl változatlan marad.
+	Enter bookmark name:	Add meg a könyvjelző nevét:
+	Type a page number, or +2 / -1.	Írj be egy oldalszámot, vagy +2 / -1 értéket.
+	Property names are 1–{max} characters.	A tulajdonságnevek 1–{max} karakter hosszúak lehetnek.
+	Property values are at most {max} bytes.	A tulajdonságértékek legfeljebb {max} bájtosak lehetnek.
+	Only text properties can be changed.	Csak szöveges tulajdonságok módosíthatók.
+	Select a property to change.	Válaszd ki a módosítandó tulajdonságot.
+	This document has no custom properties.	A dokumentumnak nincsenek egyéni tulajdonságai.
+	Text properties only: Word's number, date and yes-no types aren't offered.	Csak szöveges tulajdonságok: a Word szám, dátum és igen/nem típusai nem választhatók.
+	{field}, record {n}	{field}, {n}. rekord
+	Folder path	Mappa elérési útja
+	File type	Fájltípus
+	No new sources in that file	A fájlban nincs új forrás
+	Imported 1 source	1 forrás importálva
+	Imported {n} sources	{n} forrás importálva
+	{language}: {file} (unreadable: {reason})	{language}: {file} (nem olvasható: {reason})
+	Spanish (Latin America)	Spanyol (Latin-Amerika)
+	Spanish (Uruguay)	Spanyol (Uruguay)
+	Pane Options	Panel beállításai
+	Dock Left	Dokkolás balra
+	Dock Right	Dokkolás jobbra
+	Float	Lebegő
+	Move Pane: {title}	Panel áthelyezése: {title}
+	Resize Pane	Panel átméretezése
+	Pages in the range	Oldalak a tartományban
+	Scale to paper size	Igazítás a papírmérethez
+	Viewing	Megtekintés
+	Viewing — read without changing anything	Megtekintés – olvasás módosítás nélkül
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Page color	Oldalszín
+	Update check is not supported in the web browser.	A frissítések keresése a webböngészőben nem támogatott.
+	WordCraft {version} is currently the newest version available.	A WordCraft {version} jelenleg a legújabb elérhető verzió.
+	Could not check for updates:\n{error}	Nem sikerült frissítéseket keresni:\n{error}
+	Checking for updates…	Frissítések keresése…
+	Syncing…	Szinkronizálás…
+	Too many changes are waiting to sync. The document is read only until they do.	Túl sok módosítás vár szinkronizálásra. A dokumentum addig csak olvasható, amíg ez meg nem történik.

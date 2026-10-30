@@ -2467,3 +2467,70 @@ preview	Title	כותרת
 	✓ None	✓ ללא
 	➕ New comment	➕ הערה חדשה
 	📂  Browse…	📂  עיון…
+	Advanced Properties…	מאפיינים מתקדמים…
+	View and edit the document's custom properties.	הצגה ועריכה של המאפיינים המותאמים אישית של המסמך.
+	{n} people editing	עורכים כעת: {n}
+	Go to {name}	מעבר אל {name}
+	Questions, ideas and bug reports on GitHub	שאלות, רעיונות ודיווחי באגים ב-GitHub
+	Version history	היסטוריית גרסאות
+	Text Size	גודל טקסט
+	Saving…	שומר…
+	All changes saved	כל השינויים נשמרו
+	Offline — changes will sync	לא מקוון — השינויים יסונכרנו
+	Commenting	הוספת הערות
+	Suggesting	הצעת שינויים
+	View only	צפייה בלבד
+	Reconnecting…	מתחבר מחדש…
+	You're offline. The document is read only until your changes sync.	אין חיבור לרשת. המסמך מוצג לקריאה בלבד עד שהשינויים שלך יסונכרנו.
+	Save my copy	שמירת העותק שלי
+	Loading…	טוען…
+	No versions yet. A version is kept when the document is saved.	אין עדיין גרסאות. גרסה נשמרת כאשר המסמך נשמר.
+	This version is no longer kept.	גרסה זו כבר אינה נשמרת.
+	Restore this version	שחזור גרסה זו
+	No matching commands	אין פקודות תואמות
+	*Bold* and _italic_ as real formatting	*מודגש* ו-_נטוי_ כעיצוב אמיתי
+	Add a period with double-space	הוספת נקודה ברווח כפול
+	Built-in Heading styles	סגנונות כותרת מובנים
+	Set left- and first-indent with tabs and backspaces	הגדרת כניסה שמאלית וכניסת שורה ראשונה באמצעות Tab ו-Backspace
+	WordCraft Collab	WordCraft Collab
+	Version {version}	גרסה {version}
+	A free, open-source word processor written in Rust, with real-time co-editing.\nBased on WordCraft by the ArtCraft team.	מעבד תמלילים חינמי בקוד פתוח, שנכתב ב-Rust, עם עריכה משותפת בזמן אמת.\nמבוסס על WordCraft של צוות ArtCraft.
+	WordCraft Collab by Hossam Taha	WordCraft Collab מאת Hossam Taha
+	hossamtaha.me	hossamtaha.me
+	github.com/hossamTahaHussein/wordcraft-collab	github.com/hossamTahaHussein/wordcraft-collab
+	Based on github.com/storytold/wordcraft	מבוסס על github.com/storytold/wordcraft
+	Property names are 1–{max} characters.	שמות מאפיינים הם באורך 1–{max} תווים.
+	Property values are at most {max} bytes.	ערכי מאפיינים הם לכל היותר {max} בתים.
+	Only text properties can be changed.	ניתן לשנות רק מאפייני טקסט.
+	Select a property to change.	יש לבחור מאפיין לשינוי.
+	This document has no custom properties.	אין למסמך זה מאפיינים מותאמים אישית.
+	Value:	ערך:
+	Text properties only: Word's number, date and yes-no types aren't offered.	מאפייני טקסט בלבד: סוגי המספר, התאריך וכן/לא של Word אינם מוצעים.
+	{field}, record {n}	{field}, רשומה {n}
+	Folder path	נתיב תיקייה
+	File type	סוג קובץ
+	Direction	כיוון
+	pi	פיקה
+	Pane Options	אפשרויות חלונית
+	Dock Left	עגינה לשמאל
+	Dock Right	עגינה לימין
+	Float	צף
+	Move Pane: {title}	העברת חלונית: {title}
+	Resize Pane	שינוי גודל חלונית
+	Pages in the range	עמודים בטווח
+	Viewing	צפייה
+	Viewing — read without changing anything	צפייה — קריאה בלי לשנות דבר
+	{paper}   {width} × {height}	{paper}   {width} × {height}
+	Update check is not supported in the web browser.	בדיקת עדכונים אינה נתמכת בדפדפן האינטרנט.
+	WordCraft {version} is currently the newest version available.	WordCraft {version} היא כרגע הגרסה החדשה ביותר שזמינה.
+	Could not check for updates:\n{error}	לא ניתן היה לבדוק אם יש עדכונים:\n{error}
+	Check for Updates	בדיקת עדכונים
+	Checking for updates…	בודק אם יש עדכונים…
+	Restore	שחזור
+	Community	קהילה
+	Discard	מחיקה
+	Modify	שינוי
+	Angle	זווית
+	Gradient	מעבר צבע
+	Syncing…	מסנכרן…
+	Too many changes are waiting to sync. The document is read only until they do.	יותר מדי שינויים ממתינים לסנכרון. המסמך מוצג לקריאה בלבד עד שהם יסונכרנו.
