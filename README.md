@@ -3,7 +3,7 @@
 **A Word-style word processor in Rust that runs in the browser, with real-time co-editing,
 Arabic done properly, and AI agents as collaborators.**
 
-Version 1.0.1, by [Hossam Taha](https://hossamtaha.me).
+Version 1.0.2, by [Hossam Taha](https://hossamtaha.me).
 
 Several people can edit the same document at once: each person's typing appears instantly on
 their own screen, everyone else's within a network round trip, and the document saves itself.
