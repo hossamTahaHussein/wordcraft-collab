@@ -334,3 +334,20 @@ fn every_suggester_command_is_a_suggestion() {
         assert_eq!(serde_json::to_value(&s.doc.body).unwrap(), before, "{id}: Reject All takes it back");
     }
 }
+
+/// A shared edit can't read a file from this computer: the other copies can't read it, so the
+/// documents would differ. Its contents (`data`) are fine, and saving or exporting still is.
+#[test]
+fn co_editing_refuses_edits_that_read_local_files() {
+    let mut s = collab();
+    for (id, params) in [("insert.picture", json!({"path": "/tmp/picture.png"})), ("insert.textFromFile", json!({"path": "/tmp/notes.txt"}))] {
+        let e = s.run(id, &params).unwrap_err().to_string();
+        assert!(e.contains("Reading a file from this computer"), "{id}: {e}");
+    }
+    assert!(s.take_outbox().is_empty(), "nothing recorded");
+    let dir = std::env::temp_dir().join(format!("wc-collab-path-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let out = dir.join("copy.txt");
+    s.run("file.saveAs", &json!({"path": out.to_string_lossy()})).expect("saving a copy still works");
+    std::fs::remove_dir_all(&dir).ok();
+}

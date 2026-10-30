@@ -1,6 +1,7 @@
 use super::*;
 use egui_kittest::kittest::Queryable;
 
+mod collab_flow;
 mod perf;
 mod rtl;
 

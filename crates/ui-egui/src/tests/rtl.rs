@@ -6,7 +6,7 @@ use egui::epaint::{ClippedShape, Shape};
 use crate::{Services, WordApp};
 
 /// An app on a one-paragraph document with the interface in `lang`, after its first frames.
-fn app_in(lang: &str) -> (WordApp, egui::Context) {
+pub(super) fn app_in(lang: &str) -> (WordApp, egui::Context) {
     let doc = wordcraft_doc::Document::from_text("Hello world");
     let mut app = WordApp::new(wordcraft_engine::Session::new(doc), Services::default());
     app.run("ui.language", serde_json::json!({"value": lang})).unwrap();
@@ -16,12 +16,12 @@ fn app_in(lang: &str) -> (WordApp, egui::Context) {
 }
 
 /// Run a few frames `width` × 800 and return what the last one painted.
-fn frame(app: &mut WordApp, ctx: &egui::Context, width: f32) -> Vec<ClippedShape> {
+pub(super) fn frame(app: &mut WordApp, ctx: &egui::Context, width: f32) -> Vec<ClippedShape> {
     frame_sized(app, ctx, width, 800.0)
 }
 
 /// One frame with a click at `at`, then [`frame`]'s frames.
-fn click(app: &mut WordApp, ctx: &egui::Context, width: f32, at: egui::Pos2) -> Vec<ClippedShape> {
+pub(super) fn click(app: &mut WordApp, ctx: &egui::Context, width: f32, at: egui::Pos2) -> Vec<ClippedShape> {
     let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, 800.0));
     for (i, pressed) in [true, false].into_iter().enumerate() {
         let events = vec![
@@ -40,7 +40,7 @@ fn click(app: &mut WordApp, ctx: &egui::Context, width: f32, at: egui::Pos2) -> 
 }
 
 /// [`frame`] with a window `height` tall.
-fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) -> Vec<ClippedShape> {
+pub(super) fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) -> Vec<ClippedShape> {
     let screen = egui::Rect::from_min_size(egui::Pos2::ZERO, egui::vec2(width, height));
     let mut shapes = Vec::new();
     for i in 0..4 {
@@ -58,7 +58,7 @@ fn frame_sized(app: &mut WordApp, ctx: &egui::Context, width: f32, height: f32) 
 }
 
 /// The bounding rect of the first text shape showing exactly `text`.
-fn text_rect(shapes: &[ClippedShape], text: &str) -> Option<egui::Rect> {
+pub(super) fn text_rect(shapes: &[ClippedShape], text: &str) -> Option<egui::Rect> {
     fn find(shape: &Shape, text: &str) -> Option<egui::Rect> {
         match shape {
             Shape::Text(t) if t.galley.text() == text => Some(t.visual_bounding_rect()),

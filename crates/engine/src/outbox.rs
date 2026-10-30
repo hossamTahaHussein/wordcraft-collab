@@ -274,6 +274,11 @@ impl Session {
             return Err(CmdError::Disabled(format!("{id}: You can only comment on this document")));
         }
         let refuse = |why: &str| Err(CmdError::Disabled(format!("{id}: {why} isn't available while co-editing")));
+        // Every copy replays the edit, and they can't read this computer's files: the file's
+        // contents (`data`) travel with the edit instead.
+        if !reads && params.get("path").is_some_and(|p| !p.is_null()) {
+            return refuse("Reading a file from this computer");
+        }
         if !self.also_selected.is_empty() || self.column.is_some() {
             return refuse("Editing several selections at once");
         }
