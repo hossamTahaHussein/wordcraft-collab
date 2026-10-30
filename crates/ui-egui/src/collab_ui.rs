@@ -18,6 +18,8 @@ pub struct CollabUi {
     pub can_redo: bool,
     /// Too long offline or too many edits waiting: the document is read only until they sync.
     pub offline: bool,
+    /// Connected to the relay (so a read-only document is waiting on its edits, not offline).
+    pub connected: bool,
     /// The header's save indicator; `None` when not co-editing.
     pub sync: Option<SyncState>,
     /// The Version history window, when open.
@@ -161,14 +163,24 @@ pub(crate) fn show(app: &mut WordApp, ctx: &Context) {
     }
 }
 
+/// The read-only notice's title and text: offline, or connected with too many edits waiting.
+fn read_only_notice(connected: bool) -> (&'static str, &'static str) {
+    if connected {
+        (tl!("Syncing…"), tl!("Too many changes are waiting to sync. The document is read only until they do."))
+    } else {
+        (tl!("Reconnecting…"), tl!("You're offline. The document is read only until your changes sync."))
+    }
+}
+
 fn offline_notice(app: &mut WordApp, ctx: &Context) {
-    egui::Window::new(tl!("Reconnecting…"))
+    let (title, text) = read_only_notice(app.collab.connected);
+    egui::Window::new(title)
         .id(egui::Id::unique("collab_offline"))
         .collapsible(false)
         .resizable(false)
         .anchor(egui::Align2::CENTER_TOP, egui::vec2(0.0, 90.0))
         .show(ctx, |ui| {
-            ui.label(tl!("You're offline. The document is read only until your changes sync."));
+            ui.label(text);
             if ui.button(tl!("Save my copy")).clicked() {
                 app.collab.requests.push(CollabRequest::SaveMyCopy);
             }
@@ -283,6 +295,17 @@ mod tests {
         assert_eq!(role_label(&a), Some("Commenting"));
         a.session.set_collab(false);
         assert_eq!(role_label(&a), None);
+    }
+
+    /// Read only for edits piling up while connected isn't being offline: the notice says which.
+    #[test]
+    fn the_read_only_notice_says_why() {
+        let (title, text) = read_only_notice(false);
+        assert_eq!(title, "Reconnecting…");
+        assert!(text.contains("offline"), "{text}");
+        let (title, text) = read_only_notice(true);
+        assert_eq!(title, "Syncing…");
+        assert!(text.contains("waiting to sync") && !text.contains("offline"), "{text}");
     }
 
     #[test]

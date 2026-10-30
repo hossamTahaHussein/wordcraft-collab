@@ -243,6 +243,7 @@ impl eframe::App for WebShell {
             self.app.collab.can_undo = link.can_undo();
             self.app.collab.can_redo = link.can_redo();
             self.app.collab.offline = link.offline_locked();
+            self.app.collab.connected = link.online();
             self.app.collab.sync = self.app.collab.active.then(|| {
                 use wordcraft_ui_egui::collab_ui::SyncState;
                 if !link.online() {
