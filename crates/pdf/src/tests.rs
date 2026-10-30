@@ -1811,9 +1811,9 @@ fn right_to_left_text_extracts_in_logical_order() {
     {
         assert!(words.iter().any(|x| x == w), "{w:?} not extracted intact from {words:?}");
     }
-    // The vocalized مَرْحَبًا reads as its letters: its vowels are drawn but left out of the text,
-    // so the word copies and searches whole (see `arabic_vowels_stay_out_of_the_text_layer`).
-    assert_eq!(words.iter().filter(|x| *x == "مرحبا").count(), 2, "{words:?}");
+    // The vowelled مَرْحَبًا reads back whole, with its vowels, in reading order (see
+    // `arabic_vowels_are_in_the_text_layer_unless_left_out`).
+    assert!(words.iter().any(|x| x == "مَرْحَبًا"), "{words:?}");
 }
 
 /// Every glyph's outline on the page, as a rounded bounding box in page space (sorted): what the
@@ -1840,8 +1840,14 @@ fn glyph_boxes(bytes: &[u8]) -> Vec<[i64; 4]> {
         }
         fn push_clip_path(&mut self, _: &ClipPath) {}
         fn push_transparency_group(&mut self, _: f32, _: Option<SoftMask<'_>>, _: BlendMode) {}
-        fn draw_glyph(&mut self, g: &Glyph<'_>, t: kurbo::Affine, gt: kurbo::Affine, _: &Paint<'_>, mode: &GlyphDrawMode) {
+        fn draw_glyph(&mut self, g: &Glyph<'_>, t: kurbo::Affine, gt: kurbo::Affine, paint: &Paint<'_>, mode: &GlyphDrawMode) {
             if matches!(mode, GlyphDrawMode::Stroke(_)) {
+                return;
+            }
+            // Invisible text (a vowelled run's text, its glyphs drawn as shapes) shows nothing.
+            if let Paint::Color(c) = paint
+                && c.to_rgba().to_rgba8()[3] == 0
+            {
                 return;
             }
             // Spaces have no outline: nothing to see.
@@ -2495,20 +2501,26 @@ fn arabic_text_extracts_as_whole_letters() {
     assert!(actual('ن') || actual('ب'), "the second of ن and ب to use the shared body is named by ActualText");
 }
 
-/// Vowel marks (harakat, tanween) are drawn but left out of the text, so a vocalized word copies
-/// and searches whole: الحلًوة as الحلوة, not split at its raised tanween.
+/// Arabic vowels (harakat, tanween) are in the text readers copy: every letter and every vowel
+/// once, each vowel right after its letter. With `arabic_vowels` off they are left out, so a
+/// vowelled word copies and searches whole in every reader (Chrome's PDFium splits words at them).
 #[test]
-fn arabic_vowels_stay_out_of_the_text_layer() {
+fn arabic_vowels_are_in_the_text_layer_unless_left_out() {
     let text = "الحلًوة مَرْحَبًا";
     let mut p = Paragraph::with_text(text, CharProps { rtl: Some(true), ..Default::default() });
     p.props.bidi = Some(true);
     let mut d = Document::new();
     d.body = vec![para_block(p)];
+    let vowel = |c: &char| ('\u{064B}'..='\u{065F}').contains(c);
+    let letters = |s: &str| s.chars().filter(|c| !c.is_whitespace() && !vowel(c)).count();
+    let vowels = |s: &str| s.chars().filter(vowel).count();
     let got = extract_text(&export(&d, &PdfOptions::default()).unwrap()).concat();
-    assert!(!got.chars().any(|c| ('\u{064B}'..='\u{065F}').contains(&c)), "no vowel marks in the text: {got:?}");
-    let letters = |s: &str| s.chars().filter(|c| !c.is_whitespace() && !('\u{064B}'..='\u{065F}').contains(c)).count();
     assert_eq!(letters(&got), letters(text), "every letter once: {got:?}");
-    // Still drawn: the marks are shapes on the page.
+    assert_eq!(vowels(&got), vowels(text), "every vowel once: {got:?}");
+    let without = extract_text(&export(&d, &PdfOptions { arabic_vowels: false, ..Default::default() }).unwrap()).concat();
+    assert_eq!(vowels(&without), 0, "left out: {without:?}");
+    assert_eq!(letters(&without), letters(text), "every letter once: {without:?}");
+    // Either way the vowels are drawn: shapes on the page.
     let raw = String::from_utf8_lossy(&export(&d, &PdfOptions { compress: false, ..Default::default() }).unwrap()).into_owned();
     assert!(
         raw.matches(" f\n").count() + raw.matches(" f*").count() + raw.matches("\nf\n").count() > 0 || raw.contains(" re f") || raw.contains("h f"),

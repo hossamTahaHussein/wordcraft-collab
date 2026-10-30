@@ -167,6 +167,38 @@ impl Exporter<'_> {
         };
         // A colour font's marks stay glyphs: as shapes they would lose their colours.
         let colour = face.has_color_glyphs();
+        // The vowels' text: each vowel's character on its own glyph, invisible, on the baseline at
+        // the trailing edge of its letter (where a reader puts the next character), so copying
+        // and searching keep the vowels without the raised marks breaking words apart.
+        let vowel_text: Vec<(u32, f32, std::ops::Range<usize>)> = if colour || !self.opts.arabic_vowels {
+            Vec::new()
+        } else {
+            let cmap = self.cmap(face);
+            let mut out = Vec::new();
+            for b in placed.iter().filter(|b| !b.3.is_empty() && !vowel(b)) {
+                let Some(t) = txt.get(b.3.clone()) else { continue };
+                // The trailing edge of a right-to-left letter is its left edge.
+                let edge = b.1 - 0.001 * size;
+                // Vowels shaped as their own characters, right after this letter.
+                let mut end = b.3.end;
+                while let Some(v) = placed.iter().find(|v| vowel(v) && v.3.start == end) {
+                    out.push((v.0, edge, v.3.clone()));
+                    end = v.3.end;
+                }
+                // Vowels in the letter's own text: their characters on the cluster's mark glyphs.
+                let kept = t.trim_end_matches(is_arabic_mark).len();
+                if kept > 0 && kept < t.len() {
+                    let marks: Vec<u32> = placed.iter().filter(|m| m.3 == (b.3.end..b.3.end)).map(|m| m.0).collect();
+                    for (off, c) in t[kept..].char_indices() {
+                        let at = b.3.start + kept + off;
+                        if let Some(&g) = marks.iter().find(|g| cmap.get(g) == Some(&c)) {
+                            out.push((g, edge, at..at + c.len_utf8()));
+                        }
+                    }
+                }
+            }
+            out
+        };
         let marks: Vec<(u32, f32, f32)> =
             if colour { Vec::new() } else { placed.iter().filter(|p| p.3.is_empty() || vowel(p)).map(|p| (p.0, p.1, p.2)).collect() };
         if !colour {
@@ -206,8 +238,42 @@ impl Exporter<'_> {
             None
         });
         match font {
+            Some(font) if !vowel_text.is_empty() => {
+                // Vowelled Arabic: what shows is shapes; the text is an invisible run with each
+                // vowel on the baseline right after its letter, in reading order.
+                // One shape per glyph, each where layout put it.
+                for g in glyphs {
+                    if let Some(path) = glyph_outlines(face, size, std::slice::from_ref(g)) {
+                        s.draw_path(&path);
+                    }
+                }
+                let mut items: Vec<(u32, f32, f32, std::ops::Range<usize>, bool)> =
+                    placed.iter().map(|(g, x, y, r)| (*g, *x, *y, r.clone(), false)).collect();
+                for (g, x, r) in &vowel_text {
+                    let y = placed.iter().find(|b| b.3.end <= r.start && (b.1 - x).abs() < size).map_or(y0, |b| b.2);
+                    items.push((*g, *x, y, r.clone(), true));
+                }
+                items.sort_by(|a, b| a.1.total_cmp(&b.1));
+                let tx0 = items[0].1;
+                let ty0 = items[0].2;
+                let tg: Vec<KrillaGlyph> = items
+                    .iter()
+                    .enumerate()
+                    .map(|(k, (g, x, y, r, v))| {
+                        let adv = match items.get(k + 1) {
+                            Some(n) => (n.1 - x) / size,
+                            None if *v => 0.0,
+                            None => face.advance(*g) as f32 / upem,
+                        };
+                        KrillaGlyph::new(GlyphId::new(*g), adv, 0.0, (ty0 - y) / size, 0.0, r.clone(), None)
+                    })
+                    .collect();
+                s.set_stroke(None);
+                s.set_fill(Some(fill(color, 0.0)));
+                s.draw_glyphs(Point::from_xy(tx0, ty0), &tg, font, &txt, size, false);
+            }
             Some(font) => {
-                s.draw_glyphs(Point::from_xy(x0, y0), &kg, font, &txt, size, false);
+                s.draw_glyphs(Point::from_xy(x0, y0), &kg, font.clone(), &txt, size, false);
                 // One shape per mark, each where layout put it.
                 for mark in &marks {
                     if let Some(path) = glyph_outlines(face, size, std::slice::from_ref(mark)) {

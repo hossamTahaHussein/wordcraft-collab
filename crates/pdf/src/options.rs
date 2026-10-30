@@ -28,8 +28,9 @@ pub struct PdfOptions {
     pub tagged: bool,
     /// Show tracked changes as markup (coloured, underlined / struck through).
     pub include_markup: bool,
-    /// Print Markup's comments: each page is scaled down to make room on its right for the
-    /// comments in balloons joined to their anchors (Word's "Document showing markup").
+    /// Print Markup's comments: each page is scaled down to make room beside it (on the right, or
+    /// the left for a right-to-left document) for the comments in balloons joined to their
+    /// anchors (Word's "Document showing markup").
     pub comments: bool,
     /// Compress content streams.
     pub compress: bool,
@@ -40,6 +41,10 @@ pub struct PdfOptions {
     /// How [`export`] shows digits (the Numeral setting; callers resolve `System`, see
     /// [`NumeralMode::resolve`]). [`export_layout`] keeps the layout it is given.
     pub numeral: NumeralMode,
+    /// Arabic vowels (harakat, tanween, shadda…) in the text readers copy and search. On, copied
+    /// text keeps them (poppler, pdf.js); Chrome's PDFium treats each vowel as a break and splits
+    /// a vowelled word. Off, vowelled words copy and search whole everywhere, without vowels.
+    pub arabic_vowels: bool,
 }
 
 impl Default for PdfOptions {
@@ -54,6 +59,7 @@ impl Default for PdfOptions {
             compress: true,
             paper: None,
             numeral: NumeralMode::Arabic,
+            arabic_vowels: true,
         }
     }
 }

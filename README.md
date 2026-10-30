@@ -41,7 +41,7 @@ has the same build as a zip, which wordcraft-embed's `npm run fetch-editor` down
 |---|---|
 | Interface | Fully translated into Arabic, and mirrored: the ribbon, menus, dialogs, panes, rulers and status bar read from the right (`?lang=ar`, or the system language) |
 | Writing | Right-to-left paragraphs, tables and sections; mixed Arabic and English lines in the right order; Kashida justification; Arabic spell checking |
-| Files | Right to left kept in .docx, HTML, ODT and RTF; PDFs whose Arabic text you can search and copy (vowel marks are left out of the copied text, so searches match the plain words) |
+| Files | Right to left kept in .docx, HTML, ODT and RTF; PDFs whose Arabic text you can search and copy, vowels included (Chrome's PDF reader splits words at their vowels; `arabic_vowels: false` leaves the vowels out of the text for it) |
 | Fonts and spelling | Noto Sans Arabic and the Ayaspell Arabic dictionary are bundled, so Arabic looks right and is checked without anything installed |
 
 ## Integrations
