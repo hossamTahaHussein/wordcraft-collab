@@ -3,7 +3,7 @@
 **A Word-style word processor in Rust that runs in the browser, with real-time co-editing,
 Arabic done properly, and AI agents as collaborators.**
 
-Version 1.0.0, by [Hossam Taha](https://hossamtaha.me).
+Version 1.0.1, by [Hossam Taha](https://hossamtaha.me).
 
 Several people can edit the same document at once: each person's typing appears instantly on
 their own screen, everyone else's within a network round trip, and the document saves itself.
@@ -28,7 +28,7 @@ ArtCraft team. It is independent: not made, sponsored or endorsed by the ArtCraf
 
 Build the browser app with co-editing: `cd apps/wordcraft-web && trunk build --release`
 (output in `dist/web`), then serve it with wordcraft-embed's demo (`EDITOR_DIR=…/dist/web npm start`).
-The [1.0.0 release](https://github.com/hossamTahaHussein/wordcraft-collab/releases/tag/v1.0.0)
+The [latest release](https://github.com/hossamTahaHussein/wordcraft-collab/releases/latest)
 has the same build as a zip, which wordcraft-embed's `npm run fetch-editor` downloads.
 
 <img src="docs/images/suggesting.png" alt="Bob Diaz's suggested rewrite shown in magenta with the old sentence struck through, and his comment in a balloon in the margin" width="100%">
