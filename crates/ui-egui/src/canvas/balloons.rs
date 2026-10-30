@@ -1,4 +1,4 @@
-use super::geometry::{FLOAT_WIDTH, floating_comments, markup_width, shown_comment};
+use super::geometry::{FLOAT_WIDTH, floating_comments, markup_on_left, markup_width, shown_comment};
 use super::pages::page_screen_scale;
 use super::{
     Color32, CommentDisplay, DocLayout, HashMap, PX_PER_PT, Pos, Pos2, Rect, Sense, StoryRef, Stroke, Tokens, Ui, WordApp, json, pos2, regular,
@@ -11,6 +11,8 @@ use super::{
 pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, rects: &[Rect], layout: &DocLayout, scale: f32, view: Rect) {
     app.canvas.balloon_rects.clear();
     let mw = markup_width(app);
+    // A right-to-left document has its markup area on the left of each page.
+    let left = markup_on_left(app);
     let float = floating_comments(app);
     if app.canvas.balloon.is_some_and(|id| (mw <= 0.0 && !float) || !app.session.doc.comments.contains_key(&id)) {
         deselect_balloon(app);
@@ -30,10 +32,15 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
     // The markup area extends each page.
     for (pi, pr) in rects.iter().enumerate() {
         let page_scale = layout.pages.get(pi).map_or(scale, |page| page_screen_scale(*pr, page, scale));
-        let area = Rect::from_min_max(pos2(pr.max.x, pr.min.y), pos2(pr.max.x + mw * page_scale, pr.max.y));
+        let area = if left {
+            Rect::from_min_max(pos2(pr.min.x - mw * page_scale, pr.min.y), pos2(pr.min.x, pr.max.y))
+        } else {
+            Rect::from_min_max(pos2(pr.max.x, pr.min.y), pos2(pr.max.x + mw * page_scale, pr.max.y))
+        };
         if mw > 0.0 && area.intersects(clip) {
             painter.rect_filled(area, 0.0, t.markup_area);
-            painter.line_segment([area.left_top(), area.left_bottom()], Stroke::new(1.0, t.markup_edge));
+            let edge = if left { [area.right_top(), area.right_bottom()] } else { [area.left_top(), area.left_bottom()] };
+            painter.line_segment(edge, Stroke::new(1.0, t.markup_edge));
         }
     }
     let mut pages: Vec<usize> = by_page.keys().copied().collect();
@@ -48,12 +55,20 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
         let page_scale = layout.pages.get(pi).map_or(scale, |page| page_screen_scale(*pr, page, scale));
         // Beside the page in the column; floating, beside it when the view has room, else over its edge.
         let (x0, w, over_page) = if mw > 0.0 {
-            (pr.max.x + 10.0, (mw * page_scale - 20.0).max(60.0), false)
+            let w = (mw * page_scale - 20.0).max(60.0);
+            (if left { pr.min.x - 10.0 - w } else { pr.max.x + 10.0 }, w, false)
         } else {
             let w = (FLOAT_WIDTH * page_scale - 20.0).max(60.0);
-            let beside = pr.max.x + 10.0;
-            if beside + w <= view.max.x - 8.0 { (beside, w, false) } else { ((view.max.x - w - 8.0).max(view.min.x + 8.0), w, true) }
+            if left {
+                let beside = pr.min.x - 10.0 - w;
+                if beside >= view.min.x + 8.0 { (beside, w, false) } else { ((view.min.x + 8.0).min(view.max.x - w - 8.0), w, true) }
+            } else {
+                let beside = pr.max.x + 10.0;
+                if beside + w <= view.max.x - 8.0 { (beside, w, false) } else { ((view.max.x - w - 8.0).max(view.min.x + 8.0), w, true) }
+            }
         };
+        // Leaders run along the text to the page's edge on the markup area's side, then to the card's near edge.
+        let (page_edge, card_edge) = if left { (pr.min.x, x0 + w) } else { (pr.max.x, x0) };
         let mut next_y = pr.min.y;
         for (ax, ay, item, pos) in list.iter() {
             let id = match item {
@@ -78,8 +93,8 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
                     }
                     let lead = Stroke::new(1.0, color.linear_multiply(0.7));
                     let on_page = Stroke::new(1.0, leaders.get(ai % leaders.len()).copied().unwrap_or(color).linear_multiply(0.7));
-                    dashed(painter, anchor, pos2(pr.max.x, anchor.y), on_page);
-                    painter.line_segment([pos2(pr.max.x, anchor.y), pos2(x0, top + 10.0)], lead);
+                    dashed(painter, anchor, pos2(page_edge, anchor.y), on_page);
+                    painter.line_segment([pos2(page_edge, anchor.y), pos2(card_edge, top + 10.0)], lead);
                     card_shapes(painter, &t, card, color, false, None);
                     let y = card.min.y + 6.0;
                     let hh = head.size().y;
@@ -136,8 +151,8 @@ pub(super) fn balloons(app: &mut WordApp, ui: &mut Ui, painter: &egui::Painter, 
                     lead.width,
                     leaders.get(ai % leaders.len()).copied().unwrap_or(color).linear_multiply(if selected { 1.0 } else { 0.7 }),
                 );
-                dashed(painter, anchor, pos2(pr.max.x, anchor.y), on_page);
-                painter.line_segment([pos2(pr.max.x, anchor.y), pos2(x0, top + 10.0)], lead);
+                dashed(painter, anchor, pos2(page_edge, anchor.y), on_page);
+                painter.line_segment([pos2(page_edge, anchor.y), pos2(card_edge, top + 10.0)], lead);
             }
             let card = if active {
                 active_balloon(app, ui, painter, ActiveBalloon { id: *id, thread: &thread, card, font_size: fs, color })

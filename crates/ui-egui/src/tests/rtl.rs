@@ -489,3 +489,36 @@ fn menu_items_read_from_the_right() {
         }
     }
 }
+
+/// A right-to-left document has its comment balloons on the left of the page, as Word does; a
+/// left-to-right one keeps them on the right. Both the floating card (comments alone) and the
+/// markup area (with a tracked change too).
+#[test]
+fn comment_balloons_sit_at_the_documents_reading_end() {
+    for tracked in [false, true] {
+        for (text, rtl) in [("Hello world and more words here", false), ("مرحبا بالعالم وكلمات أخرى هنا", true)] {
+            let doc = wordcraft_doc::Document::from_text(text);
+            let mut app = WordApp::new(wordcraft_engine::Session::new(doc), Services::default());
+            if rtl {
+                app.run("select.all", serde_json::json!({})).unwrap();
+                app.run("para.rtl", serde_json::json!({"value": true})).unwrap();
+            }
+            if tracked {
+                app.run("review.trackChanges", serde_json::json!({"value": true})).unwrap();
+                app.run("caret.docEnd", serde_json::json!({})).unwrap();
+                app.run("text.insert", serde_json::json!({"text": " x"})).unwrap();
+            }
+            app.run("select.all", serde_json::json!({})).unwrap();
+            app.run("review.newComment", serde_json::json!({"text": "A note in the margin"})).unwrap();
+            app.run("view.commentsPane", serde_json::json!({"value": false})).unwrap();
+            app.run("caret.docStart", serde_json::json!({})).unwrap();
+            let ctx = egui::Context::default();
+            let shapes = frame(&mut app, &ctx, 1280.0);
+            let page = app.canvas.page_rects.first().copied().expect("a page");
+            let note = text_rect(&shapes, "A note in the margin").unwrap_or_else(|| panic!("tracked={tracked} rtl={rtl}: the balloon"));
+            // Page rects are the canvas's own; compare the balloon with the window's middle,
+            // which the page straddles.
+            assert_eq!(note.center().x < 640.0, rtl, "tracked={tracked} {text}: the balloon at {note:?}, page {page:?}");
+        }
+    }
+}

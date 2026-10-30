@@ -90,6 +90,14 @@ pub(super) fn shown_comment(app: &WordApp) -> Option<u32> {
     app.canvas.balloon.or_else(|| wordcraft_engine::cmd::review::comment_range_at_caret(&app.session))
 }
 
+/// Whether the markup area goes on the left of each page: the document reads right to left (its
+/// last section is right to left, or its first paragraph with text is), as Word puts it.
+pub fn markup_on_left(app: &WordApp) -> bool {
+    let doc = &app.session.doc;
+    doc.last_section.rtl
+        || doc.body.iter().filter_map(|b| b.as_para()).find(|p| !p.is_empty()).is_some_and(|p| doc.styles.resolve_para(&p.props).bidi)
+}
+
 /// Width of the markup area beside each page for comment and revision balloons (points), or 0.
 pub fn markup_width(app: &WordApp) -> f32 {
     // Word shows comments either in balloons (contextual) or in the Comments pane (list); Track
@@ -137,6 +145,11 @@ pub(super) fn columns_for(avail_w: f32, slot_px: f32, pages: usize, min_cols: us
 /// as wide as the widest page plus `markup` and centred in `avail_w`. Returns the screen-space rects
 /// (relative to the content's top-left) and the content size.
 pub(super) fn place_pages(sizes: &[(f32, f32)], markup: f32, scale: f32, cols: usize, avail: egui::Vec2) -> (Vec<Rect>, egui::Vec2) {
+    place_pages_beside(sizes, markup, false, scale, cols, avail)
+}
+
+/// [`place_pages`] with the markup area on the left of each page (`markup_left`) or the right.
+fn place_pages_beside(sizes: &[(f32, f32)], markup: f32, markup_left: bool, scale: f32, cols: usize, avail: egui::Vec2) -> (Vec<Rect>, egui::Vec2) {
     let cols = cols.max(1);
     let scale = if scale.is_finite() { scale.clamp(0.01, 10.0) } else { PX_PER_PT };
     let markup = if markup.is_finite() { markup.clamp(0.0, 10_000.0) } else { 0.0 };
@@ -153,7 +166,7 @@ pub(super) fn place_pages(sizes: &[(f32, f32)], markup: f32, scale: f32, cols: u
         for &(w, ph) in row {
             let (w, ph) = (sane_dim(w, 1e5), sane_dim(ph, 1e6));
             // Pages narrower than the widest keep their markup area beside them.
-            let px = x + (maxw - markup - w).max(0.0) * scale / 2.0;
+            let px = x + (maxw - markup - w).max(0.0) * scale / 2.0 + if markup_left { markup * scale } else { 0.0 };
             rects.push(Rect::from_min_size(pos2(px, y), vec2(w * scale, ph * scale)));
             h = h.max(ph * scale);
             x += slot + GAP;
@@ -215,7 +228,7 @@ pub fn geometry(app: &WordApp, l: &DocLayout, avail: egui::Vec2) -> Geometry {
         let bands = rects.iter().map(|r| (0.0, r.height())).collect();
         return Geometry { rects, size, scale, cols: 1, bands };
     }
-    let (mut rects, mut size) = place_pages(&sizes, markup, scale, cols, avail);
+    let (mut rects, mut size) = place_pages_beside(&sizes, markup, markup_on_left(app), scale, cols, avail);
     let mut bands: Vec<(f32, f32)> = rects.iter().map(|r| (0.0, r.height())).collect();
     let editing_part = matches!(app.session.sel.focus.story, StoryRef::Part(_));
     if v.hide_white_space && v.mode == wordcraft_layout::ViewMode::Print && !v.read_mode && cols == 1 && !editing_part && rects.len() > 1 {
