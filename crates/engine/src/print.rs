@@ -170,6 +170,7 @@ impl Session {
             include_markup: markup.markup,
             comments: markup.comments,
             paper,
+            arabic_vowels: !markup.drop_arabic_vowels,
             ..Default::default()
         };
         let bytes = wordcraft_pdf::export_layout(&self.doc, &lay, &opts).map_err(|e| CmdError::Failed(e.to_string()))?;

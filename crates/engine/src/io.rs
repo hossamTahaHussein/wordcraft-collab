@@ -61,6 +61,9 @@ pub struct ExportOptions {
     pub word2003: bool,
     /// How digits look in PDFs and page images (the Numeral setting, `System` resolved).
     pub numeral: wordcraft_layout::NumeralMode,
+    /// Leave Arabic vowels out of a PDF's text (`arabicVowels: false`): vowelled words then copy
+    /// and search whole in Chrome's PDF reader too, without their vowels.
+    pub drop_arabic_vowels: bool,
 }
 
 /// A document password: wiped from memory when dropped, never printed (`Debug` shows `***`).

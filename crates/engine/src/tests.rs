@@ -11185,3 +11185,17 @@ fn a_locked_viewing_mode_stays_until_the_page_lifts_it() {
     run(&mut s, "view.viewing", json!({"value": false, "lock": false}));
     assert!(!s.viewing && !s.viewing_locked);
 }
+
+/// Export PDF's `arabicVowels: false` leaves Arabic vowels out of the PDF's text (in by default).
+#[test]
+fn export_pdf_can_leave_arabic_vowels_out_of_the_text() {
+    let mut s = s();
+    run(&mut s, "para.rtl", json!({"value": true}));
+    run(&mut s, "text.insert", json!({"text": "مَرْحَبًا بِكُمْ"}));
+    let with = crate::cmd::file::export_options(&s, &json!({}));
+    let without = crate::cmd::file::export_options(&s, &json!({"arabicVowels": false}));
+    assert!(!with.drop_arabic_vowels && without.drop_arabic_vowels);
+    let a = crate::io::save_bytes_opts("a.pdf", &s.doc, &with).unwrap();
+    let b = crate::io::save_bytes_opts("a.pdf", &s.doc, &without).unwrap();
+    assert!(a.len() > b.len(), "the vowelled text is written only with the vowels: {} vs {}", a.len(), b.len());
+}

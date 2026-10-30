@@ -113,7 +113,7 @@ pub fn specs() -> Vec<CommandSpec> {
             crate::io::save_path_with(std::path::Path::new(&path), &s.doc, None, &opts).map_err(CmdError::Failed)?;
             Ok(json!({"path": path, "markup": opts.markup}))
         })
-        .params(r#"{"path": string, "markup"?: bool (Print Markup: tracked changes marked up and each page scaled down beside the comments in balloons; default file.printMarkup)}"#)
+        .params(r#"{"path": string, "markup"?: bool (Print Markup: tracked changes marked up and each page scaled down beside the comments in balloons; default file.printMarkup), "arabicVowels"?: bool (false leaves Arabic vowels out of the PDF's text, so vowelled words copy and search whole in Chrome too; default true)}"#)
         .pure(),
         CommandSpec::new("file.exportPng", "Export Page as PNG", "File › Export", export_png)
             .params(r#"{"path": string, "page"?: n (1-based), "scale"?: px per pt, "markup"?: bool (the page with its comments in balloons beside it; default file.printMarkup)}"#)
@@ -422,6 +422,7 @@ pub fn export_options(s: &Session, v: &Value) -> crate::io::ExportOptions {
         comments: markup && s.prefs.markup.comments,
         word2003: p::str(v, "format") == Some(FORMAT_WORD_2003),
         numeral: s.view.numeral.resolve(crate::session::system_locale()),
+        drop_arabic_vowels: p::bool(v, "arabicVowels") == Some(false),
     }
 }
 
